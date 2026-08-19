@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Início - Sistema Barbearia</title>
+
+    <!-- CSS GLOBAL -->
+    <link rel="stylesheet" href="../css/global.css">
+
+    <!-- CSS DO DASHBOARD -->
+    <link rel="stylesheet" href="../css/dashboard.css">
+
+    <!-- CSS INDEX -->
+     <link rel="stylesheet" href="../css/index.css">
+     
+</head>
+
+<body>
+
+    <header>
+        <div id="titulo">
+            <h1>Bem-vindo ao Sistema</h1>
+        </div>
+
+        <div id="subtitulo">
+            <h2>Escolha uma das opções abaixo para continuar</h2>
+        </div>
+    </header>
+
+
+    <main id="menu">
+
+        <section id="agendamento" class="card">
+            <div class="icone">📅</div>
+
+            <h3>Agendamentos</h3>
+
+            <p>
+                Gerencie os horários e agendamentos da barbearia.
+            </p>
+
+            <button
+                type="button"
+                id="btnAgen"
+                onclick="window.location.href='agendamentos.html'">
+                Agendamentos
+            </button>
+        </section>
+
+
+        <section id="cliente" class="card">
+            <div class="icone">👥</div>
+
+            <h3>Clientes</h3>
+
+            <p>
+                Consulte e gerencie os clientes cadastrados.
+            </p>
+
+            <button
+                type="button"
+                id="btnCli"
+                onclick="window.location.href='cliente.html'">
+                Clientes
+            </button>
+        </section>
+
+
+        <section id="configuracao" class="card">
+            <div class="icone">⚙️</div>
+
+            <h3>Configurações</h3>
+
+            <p>
+                Configure as opções e informações da barbearia.
+            </p>
+
+            <button
+                type="button"
+                id="btnConfig"
+                onclick="window.location.href='configuracao.html'">
+                Configurações
+            </button>
+        </section>
+
+
+        <section id="servicos" class="card">
+            <div class="icone">✂️</div>
+
+            <h3>Serviços</h3>
+
+            <p>
+                Cadastre e gerencie os serviços oferecidos.
+            </p>
+
+            <button
+                type="button"
+                id="btnServ"
+                onclick="window.location.href='servicos.html'">
+                Serviços
+            </button>
+        </section>
+
+
+        <section id="relatorios" class="card">
+            <div class="icone">📊</div>
+
+            <h3>Relatórios</h3>
+
+            <p>
+                Visualize informações e resultados da barbearia.
+            </p>
+
+            <button
+                type="button"
+                id="btnRelat"
+                onclick="window.location.href='relatorios.html'">
+                Relatórios
+            </button>
+        </section>
+
+    </main>
+
+
+    <footer id="rodape">
+
+        <button
+            type="button"
+            id="btnVoltar"
+            onclick="logout()">
+            Sair
+        </button>
+
+    </footer>
+
+
+    <script>
+        function logout() {
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
+
+            alert("Você saiu da conta!");
+
+            window.location.href = "/login";
+        }
+    </script>
+
+</body>
+
+</html>

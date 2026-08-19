@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login - Sistema Barbearia</title>
+
+    <!-- CSS GLOBAL DO SISTEMA -->
+    <link rel="stylesheet" href="../css/global.css">
+
+    <!-- CSS ESPECÍFICO DO LOGIN -->
+    <link rel="stylesheet" href="../css/style.login.css">
+</head>
+
+<body>
+
+    <div class="login-wrapper">
+
+        <div class="login-card">
+
+            <!-- ==========================================
+                 TÍTULO
+                 ========================================== -->
+
+            <div id="title">
+                <h1>Login</h1>
+            </div>
+
+
+            <!-- ==========================================
+                 SUBTÍTULO
+                 ========================================== -->
+
+            <div id="subtitle">
+                <h2>Entre com suas credenciais para continuar</h2>
+            </div>
+
+
+            <!-- ==========================================
+                 FORMULÁRIO DE LOGIN
+                 ========================================== -->
+
+            <form class="login-form" id="loginForm">
+
+                <!-- USUÁRIO / E-MAIL -->
+                <div id="usuario">
+                    <label for="usuarioInput">
+                        Usuário
+                    </label>
+                </div>
+
+
+                <div id="texto">
+                    <input
+                        type="text"
+                        id="usuarioInput"
+                        placeholder="Digite seu usuário"
+                        required>
+                </div>
+
+
+                <!-- SENHA -->
+                <div id="senha">
+                    <label for="senhaInput">
+                        Senha
+                    </label>
+                </div>
+
+
+                <div id="digitesen">
+                    <input
+                        type="password"
+                        id="senhaInput"
+                        placeholder="Digite sua senha"
+                        required>
+                </div>
+
+
+                <!-- LEMBRAR DE MIM -->
+                <div id="checkbox">
+
+                    <input
+                        type="checkbox"
+                        id="lembrar">
+
+                    <label for="lembrar">
+                        Lembrar de mim
+                    </label>
+
+                </div>
+
+
+                <!-- ESQUECI MINHA SENHA -->
+                <div id="esqueci">
+
+                    <a href="#">
+                        Esqueci minha senha
+                    </a>
+
+                </div>
+
+
+                <!-- BOTÃO ENTRAR -->
+                <div id="btnEntrar">
+
+                    <button type="submit">
+                        Entrar
+                    </button>
+
+                </div>
+
+            </form>
+
+
+            <!-- ==========================================
+                 DIVISOR "OU"
+                 ========================================== -->
+
+            <div id="ou">
+                <label>ou</label>
+            </div>
+
+
+            <!-- ==========================================
+                 LOGO DA EMPRESA
+                 
+                 A imagem será carregada de:
+                 Frontend-public/Imagem/logo.png
+                 ========================================== -->
+
+            <div id="imagem">
+
+                <img
+                    src="../html/Imagem/Logo-MWsystem.jpeg"
+                    alt="Logo da Barbearia">
+
+            </div>
+
+
+            <!-- ==========================================
+                 MENSAGEM PRINCIPAL
+                 ========================================== -->
+
+            <div id="mensagem2">
+
+                <label>
+                    Bem-vindo, usuário
+                </label>
+
+            </div>
+
+
+            <!-- ==========================================
+                 MENSAGEM SECUNDÁRIA
+                 ========================================== -->
+
+            <div id="mensagem3">
+
+                <label>
+                    Faça seu login para acessar sua conta
+                </label>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================
+         SCRIPT DO LOGIN
+         ================================================ -->
+
+    <script>
+
+        document
+            .getElementById("loginForm")
+            .addEventListener("submit", async (e) => {
+
+                // Impede o formulário de recarregar a página
+                e.preventDefault();
+
+
+                // ==========================================
+                // PEGA OS DADOS DIGITADOS
+                // ==========================================
+
+                const email =
+                    document
+                        .getElementById("usuarioInput")
+                        .value
+                        .trim();
+
+
+                const senha =
+                    document
+                        .getElementById("senhaInput")
+                        .value;
+
+
+                const lembrar =
+                    document
+                        .getElementById("lembrar")
+                        .checked;
+
+
+                try {
+
+                    // ======================================
+                    // ENVIA OS DADOS PARA O BACKEND
+                    // ======================================
+
+                    const response = await fetch(
+                        "http://localhost:3000/api/auth/login",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+
+                            body: JSON.stringify({
+
+                                email: email,
+
+                                senha: senha,
+
+                                manterConectado: lembrar
+
+                            })
+                        }
+                    );
+
+
+                    // ======================================
+                    // CONVERTE A RESPOSTA PARA JSON
+                    // ======================================
+
+                    const data = await response.json();
+
+
+                    console.log(
+                        "STATUS:",
+                        response.status
+                    );
+
+
+                    console.log(
+                        "RESPOSTA:",
+                        data
+                    );
+
+
+                    // ======================================
+                    // LOGIN BEM-SUCEDIDO
+                    // ======================================
+
+                    if (
+                        response.ok &&
+                        data.success
+                    ) {
+
+                        alert(
+                            "Login realizado com sucesso!"
+                        );
+
+
+                        // ==================================
+                        // SALVA ACCESS TOKEN
+                        // ==================================
+
+                        if (
+                            data.data?.accessToken
+                        ) {
+
+                            localStorage.setItem(
+                                "accessToken",
+                                data.data.accessToken
+                            );
+
+                        }
+
+
+                        // ==================================
+                        // SALVA REFRESH TOKEN
+                        // ==================================
+
+                        if (
+                            data.data?.refreshToken
+                        ) {
+
+                            localStorage.setItem(
+                                "refreshToken",
+                                data.data.refreshToken
+                            );
+
+                        }
+
+
+                        // ==================================
+                        // VAI PARA O DASHBOARD
+                        // ==================================
+
+                        window.location.href =
+                            "index.html";
+
+
+                    } else {
+
+                        // ==================================
+                        // ERRO DE LOGIN
+                        // ==================================
+
+                        alert(
+                            "Erro no login: " +
+                            (
+                                data.message ||
+                                "E-mail ou senha incorretos."
+                            )
+                        );
+
+                    }
+
+
+                } catch (error) {
+
+                    // ======================================
+                    // ERRO DE CONEXÃO COM O BACKEND
+                    // ======================================
+
+                    console.error(
+                        "Erro:",
+                        error
+                    );
+
+
+                    alert(
+                        "Não foi possível conectar ao servidor."
+                    );
+
+                }
+
+            });
+
+    </script>
+
+</body>
+
+</html>

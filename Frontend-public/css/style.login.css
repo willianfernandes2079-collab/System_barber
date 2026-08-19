@@ -1,0 +1,524 @@
+/* ============================================================
+   LOGIN.CSS — tela de autenticação (estilo "Meu Sistema")
+   Mapeado para os IDs reais de login.html:
+   .login-wrapper > .login-card > (#title, #subtitle, form#loginForm,
+   #ou, #imagem, #mensagem2, #mensagem3)
+   ============================================================ */
+
+:root {
+  --login-blue-start: #2f5fde;
+  --login-blue-mid: #4c86f5;
+  --login-blue-end: #6fa9ff;
+  --login-accent: #3d63e0;
+  --login-accent-hover: #3253c9;
+  --login-border: #e4e7ec;
+  --login-text-heading: #101828;
+  --login-text-muted: #667085;
+  --login-label: #1d2433;
+  --login-placeholder: #98a2b3;
+}
+
+/* -------- Fundo da página -------- */
+
+body:has(.login-wrapper) {
+  position: relative;
+  overflow-x: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background: #eef1fc;
+}
+
+/* Blob desfocado — canto superior-esquerdo */
+
+body:has(.login-wrapper)::before {
+  content: "";
+  position: absolute;
+  top: -140px;
+  left: -180px;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.95),
+    rgba(214, 224, 250, 0.35) 60%,
+    transparent 75%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Blob desfocado — canto inferior-direito */
+
+body:has(.login-wrapper)::after {
+  content: "";
+  position: absolute;
+  bottom: -170px;
+  right: -150px;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(203, 217, 250, 0.9),
+    rgba(203, 217, 250, 0.2) 55%,
+    transparent 75%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.login-wrapper {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 980px;
+}
+
+/* Grade de pontinhos — canto superior-direito */
+
+.login-wrapper::before {
+  content: "";
+  position: absolute;
+  top: -70px;
+  right: -40px;
+  width: 130px;
+  height: 130px;
+  background-image: radial-gradient(
+    rgba(59, 102, 224, 0.35) 1.6px,
+    transparent 1.6px
+  );
+  background-size: 16px 16px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Grade de pontinhos — canto inferior-esquerdo */
+
+.login-wrapper::after {
+  content: "";
+  position: absolute;
+  bottom: -60px;
+  left: -36px;
+  width: 130px;
+  height: 130px;
+  background-image: radial-gradient(
+    rgba(59, 102, 224, 0.3) 1.6px,
+    transparent 1.6px
+  );
+  background-size: 16px 16px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* -------- Card -------- */
+
+.login-card {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 42% 58%;
+  min-height: 600px;
+  background: #fff;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow:
+    0 30px 70px rgba(47, 95, 222, 0.18),
+    0 8px 20px rgba(16, 24, 40, 0.06);
+}
+
+/* Painel azul contínuo atrás de #imagem / #mensagem2 / #mensagem3 */
+
+.login-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  right: 58%;
+  z-index: 0;
+  background-image:
+    radial-gradient(
+      ellipse 380px 460px at 12% 88%,
+      rgba(255, 255, 255, 0.1),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 320px 280px at 92% 12%,
+      rgba(255, 255, 255, 0.08),
+      transparent 55%
+    ),
+    linear-gradient(
+      160deg,
+      var(--login-blue-start) 0%,
+      var(--login-blue-mid) 55%,
+      var(--login-blue-end) 100%
+    );
+}
+
+/* -------- Painel de marca (esquerda) -------- */
+
+#imagem,
+#mensagem2,
+#mensagem3 {
+  grid-column: 1;
+}
+
+#imagem {
+  grid-row: 1;
+  position: relative;
+  z-index: 1;
+  height: 190px;
+  background: transparent;
+}
+
+/* Logo da empresa */
+
+#imagem img {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  object-fit: cover;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+/* Círculo decorativo que ficava atrás do cadeado */
+
+#imagem::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translate(-50%, -50%);
+}
+
+#mensagem2 {
+  grid-row: 2;
+  position: relative;
+  z-index: 1;
+  padding: 0 36px 4px;
+  text-align: center;
+}
+
+#mensagem2 label {
+  font-family: var(--font-body);
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+#mensagem3 {
+  grid-row: 3;
+  position: relative;
+  z-index: 1;
+  padding: 0 40px 44px;
+  text-align: center;
+}
+
+#mensagem3 label {
+  display: block;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* -------- Formulário (direita) -------- */
+
+#title,
+#subtitle,
+.login-form,
+#ou {
+  grid-column: 2;
+  padding-left: 56px;
+  padding-right: 56px;
+}
+
+#title {
+  grid-row: 1;
+  padding-top: 56px;
+}
+
+#title h1 {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 2rem;
+  color: var(--login-text-heading);
+}
+
+#subtitle {
+  grid-row: 2;
+  padding-bottom: 30px;
+}
+
+#subtitle h2 {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--login-text-muted);
+}
+
+.login-form {
+  grid-row: 3;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 12px;
+}
+
+#usuario,
+#senha {
+  grid-column: 1 / -1;
+}
+
+#usuario {
+  grid-row: 1;
+}
+
+#senha {
+  grid-row: 3;
+}
+
+#usuario label,
+#senha label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--login-label);
+}
+
+#texto {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  margin-bottom: 18px;
+}
+
+#digitesen {
+  grid-column: 1 / -1;
+  grid-row: 4;
+  margin-bottom: 6px;
+}
+
+/* Campo de usuário/e-mail com ícone de pessoa */
+
+#texto input {
+  background-color: #fff;
+  border: 1.5px solid var(--login-border);
+  border-radius: 12px;
+  padding-left: 46px;
+  background-repeat: no-repeat;
+  background-position: 16px center;
+  background-size: 18px 18px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233B66E0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 20c0-4 4-6 8-6s8 2 8 6'/%3E%3C/svg%3E");
+}
+
+/* Campo de senha com ícone de cadeado + olho decorativo */
+
+#digitesen input {
+  background-color: #fff;
+  border: 1.5px solid var(--login-border);
+  border-radius: 12px;
+  padding-left: 46px;
+  padding-right: 46px;
+  background-repeat: no-repeat, no-repeat;
+  background-position: 16px center, right 16px center;
+  background-size: 18px 18px, 20px 20px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233B66E0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='9' rx='2'/%3E%3Cpath d='M8 11V7a4 4 0 0 1 8 0v4'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2398A2B3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E");
+}
+
+#texto input::placeholder,
+#digitesen input::placeholder {
+  color: var(--login-placeholder);
+}
+
+#texto input:focus,
+#digitesen input:focus {
+  border-color: var(--login-accent);
+  box-shadow: 0 0 0 3px rgba(61, 99, 224, 0.15);
+}
+
+#checkbox {
+  grid-column: 1;
+  grid-row: 5;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+#checkbox input[type="checkbox"] {
+  accent-color: var(--login-accent);
+}
+
+#checkbox label {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--login-text-muted);
+}
+
+#esqueci {
+  grid-column: 2;
+  grid-row: 5;
+  align-self: center;
+  text-align: right;
+}
+
+#esqueci a {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--login-accent);
+}
+
+#btnEntrar {
+  grid-column: 1 / -1;
+  grid-row: 6;
+  margin-top: 26px;
+}
+
+#btnEntrar button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--login-accent);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 150ms ease, transform 150ms ease;
+}
+
+#btnEntrar button::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4'/%3E%3Cpath d='M10 17l5-5-5-5'/%3E%3Cpath d='M15 12H3'/%3E%3C/svg%3E");
+}
+
+#btnEntrar button:hover {
+  background: var(--login-accent-hover);
+}
+
+#btnEntrar button:active {
+  transform: translateY(1px);
+}
+
+#ou {
+  grid-row: 4;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 28px;
+  padding-bottom: 40px;
+  color: var(--login-placeholder);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+#ou::before,
+#ou::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--login-border);
+}
+
+.login-wrapper :focus-visible {
+  outline-color: var(--login-accent);
+}
+
+/* -------- Responsivo -------- */
+
+@media (max-width: 860px) {
+  .login-card {
+    grid-template-columns: 1fr;
+  }
+
+  .login-card::before {
+    right: 0;
+    height: 320px;
+  }
+
+  #imagem,
+  #mensagem2,
+  #mensagem3,
+  #title,
+  #subtitle,
+  .login-form,
+  #ou {
+    grid-column: 1;
+  }
+
+  #imagem {
+    grid-row: 1;
+    height: 150px;
+  }
+
+  #mensagem2 {
+    grid-row: 2;
+    padding: 0 24px 4px;
+  }
+
+  #mensagem2 label {
+    font-size: 1.4rem;
+  }
+
+  #mensagem3 {
+    grid-row: 3;
+    padding: 0 24px 28px;
+  }
+
+  #title {
+    grid-row: 4;
+    padding: 32px 28px 4px;
+  }
+
+  #subtitle {
+    grid-row: 5;
+    padding: 0 28px 20px;
+  }
+
+  .login-form {
+    grid-row: 6;
+    padding: 0 28px;
+  }
+
+  #ou {
+    grid-row: 7;
+    padding: 20px 28px 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-wrapper {
+    max-width: 100%;
+  }
+
+  .login-card {
+    border-radius: 20px;
+  }
+
+  .login-card::before {
+    height: 280px;
+  }
+}

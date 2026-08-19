@@ -1,0 +1,166 @@
+/* ============================================================
+   DASHBOARD.CSS — página de menu inicial (index.html)
+   Mesma linguagem visual do login: fundo claro com blobs e
+   grade de pontinhos, cards brancos, azul como destaque.
+   ============================================================ */
+
+body:has(#menu) {
+  position: relative;
+  overflow-x: hidden;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+}
+
+body:has(#menu)::before {
+  content: "";
+  position: fixed;
+  top: -140px;
+  left: -180px;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--color-bg-blob-a), rgba(214, 224, 250, 0.35) 60%, transparent 75%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body:has(#menu)::after {
+  content: "";
+  position: fixed;
+  bottom: -170px;
+  right: -150px;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--color-bg-blob-b), rgba(203, 217, 250, 0.2) 55%, transparent 75%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+header {
+  position: relative;
+  z-index: 1;
+  padding: 56px 24px 40px;
+  text-align: center;
+}
+
+/* Grade de pontinhos, ecoando o canto do card de login */
+header::after {
+  content: "";
+  position: absolute;
+  top: 18px;
+  right: max(24px, calc(50% - 560px));
+  width: 110px;
+  height: 110px;
+  background-image: radial-gradient(rgba(61, 99, 224, 0.28) 1.6px, transparent 1.6px);
+  background-size: 16px 16px;
+  pointer-events: none;
+}
+
+#titulo h1 {
+  font-size: 2.4rem;
+  color: var(--color-text-heading);
+  position: relative;
+  display: inline-block;
+  padding-bottom: 16px;
+}
+
+#titulo h1::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 64px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--stripe-gradient);
+}
+
+#subtitulo h2 {
+  margin-top: 18px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+#menu {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 48px 24px 64px;
+  width: 100%;
+}
+
+#menu .card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  text-align: left;
+  background: var(--color-surface);
+}
+
+#menu .icone {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  border-radius: var(--radius-md);
+  background: var(--color-accent-soft);
+}
+
+#menu .card h3 { font-size: 1.2rem; color: var(--color-text-heading); }
+#menu .card p { font-size: 0.9rem; min-height: 42px; }
+
+#menu .card button {
+  margin-top: 6px;
+  padding: 10px 20px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--color-accent);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+#menu .card button:hover { background: var(--color-accent-hover); }
+
+footer#rodape {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  padding: 28px 24px 40px;
+}
+
+#btnVoltar {
+  padding: 11px 28px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+#btnVoltar:hover { color: var(--color-danger); border-color: var(--color-danger); }
+
+@media (max-width: 480px) {
+  header { padding: 40px 20px 32px; }
+  #titulo h1 { font-size: 1.9rem; }
+  #menu { grid-template-columns: 1fr; padding: 32px 16px 48px; }
+}
