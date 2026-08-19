@@ -76,3 +76,6 @@ coverage/
 
 # Backups do banco de dados
 *.dump
+
+# Backups locais
+backups/
