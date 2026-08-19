@@ -73,3 +73,6 @@ coverage/
 
 # NÃO ignoramos as migrations.
 # Elas precisam ir para o GitHub.
+
+# Backups do banco de dados
+*.dump

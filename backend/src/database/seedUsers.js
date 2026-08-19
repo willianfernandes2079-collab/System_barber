@@ -2,11 +2,10 @@ const userStore = require("../models/userStore");
 const { hashPassword } = require("../utils/hash");
 const env = require("../config/env");
 
-/**
- * Cria usuários de teste em memória quando DEVELOPMENT_MODE=true
- * (item 47/48 da especificação). Roda uma vez, na subida do servidor.
- * Substituído por `prisma db seed` na fase de banco de dados.
- */
+/* Cria usuários de teste em memória quando DEVELOPMENT_MODE=true
+  (item 47/48 da especificação). Roda uma vez, na subida do servidor.
+  Substituído por `prisma db seed` na fase de banco de dados.*/
+
 async function seedUsers() {
   if (!env.DEVELOPMENT_MODE) return;
 
@@ -31,6 +30,7 @@ async function seedUsers() {
   }
 
   // eslint-disable-next-line no-console
+  
   console.log("\n[SEED] Usuários de teste criados (DEVELOPMENT_MODE=true):");
   usuariosSeed.forEach((u) => console.log(`  - ${u.cargo.padEnd(14)} ${u.email} / ${u.senha}`));
   console.log("");

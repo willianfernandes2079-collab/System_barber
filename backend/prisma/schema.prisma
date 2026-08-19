@@ -7,17 +7,17 @@ datasource db {
 }
 
 model Usuario {
-  id         String   @id @default(uuid()) @db.Uuid
+  id         String    @id @default(uuid()) @db.Uuid
   nome       String
-  email      String   @unique
+  email      String    @unique
   senha_hash String
   telefone   String?
   cargo      String
-  ativo      Boolean  @default(true)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  sessoes Sessao[]
+  ativo      Boolean   @default(true)
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  barbeiro   Barbeiro?
+  sessoes    Sessao[]
 
   @@map("usuarios")
 }
@@ -30,8 +30,93 @@ model Sessao {
   expires_at DateTime
   user_agent String?
   ip         String?
+  usuario    Usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
 
-  usuario Usuario @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
-
+  @@index([expires_at])
+  @@index([usuario_id])
   @@map("sessoes")
+}
+
+model Cliente {
+  id                   String         @id @default(uuid()) @db.Uuid
+  nome                 String
+  telefone             String
+  whatsapp             String?
+  email                String?
+  data_nascimento      DateTime?
+  cpf                  String?
+  observacoes          String?
+  preferencia_barbeiro String?
+  preferencia_servico  String?
+  ultimo_atendimento   DateTime?
+  ativo                Boolean        @default(true)
+  created_at           DateTime       @default(now())
+  updated_at           DateTime       @updatedAt
+  agendamentos         agendamentos[]
+
+  @@index([nome])
+  @@index([telefone])
+  @@index([email])
+  @@index([ativo])
+  @@map("clientes")
+}
+
+model Barbeiro {
+  id                  String         @id @default(uuid()) @db.Uuid
+  usuario_id          String         @unique @db.Uuid
+  nome                String
+  telefone            String?
+  especialidade       String?
+  percentual_comissao Decimal        @default(0) @db.Decimal(5, 2)
+  ativo               Boolean        @default(true)
+  created_at          DateTime       @default(now())
+  updated_at          DateTime       @updatedAt
+  agendamentos        agendamentos[]
+  usuario             Usuario        @relation(fields: [usuario_id], references: [id])
+
+  @@index([nome])
+  @@index([ativo])
+  @@map("barbeiros")
+}
+
+model agendamentos {
+ id          String   @id @default(uuid()) @db.Uuid
+  cliente_id      String   @db.Uuid
+  barbeiro_id     String   @db.Uuid
+  servico_id      String   @db.Uuid
+  data            DateTime
+  horario_inicio  DateTime
+  horario_fim     DateTime
+  status          String   @default("AGENDADO")
+  observacoes     String?
+  valor           Decimal  @db.Decimal(10, 2)
+  forma_pagamento String?
+  created_at      DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  barbeiros       Barbeiro @relation(fields: [barbeiro_id], references: [id])
+  clientes        Cliente  @relation(fields: [cliente_id], references: [id])
+  servicos        servicos @relation(fields: [servico_id], references: [id])
+
+  @@index([barbeiro_id, data])
+  @@index([barbeiro_id])
+  @@index([cliente_id])
+  @@index([data])
+  @@index([servico_id])
+  @@index([status])
+}
+
+model servicos {
+  id                  String         @id @default(uuid()) @db.Uuid
+  nome                String
+  descricao           String?
+  duracao             Int
+  preco               Decimal        @db.Decimal(10, 2)
+  percentual_comissao Decimal?       @db.Decimal(5, 2)
+  ativo               Boolean        @default(true)
+  created_at          DateTime       @default(now())
+  updated_at          DateTime       @updatedAt
+  agendamentos        agendamentos[]
+
+  @@index([ativo])
+  @@index([nome])
 }

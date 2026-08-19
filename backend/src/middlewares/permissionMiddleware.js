@@ -1,12 +1,11 @@
 const { fail } = require("../utils/apiResponse");
 
-/**
- * Controle de permissões por cargo (item 7 da especificação).
- * Uso: router.delete('/usuarios/:id', autenticar, autorizar('ADMIN'), ...)
- *
- * Deve ser usado sempre DEPOIS do middleware `autenticar`, pois depende de
- * `req.user` já estar preenchido.
- */
+/*
+  Controle de permissões por cargo (item 7 da especificação).
+  Uso: router.delete('/usuarios/:id', autenticar, autorizar('ADMIN'), ...)
+ 
+  Deve ser usado sempre DEPOIS do middleware `autenticar`, pois depende de
+  `req.user` já estar preenchido.*/
 function autorizar(...cargosPermitidos) {
   return (req, res, next) => {
     if (!req.user) {

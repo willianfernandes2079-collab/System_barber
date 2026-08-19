@@ -45,6 +45,7 @@ async function login({ email, senha, remember = false, userAgent, ip }) {
   const usuario = await userStore.findByEmail(email);
 
   // Mensagem genérica de propósito: não revelar se o e-mail existe ou não.
+
   if (!usuario || !usuario.ativo) {
     throw new AppError("Usuário ou senha inválidos.", 401);
   }
@@ -106,8 +107,10 @@ async function logout({ refreshToken }) {
     const payload = verifyRefreshToken(refreshToken);
     sessionStore.revogarSessao(payload.sub, payload.jti);
   } catch {
+
     // Token já inválido/expirado — nada a revogar, mas não é um erro fatal
     // para quem está tentando sair.
+
   }
   return true;
 }
@@ -135,6 +138,7 @@ async function alterarSenha({ userId, userNome, senhaAtual, novaSenha }) {
   await userStore.updateSenha(userId, novoHash);
 
   // Por segurança, trocar a senha derruba todas as sessões existentes.
+
   sessionStore.revogarTodasSessoes(userId);
 
   auditLogger.registrar({
@@ -151,6 +155,7 @@ async function solicitarRecuperacaoSenha({ email }) {
 
   // Mesma resposta independentemente do e-mail existir, para não vazar
   // quais e-mails estão cadastrados.
+  
   if (!usuario) return true;
 
   const { token } = signResetToken(usuario);

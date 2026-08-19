@@ -109,6 +109,7 @@ const esqueciSenha = asyncHandler(async (req, res) => {
   await authService.solicitarRecuperacaoSenha({ email });
 
   // Mesma resposta sempre, para não revelar se o e-mail existe.
+  
   return success(res, {
     message: "Se o e-mail estiver cadastrado, enviaremos um link de recuperação.",
   });

@@ -1,11 +1,12 @@
 const { verifyAccessToken } = require("../utils/jwt");
 const { fail } = require("../utils/apiResponse");
 
-/**
- * Exige um access token JWT válido no header:
- *   Authorization: Bearer <token>
- * Preenche req.user com { sub, cargo, nome } em caso de sucesso.
- */
+/*
+  Exige um access token JWT válido no header:
+  Authorization: Bearer <token>
+  Preenche req.user com { sub, cargo, nome } em caso de sucesso.*/
+
+  
 function autenticar(req, res, next) {
   const header = req.headers.authorization || "";
   const [scheme, token] = header.split(" ");

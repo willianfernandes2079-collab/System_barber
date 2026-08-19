@@ -1,9 +1,10 @@
 const rateLimit = require("express-rate-limit");
 
 /**
- * Limita tentativas de login e de recuperação de senha para dificultar
- * ataques de força bruta (item 33 da especificação).
- */
+  Limita tentativas de login e de recuperação de senha para dificultar
+  ataques de força bruta (item 33 da especificação).*/
+
+  
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
   max: 10,
