@@ -80,6 +80,23 @@ const me = asyncHandler(async (req, res) => {
   return success(res, { data: userStore.toPublicUser(usuario) });
 });
 
+const atualizarPerfil = asyncHandler(async (req, res) => {
+  const { nome, telefone } = req.body;
+
+  if (nome !== undefined && !isNonEmptyString(nome)) {
+    return fail(res, { message: "Nome inválido.", status: 422 });
+  }
+
+  const usuario = await authService.atualizarPerfil({
+    userId: req.user.sub,
+    userNome: req.user.nome,
+    nome,
+    telefone,
+  });
+
+  return success(res, { message: "Perfil atualizado com sucesso.", data: usuario });
+});
+
 const alterarSenha = asyncHandler(async (req, res) => {
   const { senhaAtual, novaSenha } = req.body;
 
@@ -109,7 +126,6 @@ const esqueciSenha = asyncHandler(async (req, res) => {
   await authService.solicitarRecuperacaoSenha({ email });
 
   // Mesma resposta sempre, para não revelar se o e-mail existe.
-  
   return success(res, {
     message: "Se o e-mail estiver cadastrado, enviaremos um link de recuperação.",
   });
@@ -136,6 +152,7 @@ module.exports = {
   logout,
   logoutTodasSessoes,
   me,
+  atualizarPerfil,
   alterarSenha,
   esqueciSenha,
   redefinirSenha,

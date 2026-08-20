@@ -8,16 +8,15 @@ const {
   desativarBarbeiro,
 } = require("../controllers/barbeiroController");
 
+const autorizar = require("../middlewares/permissionMiddleware");
+
 const router = Router();
 
+// autenticar já é aplicado no mount central (routes/index.js)
 router.get("/", listarBarbeiros);
-
 router.get("/:id", buscarBarbeiroPorId);
-
-router.post("/", criarBarbeiro);
-
-router.put("/:id", atualizarBarbeiro);
-
-router.delete("/:id", desativarBarbeiro);
+router.post("/", autorizar("ADMIN", "GERENTE"), criarBarbeiro);
+router.put("/:id", autorizar("ADMIN", "GERENTE"), atualizarBarbeiro);
+router.delete("/:id", autorizar("ADMIN", "GERENTE"), desativarBarbeiro);
 
 module.exports = router;

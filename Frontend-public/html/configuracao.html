@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Configurações - System Barber</title>
+
+    <!-- CSS GLOBAL -->
+
+    <link rel="stylesheet" href="../css/global.css" />
+
+    <!-- CSS CONFIG -->
+
+    <link rel="stylesheet" href="../css/configurações.css">
+  </head>
+
+  <body>
+    <h1>Configurações da Barbearia</h1>
+
+    <form id="configForm">
+      <label for="nome_barbearia"> Nome da barbearia </label>
+
+      <input type="text" id="nome_barbearia" name="nome_barbearia" />
+
+      <label for="telefone"> Telefone </label>
+
+      <input type="text" id="telefone" name="telefone" />
+
+      <label for="endereco"> Endereço </label>
+
+      <input type="text" id="endereco" name="endereco" />
+
+      <label for="horario_abertura"> Horário de abertura </label>
+
+      <input type="time" id="horario_abertura" name="horario_abertura" />
+
+      <label for="horario_fechamento"> Horário de fechamento </label>
+
+      <input type="time" id="horario_fechamento" name="horario_fechamento" />
+
+      <label for="dias_funcionamento"> Dias de funcionamento </label>
+
+      <input
+        type="text"
+        id="dias_funcionamento"
+        name="dias_funcionamento"
+        placeholder="SEG,TER,QUA,QUI,SEX"
+      />
+
+      <button type="submit">Salvar configurações</button>
+
+      <button type="button" onclick="window.location.href = 'index.html'">
+        Voltar
+      </button>
+    </form>
+
+    <p id="mensagem"></p>
+
+    <script>
+      const token = localStorage.getItem("accessToken");
+
+      if (!token) {
+        window.location.href = "/login";
+      }
+
+      const form = document.getElementById("configForm");
+
+      const mensagem = document.getElementById("mensagem");
+
+      async function carregarConfiguracoes() {
+        try {
+          const resposta = await fetch("/api/configuracoes", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          const resultado = await resposta.json();
+
+          if (!resposta.ok || !resultado.success) {
+            throw new Error(
+              resultado.message || "Erro ao carregar configurações.",
+            );
+          }
+
+          const config = resultado.data;
+
+          document.getElementById("nome_barbearia").value =
+            config.nome_barbearia || "";
+
+          document.getElementById("telefone").value = config.telefone || "";
+
+          document.getElementById("endereco").value = config.endereco || "";
+
+          document.getElementById("horario_abertura").value =
+            config.horario_abertura || "";
+
+          document.getElementById("horario_fechamento").value =
+            config.horario_fechamento || "";
+
+          document.getElementById("dias_funcionamento").value =
+            config.dias_funcionamento || "";
+        } catch (erro) {
+          mensagem.textContent = erro.message;
+        }
+      }
+
+      form.addEventListener("submit", async (evento) => {
+        evento.preventDefault();
+
+        const dados = {
+          nome_barbearia: document.getElementById("nome_barbearia").value,
+
+          telefone: document.getElementById("telefone").value,
+
+          endereco: document.getElementById("endereco").value,
+
+          horario_abertura: document.getElementById("horario_abertura").value,
+
+          horario_fechamento:
+            document.getElementById("horario_fechamento").value,
+
+          dias_funcionamento:
+            document.getElementById("dias_funcionamento").value,
+        };
+
+        try {
+          const resposta = await fetch("/api/configuracoes", {
+            method: "PUT",
+
+            headers: {
+              "Content-Type": "application/json",
+
+              Authorization: `Bearer ${token}`,
+            },
+
+            body: JSON.stringify(dados),
+          });
+
+          const resultado = await resposta.json();
+
+          if (!resposta.ok || !resultado.success) {
+            throw new Error(
+              resultado.message || "Erro ao salvar configurações.",
+            );
+          }
+
+          mensagem.textContent = "Configurações salvas com sucesso!";
+        } catch (erro) {
+          mensagem.textContent = erro.message;
+        }
+      });
+
+      carregarConfiguracoes();
+    </script>
+  </body>
+</html>

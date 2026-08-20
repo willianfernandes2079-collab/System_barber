@@ -120,3 +120,16 @@ model servicos {
   @@index([ativo])
   @@index([nome])
 }
+model Configuracao {
+  id                  String   @id @default(uuid()) @db.Uuid
+  nome_barbearia      String
+  telefone            String?
+  endereco            String?
+  horario_abertura    String?
+  horario_fechamento  String?
+  dias_funcionamento  String?
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  @@map("configuracoes")
+}

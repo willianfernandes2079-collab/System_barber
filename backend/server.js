@@ -25,31 +25,31 @@ app.use(
   express.static(path.join(__dirname, "..", "frontend-public"))
 );
 
-// ================================
+
 // ROTAS HTML
-// ================================
+
 
 app.get("/", (req, res) => {
   res.sendFile(
-    path.join(__dirname, "..", "frontend-public", "login.html")
+    path.join(__dirname, "..", "frontend-public", "html", "login.html")
   );
 });
 
 app.get("/login", (req, res) => {
   res.sendFile(
-    path.join(__dirname, "..", "frontend-public", "login.html")
+    path.join(__dirname, "..", "frontend-public", "html", "login.html")
   );
 });
 
 app.get("/index", (req, res) => {
   res.sendFile(
-    path.join(__dirname, "..", "frontend-public", "index.html")
+    path.join(__dirname, "..", "frontend-public", "html", "index.html")
   );
 });
 
-// ================================
+
 // API
-// ================================
+
 
 // Todas as rotas da API ficam sob /api
 app.use("/api", apiRoutes);
@@ -60,9 +60,9 @@ app.use("/api", notFoundHandler);
 // Tratamento global de erros
 app.use(errorHandler);
 
-// ================================
+
 // INICIAR SERVIDOR
-// ================================
+
 
 async function start() {
   try {
@@ -82,3 +82,4 @@ async function start() {
 start();
 
 module.exports = app;
+

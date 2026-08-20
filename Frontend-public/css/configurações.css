@@ -1,0 +1,316 @@
+/* ============================================================
+   CONFIGURACAO.CSS — Configurações da Barbearia
+   Baseado na identidade visual do Login + Dashboard
+   ============================================================ */
+
+/* Fundo da página */
+
+body:has(#configForm) {
+  min-height: 100vh;
+  padding: 50px 20px 70px;
+  background:
+    radial-gradient(
+      circle at 0% 0%,
+      rgba(255, 255, 255, 0.95),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at 100% 100%,
+      rgba(203, 217, 250, 0.7),
+      transparent 38%
+    ),
+    var(--color-bg);
+}
+
+/* ============================================================
+   TÍTULO
+   ============================================================ */
+
+body:has(#configForm) > h1 {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto 32px;
+
+  position: relative;
+
+  padding-bottom: 16px;
+
+  text-align: center;
+
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 700;
+
+  color: var(--color-text-heading);
+}
+
+body:has(#configForm) > h1::after {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+  bottom: 0;
+
+  width: 64px;
+  height: 4px;
+
+  transform: translateX(-50%);
+
+  border-radius: 999px;
+
+  background: var(--stripe-gradient);
+}
+
+/* ============================================================
+   FORMULÁRIO
+   ============================================================ */
+
+#configForm {
+  width: 100%;
+  max-width: 760px;
+
+  margin: 0 auto;
+
+  padding: 36px 40px;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 20px;
+  row-gap: 6px;
+
+  background: var(--color-surface);
+
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-xl);
+
+  box-shadow: var(--shadow-md);
+}
+
+/* ============================================================
+   LABELS
+   ============================================================ */
+
+#configForm label {
+  display: block;
+
+  margin-bottom: 6px;
+
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  color: var(--color-text-heading);
+}
+
+/* ============================================================
+   CAMPOS
+   ============================================================ */
+
+#configForm input {
+  width: 100%;
+
+  margin-bottom: 16px;
+
+  padding: 13px 15px;
+
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+
+  color: var(--color-text-heading);
+
+  background: var(--color-surface);
+
+  border: 1.5px solid var(--color-border);
+
+  border-radius: var(--radius-sm);
+
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+#configForm input:hover {
+  border-color: rgba(61, 99, 224, 0.35);
+}
+
+#configForm input:focus {
+  border-color: var(--color-accent);
+
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+
+  outline: none;
+}
+
+#configForm input::placeholder {
+  color: var(--color-placeholder);
+}
+
+/* ============================================================
+   CAMPOS QUE OCUPAM A LINHA INTEIRA
+   ============================================================ */
+
+/*
+   Nome da barbearia
+   Endereço
+   Dias de funcionamento
+*/
+
+#nome_barbearia,
+#endereco,
+#dias_funcionamento {
+  grid-column: 1 / -1;
+}
+
+/* ============================================================
+   ORGANIZAÇÃO DOS LABELS
+   ============================================================ */
+
+#configForm label[for="nome_barbearia"],
+#configForm label[for="endereco"],
+#configForm label[for="dias_funcionamento"] {
+  grid-column: 1 / -1;
+}
+
+/* ============================================================
+   BOTÕES
+   ============================================================ */
+
+#configForm button {
+  margin-top: 12px;
+
+  padding: 13px 22px;
+
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+
+  border-radius: var(--radius-sm);
+
+  cursor: pointer;
+
+  transition:
+    transform var(--transition-fast),
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+/* Salvar */
+
+#configForm button[type="submit"] {
+  color: var(--color-text-on-accent);
+
+  background: var(--color-accent);
+
+  border: 1.5px solid var(--color-accent);
+}
+
+#configForm button[type="submit"]:hover {
+  background: var(--color-accent-hover);
+
+  border-color: var(--color-accent-hover);
+
+  box-shadow: 0 8px 20px rgba(61, 99, 224, 0.28);
+}
+
+#configForm button[type="submit"]:active {
+  transform: translateY(1px);
+}
+
+/* Voltar */
+
+#configForm button[type="button"] {
+  color: var(--color-text-muted);
+
+  background: var(--color-surface);
+
+  border: 1.5px solid var(--color-border);
+}
+
+#configForm button[type="button"]:hover {
+  color: var(--color-text-heading);
+
+  background: var(--color-surface-alt);
+
+  border-color: var(--color-accent);
+}
+
+/* ============================================================
+   MENSAGEM
+   ============================================================ */
+
+#mensagem {
+  width: 100%;
+  max-width: 760px;
+
+  margin: 20px auto 0;
+
+  padding: 13px 18px;
+
+  min-height: 20px;
+
+  text-align: center;
+
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  color: var(--color-success-text);
+
+  background: var(--color-success-soft);
+
+  border: 1px solid rgba(18, 183, 106, 0.25);
+
+  border-radius: var(--radius-md);
+
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   RESPONSIVO
+   ============================================================ */
+
+@media (max-width: 700px) {
+  body:has(#configForm) {
+    padding: 35px 16px 50px;
+  }
+
+  body:has(#configForm) > h1 {
+    font-size: 1.8rem;
+  }
+
+  #configForm {
+    grid-template-columns: 1fr;
+
+    padding: 28px 24px;
+
+    border-radius: var(--radius-lg);
+  }
+
+  #nome_barbearia,
+  #endereco,
+  #dias_funcionamento,
+  #configForm label[for="nome_barbearia"],
+  #configForm label[for="endereco"],
+  #configForm label[for="dias_funcionamento"] {
+    grid-column: 1;
+  }
+
+  #configForm button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  body:has(#configForm) {
+    padding: 25px 12px 40px;
+  }
+
+  body:has(#configForm) > h1 {
+    font-size: 1.55rem;
+  }
+
+  #configForm {
+    padding: 24px 18px;
+  }
+}

@@ -1,0 +1,283 @@
+ /* CLIENTES.CSS — Tela de Clientes */
+
+body:has(#nome) {
+  min-height: 100vh;
+
+  padding: 50px 20px 70px;
+
+  background:
+    radial-gradient(
+      circle at 0% 0%,
+      rgba(255, 255, 255, 0.95),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at 100% 100%,
+      rgba(203, 217, 250, 0.7),
+      transparent 38%
+    ),
+    var(--color-bg);
+}
+
+
+/* TÍTULO */
+
+body:has(#nome)::before {
+
+  content: "Clientes";
+  display: block;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto 36px;
+  padding-bottom: 16px;
+  text-align: center;
+
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 700;
+
+  color: var(--color-text-heading);
+
+  border-bottom: 4px solid transparent;
+
+  border-image: var(--stripe-gradient);
+  border-image-slice: 1;
+}
+
+
+/* LAYOUT */
+
+body:has(#nome) {
+
+  display: grid;
+  grid-template-columns: minmax(0, 760px);
+  justify-content: center;
+  align-content: start;
+}
+
+
+/* CAMPOS */
+
+body:has(#nome) > div {
+
+  width: 100%;
+}
+
+
+/* Inputs */
+
+body:has(#nome) input,
+body:has(#nome) textarea {
+
+  width: 100%;
+  padding: 13px 15px;
+  margin-bottom: 16px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--color-text-heading);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+
+body:has(#nome) input:hover,
+body:has(#nome) textarea:hover {
+
+  border-color: rgba(61, 99, 224, 0.35);
+}
+
+body:has(#nome) input:focus,
+body:has(#nome) textarea:focus {
+
+  border-color: var(--color-accent);
+  box-shadow:
+    0 0 0 3px var(--color-accent-soft),
+    var(--shadow-sm);
+
+  outline: none;
+}
+
+
+/* CAMPOS LADO A LADO */
+
+#nome,
+#telefone,
+#email,
+#endereco {
+
+  width: calc(50% - 10px);
+  display: inline-block;
+  vertical-align: top;
+}
+
+
+#nome,
+#email {
+
+  margin-right: 16px;
+}
+
+
+/* DATA DE NASCIMENTO */
+
+#datanascimento {
+
+  margin-top: 2px;
+  margin-bottom: 6px;
+}
+
+#datanascimento label {
+
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-heading);
+}
+
+
+#data {
+
+  width: 100%;
+}
+
+/* OBSERVAÇÃO */
+
+#observacao textarea {
+
+  min-height: 130px;
+
+  resize: vertical;
+}
+
+/* BOTÕES */
+
+#novocliente,
+#novo {
+
+  display: inline-block;
+  width: calc(50% - 10px);
+  margin-top: 8px;
+}
+
+
+#novocliente {
+
+  margin-right: 16px;
+}
+
+
+#novocliente button,
+#novo button {
+
+  width: 100%;
+  padding: 13px 20px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+
+/* Cadastrar */
+
+#novocliente button {
+
+  color: var(--color-text-on-accent);
+  background: var(--color-accent);
+  border: 1.5px solid var(--color-accent);
+}
+
+
+#novocliente button:hover {
+
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+  box-shadow:
+    0 8px 20px rgba(61, 99, 224, 0.28);
+}
+
+
+/* Voltar */
+
+#novo button {
+
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+}
+
+
+#novo button:hover {
+
+  color: var(--color-text-heading);
+  background: var(--color-surface-alt);
+  border-color: var(--color-accent);
+}
+
+
+#novocliente button:active,
+#novo button:active {
+
+  transform: translateY(1px);
+}
+
+/* RESPONSIVO */
+
+@media (max-width: 700px) {
+
+  body:has(#nome) {
+
+    display: block;
+    padding: 35px 16px 50px;
+  }
+
+
+  body:has(#nome)::before {
+
+    font-size: 1.8rem;
+  }
+
+
+  #nome,
+  #telefone,
+  #email,
+  #endereco {
+
+    width: 100%;
+    margin-right: 0;
+  }
+
+
+  #novocliente,
+  #novo {
+
+    width: 100%;
+    margin-right: 0;
+    margin-top: 8px;
+  }
+}
+
+
+@media (max-width: 420px) {
+
+  body:has(#nome) {
+
+    padding: 25px 12px 40px;
+  }
+
+  body:has(#nome)::before {
+    font-size: 1.55rem;
+  }
+}
