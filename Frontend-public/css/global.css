@@ -179,9 +179,9 @@ button { font-family: inherit; }
   background: var(--stripe-gradient);
 }
 
-/* ============================================================
-   BOTÕES
-   ============================================================ */
+
+   /* BOTÕES */
+
 
 .btn {
   display: inline-flex;
@@ -218,9 +218,8 @@ button { font-family: inherit; }
 
 .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
-/* ============================================================
-   CARDS
-   ============================================================ */
+
+   /* CARDS */
 
 .card {
   background: var(--color-surface);
@@ -241,9 +240,7 @@ button { font-family: inherit; }
 .card-flat { box-shadow: none; border-color: var(--color-border); }
 .card-flat:hover { transform: none; box-shadow: none; }
 
-/* ============================================================
-   FORMULÁRIOS
-   ============================================================ */
+ /* FORMULÁRIOS  */
 
 .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
 .field label { font-size: 0.85rem; font-weight: 600; color: var(--color-text-heading); }
@@ -272,9 +269,7 @@ input:focus, select:focus, textarea:focus {
 .checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--color-text-muted); }
 input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--color-accent); cursor: pointer; }
 
-/* ============================================================
-   BADGES
-   ============================================================ */
+/* BADGES */ 
 
 .badge {
   display: inline-flex;
@@ -295,9 +290,9 @@ input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--color-ac
 .badge-warning { background: var(--color-warning-soft); color: var(--color-warning-text); }
 .badge-info    { background: var(--color-info-soft);    color: var(--color-info-text); }
 
-/* ============================================================
-   ALERTAS E TOASTS
-   ============================================================ */
+
+   /* ALERTAS E TOASTS */
+
 
 .alert {
   display: flex;
@@ -348,9 +343,9 @@ input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--color-ac
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ============================================================
-   TABELAS
-   ============================================================ */
+
+   /* TABELAS */
+  
 
 .table-wrapper {
   width: 100%;
@@ -376,9 +371,8 @@ input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--color-ac
 .table td { padding: 14px 16px; border-bottom: 1px solid var(--color-border-soft); color: var(--color-text-body); }
 .table tbody tr:hover { background: var(--color-accent-soft); }
 
-/* ============================================================
-   MODAL
-   ============================================================ */
+   /* MODAL */
+
 
 .modal-overlay {
   position: fixed;
@@ -402,9 +396,8 @@ input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--color-ac
   box-shadow: var(--shadow-lg);
 }
 
-/* ============================================================
-   NAVBAR / SIDEBAR
-   ============================================================ */
+   /* NAVBAR / SIDEBAR */
+   
 
 .navbar {
   height: var(--navbar-height);
@@ -458,9 +451,8 @@ input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--color-ac
   .sidebar.open { transform: translateX(0); }
 }
 
-/* ============================================================
-   UTILITÁRIOS
-   ============================================================ */
+   /* UTILITÁRIOS */
+  
 
 .container { width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 20px; }
 

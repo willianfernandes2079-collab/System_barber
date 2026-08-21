@@ -25,21 +25,15 @@
             <div id="title">
                 <h1>Login</h1>
             </div>
-
-
-        
+ 
                  <!-- SUBTÍTULO -->
                
-
             <div id="subtitle">
                 <h2>Entre com suas credenciais para continuar</h2>
             </div>
-
-
           
                  <!-- FORMULÁRIO DE LOGIN -->
                 
-
             <form class="login-form" id="loginForm">
 
                 <!-- USUÁRIO / E-MAIL -->
@@ -59,7 +53,6 @@
                         required>
                 </div>
 
-
                 <!-- SENHA -->
 
                 <div id="senha">
@@ -77,7 +70,6 @@
                         required>
                 </div>
 
-
                 <!-- LEMBRAR DE MIM -->
 
                 <div id="checkbox">
@@ -92,7 +84,6 @@
 
                 </div>
 
-
                 <!-- ESQUECI MINHA SENHA -->
 
                 <div id="esqueci">
@@ -102,7 +93,6 @@
                     </a>
 
                 </div>
-
 
                 <!-- BOTÃO ENTRAR -->
 
@@ -121,13 +111,9 @@
             <div id="ou">
                 <label>ou</label>
             </div>
-
-
-      
+     
                  <!-- LOGO DA EMPRESA -->
-                 
-                
-
+                        
             <div id="imagem">
 
                 <img
@@ -135,12 +121,9 @@
                     alt="Logo da Barbearia">
 
             </div>
-
-
-         
+      
                  <!-- MENSAGEM PRINCIPAL -->
              
-
             <div id="mensagem2">
 
                 <label>
@@ -149,10 +132,8 @@
 
             </div>
 
-
                  <!-- MENSAGEM SECUNDÁRIA -->
              
-
             <div id="mensagem3">
 
                 <label>
@@ -165,10 +146,7 @@
 
     </div>
 
-
-
-         <!-- SCRIPT DO LOGIN -->
-      
+         <!-- SCRIPT DO LOGIN -->     
 
     <script>
 
@@ -178,7 +156,6 @@
 
                 // Impede o formulário de recarregar a página
                 e.preventDefault();
-
 
                 // PEGA OS DADOS DIGITADOS
 
@@ -200,13 +177,10 @@
                         .getElementById("lembrar")
                         .checked;
 
-
                 try {
-
-                  
+                
                     // ENVIA OS DADOS PARA O BACKEND
                   
-
                     const response = await fetch(
                         "http://localhost:3000/api/auth/login",
                         {
@@ -228,27 +202,22 @@
                         }
                     );
 
-
                     // CONVERTE A RESPOSTA PARA JSON
                   
                     const data = await response.json();
-
 
                     console.log(
                         "STATUS:",
                         response.status
                     );
 
-
                     console.log(
                         "RESPOSTA:",
                         data
                     );
 
-
                     // LOGIN BEM-SUCEDIDO
               
-
                     if (
                         response.ok &&
                         data.success
@@ -257,12 +226,9 @@
                         alert(
                             "Login realizado com sucesso!"
                         );
-
-
-                 
+              
                         // SALVA ACCESS TOKEN
                     
-
                         if (
                             data.data?.accessToken
                         ) {
@@ -273,12 +239,9 @@
                             );
 
                         }
-
-
                  
                         // SALVA REFRESH TOKEN
                      
-
                         if (
                             data.data?.refreshToken
                         ) {
@@ -289,20 +252,14 @@
                             );
 
                         }
-
-
                     
                         // VAI PARA O DASHBOARD
                    
-
-                        window.location.href = "/index"
-
+                       window.location.href = "/index";
 
                     } else {
 
-                      
                         // ERRO DE LOGIN
-                     
 
                         alert(
                             "Erro no login: " +
@@ -314,18 +271,14 @@
 
                     }
 
-
                 } catch (error) {
-
                   
-                    // ERRO DE CONEXÃO COM O BACKEND
-                  
+                    // ERRO DE CONEXÃO COM O BACKEND                  
 
                     console.error(
                         "Erro:",
                         error
                     );
-
 
                     alert(
                         "Não foi possível conectar ao servidor."
