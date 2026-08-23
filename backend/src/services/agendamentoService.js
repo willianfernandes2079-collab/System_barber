@@ -278,6 +278,66 @@ async function cancelarAgendamento(id) {
   });
 }
 
+// CONCLUIR ATENDIMENTO
+
+async function concluirAgendamento(id) {
+  const agendamento = await prisma.agendamentos.findUnique({
+    where: { id },
+  });
+
+  if (!agendamento) {
+    throw new AppError("Agendamento não encontrado.", 404);
+  }
+
+  if (agendamento.status === "CANCELADO") {
+    throw new AppError("Não é possível concluir um agendamento cancelado.", 409);
+  }
+
+  if (agendamento.status === "CONCLUIDO") {
+    throw new AppError("Este agendamento já está marcado como concluído.", 409);
+  }
+
+  return prisma.agendamentos.update({
+    where: { id },
+    data: { status: "CONCLUIDO" },
+    include: {
+      clientes: true,
+      barbeiros: true,
+      servicos: true,
+    },
+  });
+}
+
+// MARCAR FALTA DO CLIENTE
+
+async function marcarFalta(id) {
+  const agendamento = await prisma.agendamentos.findUnique({
+    where: { id },
+  });
+
+  if (!agendamento) {
+    throw new AppError("Agendamento não encontrado.", 404);
+  }
+
+  if (agendamento.status === "CANCELADO") {
+    throw new AppError("Não é possível marcar falta em um agendamento cancelado.", 409);
+  }
+
+  if (agendamento.status === "CONCLUIDO") {
+    throw new AppError("Este agendamento já foi concluído — não é possível marcar falta.", 409);
+  }
+
+  return prisma.agendamentos.update({
+    where: { id },
+    data: { status: "FALTOU" },
+    include: {
+      clientes: true,
+      barbeiros: true,
+      servicos: true,
+    },
+  });
+}
+
 // EXPORTAÇÕES
 
 module.exports = {
@@ -286,4 +346,6 @@ module.exports = {
   criarAgendamento,
   atualizarAgendamento,
   cancelarAgendamento,
+  concluirAgendamento,
+  marcarFalta,
 };

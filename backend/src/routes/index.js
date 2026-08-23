@@ -6,6 +6,7 @@ const servicoRoutes = require("./servicoRoutes");
 const agendamentoRoutes = require("./agendamentoRoutes");
 const configuracaoRoutes = require("./configuracaoRoutes");
 const financeiroRoutes = require("./financeiroRoutes");
+const relatorioRoutes = require("./relatorioRoutes");
 const autenticar = require("../middlewares/authMiddleware");
 
 const router = Router();
@@ -30,7 +31,6 @@ router.use("/servicos", autenticar, servicoRoutes);
 router.use("/agendamentos", autenticar, agendamentoRoutes);
 router.use("/configuracoes", autenticar, configuracaoRoutes);
 router.use("/financeiro", autenticar, financeiroRoutes);
-
-// Próxima fase: router.use('/relatorios', autenticar, relatorioRoutes);
+router.use("/relatorios", autenticar, relatorioRoutes);
 
 module.exports = router;

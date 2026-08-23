@@ -1,6 +1,5 @@
 /**
- * js/api.js — comunicação com a API (item 51: separar comunicação com API
- * do resto do JS). Toda página inclui este arquivo e usa o objeto `api`.
+ * js/api.js — comunicação com a API.
  */
 
 const API_BASE = "http://localhost:3000/api";
@@ -23,6 +22,7 @@ async function tentarRenovarToken() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken }),
     });
+
     const data = await response.json();
 
     if (response.ok && data.success && data.data?.accessToken) {
@@ -30,7 +30,7 @@ async function tentarRenovarToken() {
       return true;
     }
   } catch {
-    // sem conexão ou refresh também expirado — trata como falha
+    // falha de conexão ou refresh expirado
   }
 
   return false;
@@ -44,7 +44,9 @@ async function apiRequest(
 
   if (auth) {
     const token = getAccessToken();
-    if (token) headers.Authorization = `Bearer ${token}`;
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
   }
 
   const response = await fetch(`${API_BASE}${path}`, {
@@ -54,17 +56,25 @@ async function apiRequest(
   });
 
   let data = null;
+
   try {
     data = await response.json();
   } catch {
-    // resposta sem corpo (ex.: 204) — segue com data = null
+    // resposta sem corpo
   }
 
   if (response.status === 401 && auth && retry) {
     const renovado = await tentarRenovarToken();
+
     if (renovado) {
-      return apiRequest(path, { method, body, auth, retry: false });
+      return apiRequest(path, {
+        method,
+        body,
+        auth,
+        retry: false,
+      });
     }
+
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     window.location.href = "/login";
@@ -75,8 +85,10 @@ async function apiRequest(
     const erro = new Error(
       data?.message || "Erro ao comunicar com o servidor.",
     );
+
     erro.status = response.status;
     erro.data = data;
+
     throw erro;
   }
 

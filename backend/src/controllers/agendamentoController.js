@@ -121,10 +121,44 @@ async function cancelar(req, res, next) {
   }
 }
 
+async function concluir(req, res, next) {
+  try {
+    const { id } = req.params;
+
+    const agendamento = await agendamentoService.concluirAgendamento(id);
+
+    return res.status(200).json({
+      success: true,
+      data: agendamento,
+      message: "Agendamento concluído com sucesso.",
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function marcarFalta(req, res, next) {
+  try {
+    const { id } = req.params;
+
+    const agendamento = await agendamentoService.marcarFalta(id);
+
+    return res.status(200).json({
+      success: true,
+      data: agendamento,
+      message: "Falta registrada.",
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   listar,
   buscarPorId,
   criar,
   atualizar,
   cancelar,
+  concluir,
+  marcarFalta,
 };

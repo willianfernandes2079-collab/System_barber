@@ -11,6 +11,10 @@ router.post("/", agendamentoController.criar);
 
 router.patch("/:id", agendamentoController.atualizar);
 
+router.patch("/:id/concluir", agendamentoController.concluir);
+
+router.patch("/:id/faltou", agendamentoController.marcarFalta);
+
 router.delete("/:id", agendamentoController.cancelar);
 
 module.exports = router;
