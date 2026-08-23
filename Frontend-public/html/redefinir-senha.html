@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Redefinir senha - Sistema Barbearia</title>
+
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/style.login.css" />
+  </head>
+
+  <body>
+    <div class="login-wrapper">
+      <div
+        class="login-card"
+        style="grid-template-columns: 1fr; max-width: 480px; margin: 0 auto"
+      >
+        <div id="title" style="grid-column: 1; padding-top: 56px">
+          <h1>Redefinir senha</h1>
+        </div>
+
+        <div id="subtitle" style="grid-column: 1">
+          <h2>Escolha uma nova senha para sua conta.</h2>
+        </div>
+
+        <form
+          class="login-form"
+          id="formRedefinirSenha"
+          style="grid-column: 1; grid-template-columns: 1fr"
+        >
+          <div id="senha">
+            <label for="novaSenhaInput">Nova senha</label>
+          </div>
+
+          <div id="digitesen">
+            <input
+              type="password"
+              id="novaSenhaInput"
+              placeholder="Mínimo 8 caracteres, com letras e números"
+              required
+            />
+          </div>
+
+          <div id="usuario">
+            <label for="confirmarSenhaInput">Confirmar nova senha</label>
+          </div>
+
+          <div id="texto">
+            <input
+              type="password"
+              id="confirmarSenhaInput"
+              placeholder="Repita a nova senha"
+              required
+            />
+          </div>
+
+          <div
+            id="mensagemResultado"
+            class="alert alert-danger"
+            style="display: none; margin-bottom: 18px"
+          ></div>
+
+          <div id="btnEntrar">
+            <button type="submit">Redefinir senha</button>
+          </div>
+        </form>
+
+        <div id="ou" style="grid-column: 1">
+          <label>ou</label>
+        </div>
+
+        <div style="grid-column: 1; text-align: center; padding-bottom: 48px">
+          <a href="login.html"> Voltar para o login </a>
+        </div>
+      </div>
+    </div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/redefinir-senha.js"></script>
+  </body>
+</html>

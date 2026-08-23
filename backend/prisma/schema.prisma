@@ -7,17 +7,18 @@ datasource db {
 }
 
 model Usuario {
-  id         String    @id @default(uuid()) @db.Uuid
+  id         String   @id @default(uuid()) @db.Uuid
   nome       String
-  email      String    @unique
+  email      String   @unique
   senha_hash String
   telefone   String?
   cargo      String
-  ativo      Boolean   @default(true)
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
-  barbeiro   Barbeiro?
-  sessoes    Sessao[]
+  ativo      Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  barbeiro Barbeiro?
+  sessoes  Sessao[]
 
   @@map("usuarios")
 }
@@ -30,7 +31,8 @@ model Sessao {
   expires_at DateTime
   user_agent String?
   ip         String?
-  usuario    Usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+
+  usuario Usuario @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
 
   @@index([expires_at])
   @@index([usuario_id])
@@ -38,7 +40,7 @@ model Sessao {
 }
 
 model Cliente {
-  id                   String         @id @default(uuid()) @db.Uuid
+  id                   String    @id @default(uuid()) @db.Uuid
   nome                 String
   telefone             String
   whatsapp             String?
@@ -49,10 +51,12 @@ model Cliente {
   preferencia_barbeiro String?
   preferencia_servico  String?
   ultimo_atendimento   DateTime?
-  ativo                Boolean        @default(true)
-  created_at           DateTime       @default(now())
-  updated_at           DateTime       @updatedAt
-  agendamentos         agendamentos[]
+  ativo                Boolean   @default(true)
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @updatedAt
+
+  agendamentos agendamentos[]
+  pagamentos   pagamento[]
 
   @@index([nome])
   @@index([telefone])
@@ -62,17 +66,19 @@ model Cliente {
 }
 
 model Barbeiro {
-  id                  String         @id @default(uuid()) @db.Uuid
-  usuario_id          String         @unique @db.Uuid
+  id                  String   @id @default(uuid()) @db.Uuid
+  usuario_id          String   @unique @db.Uuid
   nome                String
   telefone            String?
   especialidade       String?
-  percentual_comissao Decimal        @default(0) @db.Decimal(5, 2)
-  ativo               Boolean        @default(true)
-  created_at          DateTime       @default(now())
-  updated_at          DateTime       @updatedAt
-  agendamentos        agendamentos[]
-  usuario             Usuario        @relation(fields: [usuario_id], references: [id])
+  percentual_comissao Decimal  @default(0) @db.Decimal(5, 2)
+  ativo               Boolean  @default(true)
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  agendamentos agendamentos[]
+  usuario      Usuario        @relation(fields: [usuario_id], references: [id])
+  comissoes    comissao[]
 
   @@index([nome])
   @@index([ativo])
@@ -80,7 +86,7 @@ model Barbeiro {
 }
 
 model agendamentos {
- id          String   @id @default(uuid()) @db.Uuid
+  id              String   @id @default(uuid()) @db.Uuid
   cliente_id      String   @db.Uuid
   barbeiro_id     String   @db.Uuid
   servico_id      String   @db.Uuid
@@ -92,10 +98,13 @@ model agendamentos {
   valor           Decimal  @db.Decimal(10, 2)
   forma_pagamento String?
   created_at      DateTime @default(now())
-  updated_at  DateTime @updatedAt
-  barbeiros       Barbeiro @relation(fields: [barbeiro_id], references: [id])
-  clientes        Cliente  @relation(fields: [cliente_id], references: [id])
-  servicos        servicos @relation(fields: [servico_id], references: [id])
+  updated_at      DateTime @updatedAt
+
+  barbeiros Barbeiro   @relation(fields: [barbeiro_id], references: [id])
+  clientes  Cliente    @relation(fields: [cliente_id], references: [id])
+  servicos  servicos   @relation(fields: [servico_id], references: [id])
+  pagamento pagamento?
+  comissao  comissao?
 
   @@index([barbeiro_id, data])
   @@index([barbeiro_id])
@@ -106,30 +115,73 @@ model agendamentos {
 }
 
 model servicos {
-  id                  String         @id @default(uuid()) @db.Uuid
+  id                  String   @id @default(uuid()) @db.Uuid
   nome                String
   descricao           String?
   duracao             Int
-  preco               Decimal        @db.Decimal(10, 2)
-  percentual_comissao Decimal?       @db.Decimal(5, 2)
-  ativo               Boolean        @default(true)
-  created_at          DateTime       @default(now())
-  updated_at          DateTime       @updatedAt
-  agendamentos        agendamentos[]
+  preco               Decimal  @db.Decimal(10, 2)
+  percentual_comissao Decimal? @db.Decimal(5, 2)
+  ativo               Boolean  @default(true)
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  agendamentos agendamentos[]
 
   @@index([ativo])
   @@index([nome])
 }
+
 model Configuracao {
-  id                  String   @id @default(uuid()) @db.Uuid
-  nome_barbearia      String
-  telefone            String?
-  endereco            String?
-  horario_abertura    String?
-  horario_fechamento  String?
-  dias_funcionamento  String?
-  created_at          DateTime @default(now())
-  updated_at          DateTime @updatedAt
+  id                 String   @id @default(uuid()) @db.Uuid
+  nome_barbearia     String
+  telefone           String?
+  endereco           String?
+  horario_abertura   String?
+  horario_fechamento String?
+  dias_funcionamento String?
+  comissao_padrao    Decimal  @default(40) @db.Decimal(5, 2)
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
 
   @@map("configuracoes")
+}
+
+model pagamento {
+  id              String   @id @default(uuid()) @db.Uuid
+  agendamento_id  String   @unique @db.Uuid
+  cliente_id      String   @db.Uuid
+  valor           Decimal  @db.Decimal(10, 2)
+  forma_pagamento String
+  status          String   @default("PAGO")
+  data_pagamento  DateTime @default(now())
+  observacoes     String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  agendamento agendamentos @relation(fields: [agendamento_id], references: [id])
+  cliente     Cliente      @relation(fields: [cliente_id], references: [id])
+
+  @@index([cliente_id])
+  @@index([data_pagamento])
+  @@index([forma_pagamento])
+  @@index([status])
+}
+
+model comissao {
+  id             String   @id @default(uuid()) @db.Uuid
+  barbeiro_id    String   @db.Uuid
+  agendamento_id String   @unique @db.Uuid
+  valor_servico  Decimal  @db.Decimal(10, 2)
+  percentual     Decimal  @db.Decimal(5, 2)
+  valor_comissao Decimal  @db.Decimal(10, 2)
+  status         String   @default("PENDENTE")
+  data           DateTime @default(now())
+  created_at     DateTime @default(now())
+
+  barbeiro    Barbeiro     @relation(fields: [barbeiro_id], references: [id])
+  agendamento agendamentos @relation(fields: [agendamento_id], references: [id])
+
+  @@index([barbeiro_id])
+  @@index([status])
+  @@index([data])
 }

@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Barbearia - Sistema Barbearia</title>
+
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/app-shell.css" />
+  </head>
+
+  <body>
+    <div id="app-sidebar"></div>
+    <header id="app-topbar"></header>
+
+    <main class="app-main">
+      <div class="page-header">
+        <h2 class="stripe-accent">Barbearia</h2>
+
+        <button type="button" class="btn btn-primary" id="btnNovoBarbeiro">
+          + Novo barbeiro
+        </button>
+      </div>
+
+      <div class="toolbar">
+        <input
+          type="text"
+          id="buscaInput"
+          class="search-input"
+          placeholder="Buscar por nome, telefone ou especialidade..."
+        />
+
+        <select id="filtroAtivo">
+          <option value="">Todos</option>
+          <option value="true" selected>Ativos</option>
+          <option value="false">Inativos</option>
+        </select>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Telefone</th>
+              <th>Especialidade</th>
+              <th>Comissão</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody id="tabelaBarbeiros">
+            <tr>
+              <td colspan="6" class="empty-state">Carregando...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination" id="paginacao"></div>
+    </main>
+
+    <!-- Modal criar/editar -->
+    <div class="modal-overlay" id="modalOverlay" style="display: none">
+      <div class="modal">
+        <h3 id="modalTitulo" style="margin-bottom: 18px">Novo barbeiro</h3>
+
+        <form id="formBarbeiro">
+          <input type="hidden" id="barbeiroId" />
+
+          <div class="field" id="campoEmail">
+            <label for="email"> E-mail (login de acesso) </label>
+
+            <input
+              type="email"
+              id="email"
+              placeholder="barbeiro@barbearia.com"
+            />
+          </div>
+
+          <div class="field" id="campoSenha">
+            <label for="senha"> Senha temporária </label>
+
+            <input
+              type="password"
+              id="senha"
+              placeholder="Mínimo 8 caracteres, com letras e números"
+            />
+          </div>
+
+          <div class="field">
+            <label for="nome"> Nome </label>
+
+            <input type="text" id="nome" required />
+          </div>
+
+          <div class="field">
+            <label for="telefone"> Telefone </label>
+
+            <input type="tel" id="telefone" />
+          </div>
+
+          <div class="field">
+            <label for="especialidade"> Especialidade </label>
+
+            <input
+              type="text"
+              id="especialidade"
+              placeholder="Ex.: Degradê, barba, platinado..."
+            />
+          </div>
+
+          <div class="field">
+            <label for="percentualComissao"> Comissão padrão (%) </label>
+
+            <input
+              type="number"
+              id="percentualComissao"
+              min="0"
+              max="100"
+              step="0.5"
+              value="40"
+            />
+          </div>
+
+          <div class="field" id="campoAtivo" style="display: none">
+            <label class="checkbox-row">
+              <input type="checkbox" id="ativo" />
+
+              Barbeiro ativo
+            </label>
+          </div>
+
+          <div
+            id="modalErro"
+            class="alert alert-danger"
+            style="display: none; margin-bottom: 16px"
+          ></div>
+
+          <div
+            class="flex gap-8"
+            style="justify-content: flex-end; margin-top: 22px"
+          >
+            <button type="button" class="btn btn-ghost" id="btnCancelarModal">
+              Cancelar
+            </button>
+
+            <button
+              type="submit"
+              class="btn btn-primary"
+              id="btnSalvarBarbeiro"
+            >
+              Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/layout.js"></script>
+    <script src="../js/barbearia.js"></script>
+
+    <script>
+      inicializarLayout("Barbearia");
+    </script>
+  </body>
+</html>

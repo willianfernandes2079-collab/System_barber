@@ -522,3 +522,100 @@ body:has(.login-wrapper)::after {
     height: 280px;
   }
 }
+/* ============================================================
+   RECUPERAÇÃO DE SENHA
+   Ajustes específicos para esquecisenha.html
+   Não afeta o login normal.
+   ============================================================ */
+
+body:has(#formEsqueciSenha) .login-card {
+  grid-template-columns: 1fr;
+  min-height: auto;
+  max-width: 480px;
+}
+
+body:has(#formEsqueciSenha) .login-card::before {
+  display: none;
+}
+
+body:has(#formEsqueciSenha) #title,
+body:has(#formEsqueciSenha) #subtitle,
+body:has(#formEsqueciSenha) .login-form,
+body:has(#formEsqueciSenha) #ou {
+  grid-column: 1;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+body:has(#formEsqueciSenha) #title {
+  padding-top: 40px;
+}
+
+body:has(#formEsqueciSenha) #subtitle {
+  padding-bottom: 24px;
+}
+
+body:has(#formEsqueciSenha) .login-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  padding-bottom: 10px;
+}
+
+body:has(#formEsqueciSenha) #usuario,
+body:has(#formEsqueciSenha) #texto,
+body:has(#formEsqueciSenha) #mensagemResultado,
+body:has(#formEsqueciSenha) #btnEntrar {
+  grid-column: 1;
+}
+
+body:has(#formEsqueciSenha) #texto {
+  margin-bottom: 18px;
+}
+
+body:has(#formEsqueciSenha) #texto input {
+  width: 100%;
+  padding-left: 16px;
+  background-image: none;
+}
+
+body:has(#formEsqueciSenha) #btnEntrar {
+  margin-top: 8px;
+}
+
+body:has(#formEsqueciSenha) #ou {
+  padding-top: 20px;
+  padding-bottom: 24px;
+}
+
+@media (max-width: 600px) {
+  body:has(#formEsqueciSenha) {
+    padding: 20px 12px;
+  }
+
+  body:has(#formEsqueciSenha) .login-card {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 20px;
+  }
+
+  body:has(#formEsqueciSenha) #title,
+  body:has(#formEsqueciSenha) #subtitle,
+  body:has(#formEsqueciSenha) .login-form,
+  body:has(#formEsqueciSenha) #ou {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  body:has(#formEsqueciSenha) #title {
+    padding-top: 28px;
+  }
+
+  body:has(#formEsqueciSenha) #title h1 {
+    font-size: 1.6rem;
+  }
+
+  body:has(#formEsqueciSenha) #subtitle h2 {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+}

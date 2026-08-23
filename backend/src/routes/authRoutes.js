@@ -5,6 +5,7 @@ const autorizar = require("../middlewares/permissionMiddleware");
 const {
   loginLimiter,
   forgotPasswordLimiter,
+  forgotPasswordDailyLimiter,
 } = require("../middlewares/rateLimitMiddleware");
 
 const router = Router();
@@ -16,6 +17,7 @@ router.post("/logout", authController.logout);
 router.post(
   "/forgot-password",
   forgotPasswordLimiter,
+  forgotPasswordDailyLimiter,
   authController.esqueciSenha,
 );
 router.post("/reset-password", authController.redefinirSenha);

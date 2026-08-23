@@ -21,12 +21,21 @@ function msParaData(jwtExpiresIn) {
   return new Date(Date.now() + Number(quantidade) * multiplicadores[unidade]);
 }
 
-async function registrar({ nome, email, senha, telefone, cargo }, { requestUserId, requestUserNome } = {}) {
+async function registrar(
+  { nome, email, senha, telefone, cargo },
+  { requestUserId, requestUserNome } = {},
+) {
   const senha_hash = await hashPassword(senha);
 
   let usuario;
   try {
-    usuario = await userStore.create({ nome, email, senha_hash, telefone, cargo });
+    usuario = await userStore.create({
+      nome,
+      email,
+      senha_hash,
+      telefone,
+      cargo,
+    });
   } catch (err) {
     throw new AppError(err.message || "Não foi possível criar o usuário.", 409);
   }
@@ -56,7 +65,11 @@ async function login({ email, senha, remember = false, userAgent, ip }) {
   }
 
   const accessToken = signAccessToken(usuario);
-  const { token: refreshToken, jti, expiresIn } = signRefreshToken(usuario, { remember });
+  const {
+    token: refreshToken,
+    jti,
+    expiresIn,
+  } = signRefreshToken(usuario, { remember });
 
   sessionStore.criarSessao(usuario.id, jti, {
     expiresAt: msParaData(expiresIn).toISOString(),
@@ -107,10 +120,8 @@ async function logout({ refreshToken }) {
     const payload = verifyRefreshToken(refreshToken);
     sessionStore.revogarSessao(payload.sub, payload.jti);
   } catch {
-
     // Token já inválido/expirado — nada a revogar, mas não é um erro fatal
     // para quem está tentando sair.
-
   }
   return true;
 }
@@ -155,10 +166,10 @@ async function solicitarRecuperacaoSenha({ email }) {
 
   // Mesma resposta independentemente do e-mail existir, para não vazar
   // quais e-mails estão cadastrados.
-  
+
   if (!usuario) return true;
 
-  const { token } = signResetToken(usuario);
+  const token = signResetToken(usuario);
   const linkReset = `/reset-password?token=${token}`;
 
   await emailService.enviarEmail({

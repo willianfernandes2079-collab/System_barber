@@ -47,18 +47,14 @@
 
     <div id="status">
       <select name="status">
-        <option value="pendente">Pendente</option>
-        <option value="confirmado">Confirmado</option>
-        <option value="cancelado">Cancelado</option>
+          <option value="confirmado">Confirmado</option>
+          <option value="pendente">Pendente</option>
+          <option value="cancelado">Cancelado</option>
       </select>
     </div>
 
     <div id="observacao">
       <textarea name="observacao" placeholder="Observação"></textarea>
-    </div>
-
-    <div id="volta">
-      <label>Voltar</label>
     </div>
 
     <div id="btnVolta">
@@ -70,245 +66,173 @@
 </html>
 
 <script>
-    const token = localStorage.getItem("accessToken");
+  const token = localStorage.getItem("accessToken");
 
-    if (!token) {
-        window.location.href = "/login";
+  if (!token) {
+    window.location.href = "/login";
+  }
+
+  const clienteSelect = document.getElementById("clienteSelect");
+  const barbeiroSelect = document.getElementById("barbeiroSelect");
+  const servicoSelect = document.getElementById("servicoSelect");
+  const mensagem = document.getElementById("mensagem");
+
+  // CARREGAR CLIENTES
+
+  async function carregarClientes() {
+    try {
+      const resposta = await fetch("/api/clientes?ativo=true", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const resultado = await resposta.json();
+
+      if (!resposta.ok || !resultado.success) {
+        throw new Error(resultado.message || "Erro ao carregar clientes.");
+      }
+
+      clienteSelect.innerHTML = '<option value="">Selecione o cliente</option>';
+
+      resultado.data.forEach((cliente) => {
+        const option = document.createElement("option");
+
+        option.value = cliente.id;
+
+        option.textContent = `${cliente.nome} - ${cliente.telefone}`;
+
+        clienteSelect.appendChild(option);
+      });
+    } catch (erro) {
+      console.error("Erro ao carregar clientes:", erro);
+
+      mensagem.textContent = "Erro ao carregar clientes.";
+    }
+  }
+
+  // CARREGAR BARBEIROS
+
+  async function carregarBarbeiros() {
+    try {
+      const resposta = await fetch("/api/barbeiros?ativo=true", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const resultado = await resposta.json();
+
+      if (!resposta.ok || !resultado.success) {
+        throw new Error(resultado.message || "Erro ao carregar barbeiros.");
+      }
+
+      barbeiroSelect.innerHTML =
+        '<option value="">Selecione o barbeiro</option>';
+
+      resultado.data.forEach((barbeiro) => {
+        const option = document.createElement("option");
+
+        option.value = barbeiro.id;
+
+        option.textContent = barbeiro.nome;
+
+        barbeiroSelect.appendChild(option);
+      });
+    } catch (erro) {
+      console.error("Erro ao carregar barbeiros:", erro);
+
+      mensagem.textContent = "Erro ao carregar barbeiros.";
+    }
+  }
+
+  // CARREGAR SERVIÇOS
+
+  async function carregarServicos() {
+    try {
+      const resposta = await fetch("/api/servicos", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const resultado = await resposta.json();
+
+      if (!resposta.ok || !resultado.success) {
+        throw new Error(resultado.message || "Erro ao carregar serviços.");
+      }
+
+      servicoSelect.innerHTML = '<option value="">Selecione o serviço</option>';
+
+      resultado.data.forEach((servico) => {
+        const option = document.createElement("option");
+
+        option.value = servico.id;
+
+        option.textContent = `${servico.nome} - R$ ${Number(servico.preco).toFixed(2)}`;
+
+        servicoSelect.appendChild(option);
+      });
+    } catch (erro) {
+      console.error("Erro ao carregar serviços:", erro);
+
+      mensagem.textContent = "Erro ao carregar serviços.";
+    }
+  }
+
+  // QUANDO ESCOLHER O SERVIÇO
+
+  servicoSelect.addEventListener("change", async () => {
+    const servicoId = servicoSelect.value;
+
+    if (!servicoId) {
+      document.getElementById("valor").value = "";
+
+      delete servicoSelect.dataset.duracao;
+
+      return;
     }
 
-    const clienteSelect = document.getElementById("clienteSelect");
-    const barbeiroSelect = document.getElementById("barbeiroSelect");
-    const servicoSelect = document.getElementById("servicoSelect");
-    const mensagem = document.getElementById("mensagem");
-    
-    // CARREGAR CLIENTES
+    try {
+      const resposta = await fetch(`/api/servicos/${servicoId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    async function carregarClientes() {
+      const resultado = await resposta.json();
 
-        try {
+      if (!resposta.ok || !resultado.success) {
+        throw new Error(resultado.message || "Erro ao buscar serviço.");
+      }
 
-            const resposta = await fetch(
-                "/api/clientes?ativo=true",
-                {
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                }
-            );
+      const servico = resultado.data;
 
-            const resultado = await resposta.json();
+      // Preenche o valor automaticamente
 
-            if (!resposta.ok || !resultado.success) {
-                throw new Error(
-                    resultado.message ||
-                    "Erro ao carregar clientes."
-                );
-            }
+      document.getElementById("valor").value = Number(servico.preco).toFixed(2);
 
-            clienteSelect.innerHTML =
-                '<option value="">Selecione o cliente</option>';
+      // Guarda a duração do serviço
 
-            resultado.data.forEach(cliente => {
+      servicoSelect.dataset.duracao = servico.duracao;
+    } catch (erro) {
+      console.error("Erro ao buscar informações do serviço:", erro);
 
-                const option = document.createElement("option");
-
-                option.value = cliente.id;
-
-                option.textContent =
-                    `${cliente.nome} - ${cliente.telefone}`;
-
-                clienteSelect.appendChild(option);
-            });
-
-        } catch (erro) {
-
-            console.error(
-                "Erro ao carregar clientes:",
-                erro
-            );
-
-            mensagem.textContent =
-                "Erro ao carregar clientes.";
-        }
+      mensagem.textContent = "Erro ao carregar informações do serviço.";
     }
+  });
 
-    // CARREGAR BARBEIROS
+  // CARREGAR TODOS OS DADOS
 
-    async function carregarBarbeiros() {
+  async function carregarDados() {
+    await carregarClientes();
 
-        try {
+    await carregarBarbeiros();
 
-            const resposta = await fetch(
-                "/api/barbeiros?ativo=true",
-                {
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                }
-            );
+    await carregarServicos();
+  }
 
-            const resultado = await resposta.json();
+  // INICIAR
 
-            if (!resposta.ok || !resultado.success) {
-                throw new Error(
-                    resultado.message ||
-                    "Erro ao carregar barbeiros."
-                );
-            }
-
-            barbeiroSelect.innerHTML =
-                '<option value="">Selecione o barbeiro</option>';
-
-            resultado.data.forEach(barbeiro => {
-
-                const option =
-                    document.createElement("option");
-
-                option.value = barbeiro.id;
-
-                option.textContent =
-                    barbeiro.nome;
-
-                barbeiroSelect.appendChild(option);
-            });
-
-        } catch (erro) {
-
-            console.error(
-                "Erro ao carregar barbeiros:",
-                erro
-            );
-
-            mensagem.textContent =
-                "Erro ao carregar barbeiros.";
-        }
-    }
-
-    // CARREGAR SERVIÇOS
-
-    async function carregarServicos() {
-
-        try {
-
-            const resposta = await fetch(
-                "/api/servicos",
-                {
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                }
-            );
-
-            const resultado = await resposta.json();
-
-            if (!resposta.ok || !resultado.success) {
-                throw new Error(
-                    resultado.message ||
-                    "Erro ao carregar serviços."
-                );
-            }
-
-            servicoSelect.innerHTML =
-                '<option value="">Selecione o serviço</option>';
-
-            resultado.data.forEach(servico => {
-
-                const option =
-                    document.createElement("option");
-
-                option.value = servico.id;
-
-                option.textContent =
-                    `${servico.nome} - R$ ${Number(servico.preco).toFixed(2)}`;
-
-                servicoSelect.appendChild(option);
-            });
-
-        } catch (erro) {
-
-            console.error(
-                "Erro ao carregar serviços:",
-                erro
-            );
-
-            mensagem.textContent =
-                "Erro ao carregar serviços.";
-        }
-    }
-
-    // QUANDO ESCOLHER O SERVIÇO
-
-    servicoSelect.addEventListener("change", async () => {
-
-        const servicoId = servicoSelect.value;
-
-        if (!servicoId) {
-
-            document.getElementById("valor").value = "";
-
-            delete servicoSelect.dataset.duracao;
-
-            return;
-        }
-
-        try {
-
-            const resposta = await fetch(
-                `/api/servicos/${servicoId}`,
-                {
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                }
-            );
-
-            const resultado = await resposta.json();
-
-            if (!resposta.ok || !resultado.success) {
-
-                throw new Error(
-                    resultado.message ||
-                    "Erro ao buscar serviço."
-                );
-            }
-
-            const servico = resultado.data;
-
-            // Preenche o valor automaticamente
-
-            document.getElementById("valor").value =
-                Number(servico.preco).toFixed(2);
-
-            // Guarda a duração do serviço
-
-            servicoSelect.dataset.duracao =
-                servico.duracao;
-
-        } catch (erro) {
-
-            console.error(
-                "Erro ao buscar informações do serviço:",
-                erro
-            );
-
-            mensagem.textContent =
-                "Erro ao carregar informações do serviço.";
-        }
-    });
-
-    // CARREGAR TODOS OS DADOS
-
-    async function carregarDados() {
-
-        await carregarClientes();
-
-        await carregarBarbeiros();
-
-        await carregarServicos();
-    }
-
-    // INICIAR
-
-    carregarDados();
-
+  carregarDados();
 </script>

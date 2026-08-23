@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Financeiro - Sistema Barbearia</title>
+
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/app-shell.css">
+</head>
+
+<body>
+  <div id="app-sidebar"></div>
+  <header id="app-topbar"></header>
+
+  <main class="app-main">
+
+    <div class="page-header">
+      <h2 class="stripe-accent">Financeiro</h2>
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        id="btnRegistrarPagamento"
+      >
+        + Registrar pagamento
+      </button>
+    </div>
+
+    <div class="banner-em-construcao">
+      💰 Dados financeiros conectados ao backend.
+    </div>
+
+    <div class="stat-grid">
+
+      <div class="card stat-card">
+        <span class="stat-label">
+          Faturamento hoje
+        </span>
+
+        <span
+          class="stat-value"
+          id="statFaturamentoHoje"
+        >
+          R$ 0,00
+        </span>
+      </div>
+
+      <div class="card stat-card">
+        <span class="stat-label">
+          Faturamento no mês
+        </span>
+
+        <span
+          class="stat-value"
+          id="statFaturamentoMes"
+        >
+          R$ 0,00
+        </span>
+      </div>
+
+      <div class="card stat-card">
+        <span class="stat-label">
+          Ticket médio
+        </span>
+
+        <span
+          class="stat-value"
+          id="statTicketMedio"
+        >
+          R$ 0,00
+        </span>
+      </div>
+
+      <div class="card stat-card">
+        <span class="stat-label">
+          Comissões do mês
+        </span>
+
+        <span
+          class="stat-value"
+          id="statComissoes"
+        >
+          R$ 0,00
+        </span>
+      </div>
+
+    </div>
+
+    <h3 class="section-title">
+      Formas de pagamento (mês atual)
+    </h3>
+
+    <div
+      class="table-wrapper"
+      style="margin-bottom: 28px;"
+    >
+      <table class="table">
+
+        <thead>
+          <tr>
+            <th>Forma</th>
+            <th>Valor</th>
+            <th>% do total</th>
+          </tr>
+        </thead>
+
+        <tbody id="tabelaFormasPagamento">
+          <tr>
+            <td
+              colspan="3"
+              class="empty-state"
+            >
+              Carregando...
+            </td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+
+    <h3 class="section-title">
+      Pagamentos recentes
+    </h3>
+
+    <div
+      class="table-wrapper"
+      style="margin-bottom: 28px;"
+    >
+      <table class="table">
+
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Cliente</th>
+            <th>Serviço</th>
+            <th>Forma</th>
+            <th>Valor</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+
+        <tbody id="tabelaPagamentos">
+          <tr>
+            <td
+              colspan="6"
+              class="empty-state"
+            >
+              Carregando...
+            </td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+
+    <h3 class="section-title">
+      Comissões
+    </h3>
+
+    <div class="table-wrapper">
+      <table class="table">
+
+        <thead>
+          <tr>
+            <th>Barbeiro</th>
+            <th>Valor do serviço</th>
+            <th>Percentual</th>
+            <th>Comissão</th>
+            <th>Status</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+
+        <tbody id="tabelaComissoes">
+          <tr>
+            <td
+              colspan="6"
+              class="empty-state"
+            >
+              Carregando...
+            </td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+
+  </main>
+
+       <!-- MODAL — REGISTRAR PAGAMENTO -->
+
+  <div
+    class="modal-overlay"
+    id="modalOverlay"
+    style="display: none;"
+  >
+
+    <div class="modal">
+
+      <h3 style="margin-bottom: 18px;">
+        Registrar pagamento
+      </h3>
+
+      <form id="formPagamento">
+
+        <!-- AGENDAMENTO -->
+
+        <div class="field">
+
+          <label for="agendamentoId">
+            Agendamento
+          </label>
+
+          <select
+            id="agendamentoId"
+            required
+          >
+            <option value="">
+              Carregando agendamentos...
+            </option>
+          </select>
+
+          <small
+            id="infoAgendamento"
+            style="
+              display: block;
+              margin-top: 6px;
+              color: var(--color-text-muted);
+            "
+          ></small>
+
+        </div>
+
+        <!-- FORMA DE PAGAMENTO -->
+
+        <div class="field">
+
+          <label for="formaPagamento">
+            Forma de pagamento
+          </label>
+
+          <select
+            id="formaPagamento"
+            required
+          >
+
+            <option value="">
+              Selecione uma forma de pagamento
+            </option>
+
+            <option value="DINHEIRO">
+              Dinheiro
+            </option>
+
+            <option value="PIX">
+              Pix
+            </option>
+
+            <option value="DEBITO">
+              Cartão de débito
+            </option>
+
+            <option value="CREDITO">
+              Cartão de crédito
+            </option>
+
+            <option value="OUTROS">
+              Outros
+            </option>
+
+          </select>
+
+        </div>
+
+        <!-- VALOR -->
+
+        <div class="field">
+
+          <label for="valorPagamento">
+            Valor
+          </label>
+
+          <input
+            type="number"
+            id="valorPagamento"
+            min="0"
+            step="0.01"
+            placeholder="Valor do pagamento"
+            required
+          >
+
+          <small
+            style="
+              display: block;
+              margin-top: 6px;
+              color: var(--color-text-muted);
+            "
+          >
+            O valor será preenchido automaticamente pelo agendamento,
+            mas pode ser ajustado antes do pagamento.
+          </small>
+
+        </div>
+
+        <!-- OBSERVAÇÕES -->
+
+        <div class="field">
+
+          <label for="observacoesPagamento">
+            Observações
+          </label>
+
+          <textarea
+            id="observacoesPagamento"
+            rows="3"
+            placeholder="Observações do pagamento"
+          ></textarea>
+
+        </div>
+
+        <!-- ERRO -->
+
+        <div
+          id="modalErro"
+          class="alert alert-danger"
+          style="
+            display: none;
+            margin-bottom: 16px;
+          "
+        ></div>
+
+        <!-- BOTÕES -->
+
+        <div
+          class="flex gap-8"
+          style="
+            justify-content: flex-end;
+            margin-top: 22px;
+          "
+        >
+
+          <button
+            type="button"
+            class="btn btn-ghost"
+            id="btnCancelarModal"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            class="btn btn-primary"
+          >
+            Registrar pagamento
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+  <div
+    class="toast-container"
+    id="toastContainer"
+  ></div>
+
+       <!-- SCRIPTS -->
+
+  <script src="../js/api.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/layout.js"></script>
+  <script src="../js/financeiros.js"></script>
+
+  <script>
+    inicializarLayout("Financeiro");
+  </script>
+
+</body>
+</html>
+

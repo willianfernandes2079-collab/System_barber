@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Relatórios - Sistema Barbearia</title>
+
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/app-shell.css" />
+  </head>
+
+  <body>
+    <div id="app-sidebar"></div>
+    <header id="app-topbar"></header>
+
+    <main class="app-main">
+      <div class="page-header">
+        <h2 class="stripe-accent">Relatórios</h2>
+
+        <select id="periodoSelect">
+          <option value="hoje">Hoje</option>
+          <option value="ontem">Ontem</option>
+          <option value="7dias">Últimos 7 dias</option>
+          <option value="30dias" selected>Últimos 30 dias</option>
+          <option value="mes_atual">Este mês</option>
+          <option value="mes_anterior">Mês anterior</option>
+          <option value="personalizado">Período personalizado</option>
+        </select>
+      </div>
+
+      <div class="banner-em-construcao">
+        ⚠️ Módulo de relatórios ainda não está conectado ao backend — clique em
+        um card para ver como vai funcionar.
+      </div>
+
+      <div class="report-grid">
+        <div class="card report-card" data-relatorio="faturamento">
+          <div class="icone">💰</div>
+          <h4>Faturamento</h4>
+          <p>Receita por dia, semana e mês.</p>
+        </div>
+
+        <div class="card report-card" data-relatorio="clientes">
+          <div class="icone">👥</div>
+          <h4>Clientes</h4>
+          <p>Novos clientes, retenção e clientes inativos.</p>
+        </div>
+
+        <div class="card report-card" data-relatorio="servicos">
+          <div class="icone">✂️</div>
+          <h4>Serviços</h4>
+          <p>Serviços mais vendidos e ticket médio por serviço.</p>
+        </div>
+
+        <div class="card report-card" data-relatorio="barbeiros">
+          <div class="icone">💈</div>
+          <h4>Barbeiros</h4>
+          <p>Faturamento e comissão por barbeiro.</p>
+        </div>
+
+        <div class="card report-card" data-relatorio="comissoes">
+          <div class="icone">📈</div>
+          <h4>Comissões</h4>
+          <p>Comissões pagas e pendentes por período.</p>
+        </div>
+
+        <div class="card report-card" data-relatorio="pagamentos">
+          <div class="icone">💳</div>
+          <h4>Formas de pagamento</h4>
+          <p>Distribuição entre Pix, cartão e dinheiro.</p>
+        </div>
+
+        <div class="card report-card" data-relatorio="cancelamentos">
+          <div class="icone">🚫</div>
+          <h4>Cancelamentos e faltas</h4>
+          <p>Taxa de cancelamento e de não comparecimento.</p>
+        </div>
+
+        <div class="card report-card" data-relatorio="inativos">
+          <div class="icone">📅</div>
+          <h4>Clientes para retorno</h4>
+          <p>Clientes que passaram da regra de retorno (30 dias).</p>
+        </div>
+      </div>
+    </main>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/layout.js"></script>
+    <script src="../js/relatorios.js"></script>
+
+    <script>
+      inicializarLayout("Relatórios");
+    </script>
+  </body>
+</html>

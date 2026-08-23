@@ -1,12 +1,7 @@
 const rateLimit = require("express-rate-limit");
 
-/**
-  Limita tentativas de login e de recuperação de senha para dificultar
-  ataques de força bruta (item 33 da especificação).*/
-
-  
 const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
+  windowMs: 15 * 60 * 1000,
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
@@ -17,14 +12,30 @@ const loginLimiter = rateLimit({
 });
 
 const forgotPasswordLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hora
-  max: 5,
+  windowMs: 15 * 60 * 1000,
+  max: 1,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
     success: false,
-    message: "Muitas solicitações de recuperação de senha. Tente novamente mais tarde.",
+    message:
+      "Você já solicitou uma recuperação. Tente novamente em 15 minutos.",
   },
 });
 
-module.exports = { loginLimiter, forgotPasswordLimiter };
+const forgotPasswordDailyLimiter = rateLimit({
+  windowMs: 24 * 60 * 60 * 1000,
+  max: 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Limite diário de recuperação atingido. Tente novamente amanhã.",
+  },
+});
+
+module.exports = {
+  loginLimiter,
+  forgotPasswordLimiter,
+  forgotPasswordDailyLimiter,
+};

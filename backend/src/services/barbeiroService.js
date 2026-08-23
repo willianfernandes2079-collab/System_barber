@@ -15,7 +15,7 @@ async function listarBarbeiros({ pagina = 1, limite = 20, busca = "", ativo }) {
 
   if (busca && busca.trim()) {
     const termo = busca.trim();
-
+    
     where.OR = [
       {
         nome: {

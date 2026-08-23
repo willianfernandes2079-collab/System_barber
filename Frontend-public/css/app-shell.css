@@ -1,0 +1,171 @@
+/* ============================================================
+   APP-SHELL.CSS — layout compartilhado (sidebar + topbar)
+   Usado por toda página interna: barbearia, clientes, servicos,
+   financeiros, relatorios, agendamentos, configuracao, index.
+   Requer um <div id="app-sidebar"> e <header id="app-topbar">
+   vazios no HTML — js/layout.js preenche o conteúdo.
+   ============================================================ */
+
+body:has(#app-sidebar) {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: var(--navbar-height) 1fr;
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+#app-sidebar {
+  grid-row: 1 / -1;
+  grid-column: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+#app-topbar {
+  grid-row: 1;
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 28px;
+}
+
+.app-main {
+  grid-row: 2;
+  grid-column: 2;
+  padding: 28px;
+  overflow-y: auto;
+}
+
+.app-sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 10px 22px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-text-heading);
+}
+
+.app-sidebar-logo { font-size: 1.4rem; }
+.app-sidebar-title { font-size: 1.05rem; }
+
+.app-sidebar-nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+
+.app-sidebar-logout { justify-content: flex-start; margin-top: auto; }
+
+.app-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: var(--color-text-heading);
+}
+
+.app-topbar-title { font-size: 1.3rem; flex: 1; }
+
+.app-topbar-user { display: flex; align-items: center; gap: 10px; }
+.app-topbar-user-name { font-weight: 600; color: var(--color-text-heading); font-size: 0.92rem; }
+
+/* Cabeçalho de página (título + botão de ação principal) */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.page-header h2 { font-size: 1.5rem; }
+
+/* Barra de busca/filtros acima de listas */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.toolbar .search-input { max-width: 320px; flex: 1; margin-bottom: 0; }
+
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--color-text-muted);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 20px;
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+}
+
+/* Cards de estatística (financeiro/relatórios/dashboard) */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px;
+  margin-bottom: 28px;
+}
+.stat-card { display: flex; flex-direction: column; gap: 6px; }
+.stat-card .stat-label {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.stat-card .stat-value {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--color-text-heading);
+  font-family: var(--font-display);
+}
+
+.section-title {
+  font-size: 1.05rem;
+  margin-bottom: 14px;
+}
+
+.banner-em-construcao {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  background: var(--color-warning-soft);
+  color: var(--color-warning-text);
+  border: 1px solid rgba(247, 144, 9, 0.3);
+  font-size: 0.88rem;
+  margin-bottom: 24px;
+}
+
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+.report-card { cursor: pointer; }
+.report-card .icone {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  border-radius: var(--radius-md);
+  background: var(--color-accent-soft);
+  margin-bottom: 12px;
+}
+
+@media (max-width: 900px) {
+  body:has(#app-sidebar) { grid-template-columns: 1fr; }
+  #app-topbar { grid-column: 1; }
+  .app-main { grid-column: 1; }
+  .app-menu-toggle { display: block; }
+}
