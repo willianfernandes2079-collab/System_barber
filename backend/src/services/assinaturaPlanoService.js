@@ -47,40 +47,38 @@ async function listarAssinaturasCliente(cliente_id) {
 async function listarAssinaturasAtivas(cliente_id) {
   const agora = new Date();
 
-  const assinaturas =
-    await prisma.assinaturaPlano.findMany({
-      where: {
-        cliente_id,
-        status: "ATIVO",
-        data_fim: {
-          gte: agora,
-        },
+  const assinaturas = await prisma.assinaturaPlano.findMany({
+    where: {
+      cliente_id,
+      status: "ATIVO",
+      data_fim: {
+        gte: agora,
       },
+    },
 
-      include: {
-        plano: {
-          include: {
-            servico: {
-              select: {
-                id: true,
-                nome: true,
-                duracao: true,
-                preco: true,
-              },
+    include: {
+      plano: {
+        include: {
+          servico: {
+            select: {
+              id: true,
+              nome: true,
+              duracao: true,
+              preco: true,
             },
           },
         },
       },
+    },
 
-      orderBy: {
-        data_fim: "asc",
-      },
-    });
+    orderBy: {
+      data_fim: "asc",
+    },
+  });
 
   return assinaturas.filter(
     (assinatura) =>
-      assinatura.quantidade_utilizada <
-      assinatura.quantidade_total,
+      assinatura.quantidade_utilizada < assinatura.quantidade_total,
   );
 }
 

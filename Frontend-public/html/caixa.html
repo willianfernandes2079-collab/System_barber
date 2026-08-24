@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> Sistema de Caixa </title>
+
+  <link rel="stylesheet" href="../css/global.css">
+
+  <link rel="stylesheet" href="../css/app-shell.css">
+
+  <link rel="stylesheet" href="../css/caixa.css">
+
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Sidebar de Navegação -->
+    <aside class="app-sidebar">
+      <div class="brand-logo">
+        <span class="brand-icon">💈</span>
+        <span class="brand-title">BARBEARIA</span>
+      </div>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="#"><span>📊</span> <span>Painel</span></a></li>
+        <li class="nav-item active"><a href="#"><span>💻</span> <span>Caixa / POS</span></a></li>
+        <li class="nav-item"><a href="#"><span>📅</span> <span>Agendas</span></a></li>
+        <li class="nav-item"><a href="#"><span>👥</span> <span>Clientes</span></a></li>
+        <li class="nav-item"><a href="#"><span>⚙️</span> <span>Ajustes</span></a></li>
+      </ul>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <div class="app-content">
+      
+      <!-- Topbar Header -->
+      <header class="app-topbar">
+        <div class="topbar-status">
+          <span class="badge-status">Caixa Aberto</span>
+          <span class="operator-info">Operador: <strong>Carlos Silva</strong></span>
+        </div>
+        <div id="data-hora-atual" style="color: var(--text-secondary); font-size: 0.85rem;"></div>
+      </header>
+
+      <!-- Grade Principal do Caixa -->
+      <main class="caixa-main">
+        
+        <!-- PAINEL ESQUERDO: Catálogo e Seleção -->
+        <section class="catalog-section">
+          <div class="catalog-controls">
+            <div class="search-bar">
+              <input type="text" id="input-busca" placeholder="Buscar serviço ou produto..." oninput="filtrarItens()">
+            </div>
+            
+            <div class="category-tabs">
+              <button class="tab-btn active" onclick="filtrarCategoria('todos')">Todos</button>
+              <button class="tab-btn" onclick="filtrarCategoria('servicos')">Serviços</button>
+              <button class="tab-btn" onclick="filtrarCategoria('produtos')">Produtos</button>
+              <button class="tab-btn" onclick="filtrarCategoria('bebidas')">Bebidas</button>
+            </div>
+          </div>
+
+          <!-- Grid Dinâmico de Produtos -->
+          <div class="products-grid" id="grid-produtos">
+            <!-- Renderizado via app.js -->
+          </div>
+        </section>
+
+        <!-- PAINEL DIREITO: Comanda Atual e Pagamento -->
+        <section class="checkout-section">
+          <div class="checkout-header">
+            <span class="checkout-title">Comanda Atual</span>
+            <span id="comanda-numero" style="font-size: 0.8rem; color: var(--text-secondary);">#0042</span>
+          </div>
+
+          <!-- Tabela com Itens Adicionados -->
+          <div class="cart-list-container">
+            <table class="cart-table">
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th style="width: 70px;">Qtd</th>
+                  <th>Preço</th>
+                  <th style="width: 30px;"></th>
+                </tr>
+              </thead>
+              <tbody id="cart-tbody">
+                <!-- Preenchido dinamicamente -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Detalhes e Ajustes de Pagamento -->
+          <div class="payment-form">
+            <div class="form-group">
+              <label for="cliente-nome">Cliente / Profissional</label>
+              <input type="text" id="cliente-nome" class="form-control" placeholder="Nome do cliente (Opcional)">
+            </div>
+
+            <div class="form-group">
+              <label for="forma-pagamento">Forma de Pagamento</label>
+              <select id="forma-pagamento" class="form-control" onchange="alternarCamposPagamento()">
+                <option value="dinheiro">Dinheiro</option>
+                <option value="pix">PIX</option>
+                <option value="debito">Cartão de Débito</option>
+                <option value="credito">Cartão de Crédito</option>
+              </select>
+            </div>
+
+            <!-- Campo Dinâmico para Recebido/Troco -->
+            <div class="form-group" id="grupo-dinheiro">
+              <label for="valor-recebido">Valor Entregue (R$)</label>
+              <input type="number" id="valor-recebido" class="form-control" step="0.01" placeholder="0,00" oninput="calcularCalculosValores()">
+              <div class="quick-cash-container">
+                <button type="button" class="btn-quick-cash" onclick="aplicarAtalhoDinheiro(20)">R$ 20</button>
+                <button type="button" class="btn-quick-cash" onclick="aplicarAtalhoDinheiro(50)">R$ 50</button>
+                <button type="button" class="btn-quick-cash" onclick="aplicarAtalhoDinheiro(100)">R$ 100</button>
+                <button type="button" class="btn-quick-cash" onclick="aplicarValorExato()">Exato</button>
+              </div>
+            </div>
+
+            <!-- Quadrado do Resumo Final -->
+            <div class="summary-box">
+              <div class="summary-row">
+                <span>Subtotal:</span>
+                <span id="subtotal-val">R$ 0,00</span>
+              </div>
+              <div class="summary-row" id="linha-troco">
+                <span>Troco:</span>
+                <span id="troco-val" class="troco-valido">R$ 0,00</span>
+              </div>
+              <div class="summary-row total-row">
+                <span>TOTAL:</span>
+                <span id="total-val" class="total-amount">R$ 0,00</span>
+              </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="action-buttons">
+              <button type="button" class="btn btn-danger" onclick="limparComanda()">Cancelar</button>
+              <button type="button" class="btn btn-primary" onclick="finalizarVenda()">Finalizar</button>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal de Recibo/Comprovante -->
+  <div class="modal-overlay" id="modal-recibo">
+    <div class="modal-card">
+      <div class="receipt-header">
+        <strong>BARBEARIA CLUB</strong><br>
+        <small>Comprovante de Pagamento</small>
+      </div>
+      <div class="receipt-body" id="recibo-conteudo">
+        <!-- Conteúdo via JS -->
+      </div>
+      <div class="receipt-footer">
+        Obrigado pela preferência!<br>Volte sempre.
+      </div>
+      <button class="btn btn-primary" style="width: 100%; margin-top: 15px;" onclick="fecharModal()">Fechar e Novo Atendimento</button>
+    </div>
+  </div>
+
+  <!-- Arquivo de Lógica -->
+  <script src="../js/app.js"></script>
+</body>
+</html>
