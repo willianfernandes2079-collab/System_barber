@@ -1,91 +1,128 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Serviços - Sistema Barbearia</title>
-  <link rel="stylesheet" href="css/global.css"/>
-  <link rel="stylesheet" href="css/app-shell.css"/>
-</head>
-<body>
-  <div id="app-sidebar"></div>
-  <header id="app-topbar"></header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Serviços - Sistema Barbearia</title>
 
-  <main class="app-main">
-    <div class="page-header">
-      <h2 class="stripe-accent">Serviços</h2>
-      <button type="button" class="btn btn-primary" id="btnNovoServico">+ Novo serviço</button>
+    <!-- CSS GLOBAL -->
+    <link rel="stylesheet" href="../css/global.css" />
+
+    <!-- CSS shell -->
+    <link rel="stylesheet" href="../css/app-shell.css" />
+  </head>
+  <body>
+    <div id="app-sidebar"></div>
+    <header id="app-topbar"></header>
+
+    <main class="app-main">
+      <div class="page-header">
+        <h2 class="stripe-accent">Serviços</h2>
+        <button type="button" class="btn btn-primary" id="btnNovoServico">
+          + Novo serviço
+        </button>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Duração</th>
+              <th>Preço</th>
+              <th>Comissão</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tabelaServicos">
+            <tr>
+              <td colspan="6" class="empty-state">Carregando...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <!-- Modal criar/editar -->
+    <div class="modal-overlay" id="modalOverlay" style="display: none">
+      <div class="modal">
+        <h3 id="modalTitulo" style="margin-bottom: 18px">Novo serviço</h3>
+        <form id="formServico">
+          <input type="hidden" id="servicoId" />
+
+          <div class="field">
+            <label for="nome">Nome</label>
+            <input
+              type="text"
+              id="nome"
+              placeholder="Ex.: Corte + Barba"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label for="descricao">Descrição</label>
+            <textarea id="descricao" rows="2"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="duracao">Duração (minutos)</label>
+            <input
+              type="number"
+              id="duracao"
+              min="5"
+              step="5"
+              value="30"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label for="preco">Preço (R$)</label>
+            <input type="number" id="preco" min="0" step="0.5" required />
+          </div>
+
+          <div class="field">
+            <label for="percentualComissao">Comissão do barbeiro (%)</label>
+            <input
+              type="number"
+              id="percentualComissao"
+              min="0"
+              max="100"
+              step="0.5"
+              placeholder="Deixe em branco para usar a comissão padrão da barbearia"
+            />
+          </div>
+
+          <div class="field" id="campoAtivo" style="display: none">
+            <label class="checkbox-row">
+              <input type="checkbox" id="ativo" />
+              Serviço ativo
+            </label>
+          </div>
+
+          <div
+            id="modalErro"
+            class="alert alert-danger"
+            style="display: none; margin-bottom: 16px"
+          ></div>
+
+          <div
+            class="flex gap-8"
+            style="justify-content: flex-end; margin-top: 22px"
+          >
+            <button type="button" class="btn btn-ghost" id="btnCancelarModal">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary" id="btnSalvarServico">
+              Salvar
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
 
-    <div class="table-wrapper">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>Duração</th>
-            <th>Preço</th>
-            <th>Comissão</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="tabelaServicos">
-          <tr><td colspan="6" class="empty-state">Carregando...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </main>
-
-  <!-- Modal criar/editar -->
-  <div class="modal-overlay" id="modalOverlay" style="display: none;">
-    <div class="modal">
-      <h3 id="modalTitulo" style="margin-bottom: 18px;">Novo serviço</h3>
-      <form id="formServico">
-        <input type="hidden" id="servicoId" />
-
-        <div class="field">
-          <label for="nome">Nome</label>
-          <input type="text" id="nome" placeholder="Ex.: Corte + Barba" required />
-        </div>
-
-        <div class="field">
-          <label for="descricao">Descrição</label>
-          <textarea id="descricao" rows="2"></textarea>
-        </div>
-
-        <div class="field">
-          <label for="duracao">Duração (minutos)</label>
-          <input type="number" id="duracao" min="5" step="5" value="30" required />
-        </div>
-
-        <div class="field">
-          <label for="preco">Preço (R$)</label>
-          <input type="number" id="preco" min="0" step="0.5" required />
-        </div>
-
-        <div class="field">
-          <label for="percentualComissao">Comissão do barbeiro (%)</label>
-          <input type="number" id="percentualComissao" min="0" max="100" step="0.5" placeholder="Deixe em branco para usar a comissão padrão da barbearia" />
-        </div>
-
-        <div class="field" id="campoAtivo" style="display: none;">
-          <label class="checkbox-row">
-            <input type="checkbox" id="ativo" />
-            Serviço ativo
-          </label>
-        </div>
-
-        <div id="modalErro" class="alert alert-danger" style="display: none; margin-bottom: 16px;"></div>
-
-        <div class="flex gap-8" style="justify-content: flex-end; margin-top: 22px;">
-          <button type="button" class="btn btn-ghost" id="btnCancelarModal">Cancelar</button>
-          <button type="submit" class="btn btn-primary" id="btnSalvarServico">Salvar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <div class="toast-container" id="toastContainer"></div>
-
-</body>
+    <div class="toast-container" id="toastContainer"></div>
+  </body>
 </html>

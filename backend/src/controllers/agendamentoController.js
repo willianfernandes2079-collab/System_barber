@@ -36,7 +36,8 @@ async function buscarPorId(req, res, next) {
   try {
     const { id } = req.params;
 
-    const agendamento = await agendamentoService.buscarAgendamentoPorId(id);
+    const agendamento =
+      await agendamentoService.buscarAgendamentoPorId(id);
 
     if (!agendamento) {
       return res.status(404).json({
@@ -85,19 +86,20 @@ async function criar(req, res, next) {
       });
     }
 
-    const agendamento = await agendamentoService.criarAgendamento({
-      cliente_id,
-      barbeiro_id,
-      servico_id,
-      assinatura_plano_id,
-      data,
-      horario_inicio,
-      horario_fim,
-      status,
-      observacoes,
-      valor,
-      forma_pagamento,
-    });
+    const agendamento =
+      await agendamentoService.criarAgendamento({
+        cliente_id,
+        barbeiro_id,
+        servico_id,
+        assinatura_plano_id,
+        data,
+        horario_inicio,
+        horario_fim,
+        status,
+        observacoes,
+        valor,
+        forma_pagamento,
+      });
 
     return res.status(201).json({
       success: true,
@@ -112,10 +114,11 @@ async function atualizar(req, res, next) {
   try {
     const { id } = req.params;
 
-    const agendamento = await agendamentoService.atualizarAgendamento(
-      id,
-      req.body,
-    );
+    const agendamento =
+      await agendamentoService.atualizarAgendamento(
+        id,
+        req.body,
+      );
 
     return res.status(200).json({
       success: true,
@@ -130,7 +133,8 @@ async function cancelar(req, res, next) {
   try {
     const { id } = req.params;
 
-    const agendamento = await agendamentoService.cancelarAgendamento(id);
+    const agendamento =
+      await agendamentoService.cancelarAgendamento(id);
 
     return res.status(200).json({
       success: true,
@@ -146,7 +150,8 @@ async function concluir(req, res, next) {
   try {
     const { id } = req.params;
 
-    const agendamento = await agendamentoService.concluirAgendamento(id);
+    const agendamento =
+      await agendamentoService.concluirAgendamento(id);
 
     return res.status(200).json({
       success: true,
@@ -162,7 +167,8 @@ async function marcarFalta(req, res, next) {
   try {
     const { id } = req.params;
 
-    const agendamento = await agendamentoService.marcarFalta(id);
+    const agendamento =
+      await agendamentoService.marcarFalta(id);
 
     return res.status(200).json({
       success: true,

@@ -1,4 +1,5 @@
 const clientService = require("../services/clientService");
+const userStore = require("../models/userStore");
 
 async function listar(req, res) {
   const { pagina = 1, limite = 20, busca = "", ativo } = req.query;
@@ -26,6 +27,38 @@ async function buscarPorId(req, res) {
     return res.status(404).json({
       success: false,
       message: "Cliente não encontrado.",
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    data: cliente,
+  });
+}
+
+async function meuCliente(req, res) {
+  const usuario = await userStore.findById(req.user.sub);
+
+  if (!usuario) {
+    return res.status(404).json({
+      success: false,
+      message: "Usuário não encontrado.",
+    });
+  }
+
+  const cliente = await clientService.buscarPorEmail(usuario.email);
+
+  if (!cliente) {
+    return res.status(404).json({
+      success: false,
+      message: "Nenhum cliente vinculado ao usuário autenticado.",
+    });
+  }
+
+  if (!cliente.ativo) {
+    return res.status(403).json({
+      success: false,
+      message: "O cadastro do cliente está inativo.",
     });
   }
 
@@ -191,6 +224,7 @@ async function ativar(req, res) {
 module.exports = {
   listar,
   buscarPorId,
+  meuCliente,
   criar,
   atualizar,
   desativar,

@@ -6,7 +6,11 @@ const autorizar = require("../middlewares/permissionMiddleware");
 const router = Router();
 
 // autenticar já é aplicado no mount central (routes/index.js)
+
 router.get("/", clientController.listar);
+
+router.get("/me", clientController.meuCliente);
+
 router.get("/:id", clientController.buscarPorId);
 
 router.post(

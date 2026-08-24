@@ -5,16 +5,11 @@ const router = Router();
 
 router.get("/", agendamentoController.listar);
 
-router.get(
-  "/disponiveis",
-  agendamentoController.listarHorariosDisponiveis,
-);
+router.get("/disponiveis", agendamentoController.listarHorariosDisponiveis);
 
 router.get("/:id", agendamentoController.buscarPorId);
 
 router.post("/", agendamentoController.criar);
-
-router.patch("/:id", agendamentoController.atualizar);
 
 router.patch("/:id/concluir", agendamentoController.concluir);
 
