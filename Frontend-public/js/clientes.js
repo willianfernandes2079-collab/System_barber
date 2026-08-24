@@ -45,18 +45,37 @@ function renderizarTabela(clientes) {
         <td><span class="badge ${c.ativo ? "badge-success" : "badge-danger"}">${c.ativo ? "Ativo" : "Inativo"}</span></td>
         <td class="flex gap-8">
           <button type="button" class="btn btn-outline" data-editar="${c.id}">Editar</button>
-          ${c.ativo ? `<button type="button" class="btn btn-danger" data-desativar="${c.id}">Desativar</button>` : ""}
+          ${
+            c.ativo
+              ? `<button type="button" class="btn btn-danger" data-desativar="${c.id}">Desativar</button>`
+              : `<button type="button" class="btn btn-primary" data-ativar="${c.id}">Ativar</button>`
+          }
         </td>
-      </tr>`
+      </tr>`,
     )
     .join("");
 
-  tbody.querySelectorAll("[data-editar]").forEach((btn) =>
-    btn.addEventListener("click", () => abrirModalEdicao(btn.dataset.editar, clientes))
-  );
-  tbody.querySelectorAll("[data-desativar]").forEach((btn) =>
-    btn.addEventListener("click", () => desativarCliente(btn.dataset.desativar))
-  );
+  tbody
+    .querySelectorAll("[data-editar]")
+    .forEach((btn) =>
+      btn.addEventListener("click", () =>
+        abrirModalEdicao(btn.dataset.editar, clientes),
+      ),
+    );
+
+  tbody
+    .querySelectorAll("[data-desativar]")
+    .forEach((btn) =>
+      btn.addEventListener("click", () =>
+        desativarCliente(btn.dataset.desativar),
+      ),
+    );
+
+  tbody
+    .querySelectorAll("[data-ativar]")
+    .forEach((btn) =>
+      btn.addEventListener("click", () => ativarCliente(btn.dataset.ativar)),
+    );
 }
 
 function renderizarPaginacao(paginacao) {
@@ -76,6 +95,7 @@ function renderizarPaginacao(paginacao) {
     paginaAtualLista = Math.max(1, paginaAtualLista - 1);
     carregarClientes();
   });
+
   document.getElementById("btnPagProxima")?.addEventListener("click", () => {
     paginaAtualLista += 1;
     carregarClientes();
@@ -135,9 +155,11 @@ async function salvarCliente(event) {
     telefone: document.getElementById("telefone").value.trim(),
     whatsapp: document.getElementById("whatsapp").value.trim() || undefined,
     email: document.getElementById("email").value.trim() || undefined,
-    data_nascimento: document.getElementById("dataNascimento").value || undefined,
+    data_nascimento:
+      document.getElementById("dataNascimento").value || undefined,
     cpf: document.getElementById("cpf").value.trim() || undefined,
-    observacoes: document.getElementById("observacoes").value.trim() || undefined,
+    observacoes:
+      document.getElementById("observacoes").value.trim() || undefined,
   };
 
   try {
@@ -169,23 +191,42 @@ async function desativarCliente(id) {
   }
 }
 
+async function ativarCliente(id) {
+  if (!confirm("Ativar este cliente?")) return;
+
+  try {
+    await api.patch(`/clientes/${id}/ativar`);
+    mostrarToast("Cliente ativado.", "success");
+    carregarClientes();
+  } catch (erro) {
+    mostrarToast(erro.message, "danger");
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   carregarClientes();
 
   document.getElementById("btnNovoCliente").addEventListener("click", () => {
-  window.location.href = "cadastrarcli.html";
-});
-  document.getElementById("btnCancelarModal").addEventListener("click", fecharModal);
-  document.getElementById("formCliente").addEventListener("submit", salvarCliente);
+    window.location.href = "cadastrarcli.html";
+  });
+
+  document
+    .getElementById("btnCancelarModal")
+    .addEventListener("click", fecharModal);
+  document
+    .getElementById("formCliente")
+    .addEventListener("submit", salvarCliente);
+
   document.getElementById("filtroAtivo").addEventListener("change", () => {
     paginaAtualLista = 1;
     carregarClientes();
   });
+
   document.getElementById("buscaInput").addEventListener(
     "input",
     debounce(() => {
       paginaAtualLista = 1;
       carregarClientes();
-    })
+    }),
   );
 });

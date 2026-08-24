@@ -256,3 +256,22 @@ body:has(#horario) textarea:focus {
     font-size: 1.55rem;
   }
 }
+#btnSalvar button {
+  padding: 12px 22px;
+  border: none;
+  border-radius: 8px;
+  background: var(--color-primary, #3b63e6);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+#btnSalvar button:hover {
+  opacity: 0.9;
+}
+
+#btnSalvar button:active {
+  transform: scale(0.98);
+}

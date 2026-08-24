@@ -168,10 +168,31 @@ async function desativar(req, res) {
   });
 }
 
+async function ativar(req, res) {
+  const { id } = req.params;
+
+  const clienteExistente = await clientService.buscarClientePorId(id);
+
+  if (!clienteExistente) {
+    return res.status(404).json({
+      success: false,
+      message: "Cliente não encontrado.",
+    });
+  }
+
+  await clientService.ativarCliente(id);
+
+  return res.status(200).json({
+    success: true,
+    message: "Cliente ativado com sucesso.",
+  });
+}
+
 module.exports = {
   listar,
   buscarPorId,
   criar,
   atualizar,
   desativar,
+  ativar,
 };

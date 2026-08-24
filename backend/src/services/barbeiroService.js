@@ -3,9 +3,12 @@ const prisma = require("../config/prismaClient");
 async function listarBarbeiros({ pagina = 1, limite = 20, busca = "", ativo }) {
   const paginaNumerica = Math.max(Number(pagina) || 1, 1);
 
-  const limiteNumerico = Math.min(Math.max(Number(limite) || 20, 1), 100);
+  const limiteNumerica = Math.min(
+    Math.max(Number(limite) || 20, 1),
+    100,
+  );
 
-  const skip = (paginaNumerica - 1) * limiteNumerico;
+  const skip = (paginaNumerica - 1) * limiteNumerica;
 
   const where = {};
 
@@ -15,7 +18,7 @@ async function listarBarbeiros({ pagina = 1, limite = 20, busca = "", ativo }) {
 
   if (busca && busca.trim()) {
     const termo = busca.trim();
-    
+
     where.OR = [
       {
         nome: {
@@ -45,7 +48,7 @@ async function listarBarbeiros({ pagina = 1, limite = 20, busca = "", ativo }) {
         nome: "asc",
       },
       skip,
-      take: limiteNumerico,
+      take: limiteNumerica,
       include: {
         usuario: {
           select: {
@@ -69,9 +72,11 @@ async function listarBarbeiros({ pagina = 1, limite = 20, busca = "", ativo }) {
     barbeiros,
     paginacao: {
       pagina: paginaNumerica,
-      limite: limiteNumerico,
+      limite: limiteNumerica,
       total,
-      total_paginas: Math.ceil(total / limiteNumerico),
+      total_paginas: Math.ceil(
+        total / limiteNumerica,
+      ),
     },
   };
 }
@@ -116,14 +121,34 @@ async function buscarPorUsuarioId(usuarioId) {
   });
 }
 
+async function buscarPorCpf(cpf) {
+  if (!cpf) {
+    return null;
+  }
+
+  return prisma.barbeiro.findFirst({
+    where: {
+      cpf,
+    },
+  });
+}
+
 async function criarBarbeiro(dados) {
   return prisma.barbeiro.create({
     data: {
       usuario_id: dados.usuario_id,
       nome: dados.nome.trim(),
+      cpf: dados.cpf?.trim() || null,
+      data_nascimento: dados.data_nascimento
+        ? new Date(dados.data_nascimento)
+        : null,
       telefone: dados.telefone?.trim() || null,
+      whatsapp: dados.whatsapp?.trim() || null,
       especialidade: dados.especialidade?.trim() || null,
-      percentual_comissao: dados.percentual_comissao ?? 0,
+      pix_tipo: dados.pix_tipo?.trim() || null,
+      pix_chave: dados.pix_chave?.trim() || null,
+      percentual_comissao:
+        dados.percentual_comissao ?? 0,
       ativo: true,
     },
     include: {
@@ -152,20 +177,48 @@ async function atualizarBarbeiro(id, dados) {
     data.nome = dados.nome.trim();
   }
 
+  if (dados.cpf !== undefined) {
+    data.cpf = dados.cpf?.trim() || null;
+  }
+
+  if (dados.data_nascimento !== undefined) {
+    data.data_nascimento = dados.data_nascimento
+      ? new Date(dados.data_nascimento)
+      : null;
+  }
+
   if (dados.telefone !== undefined) {
     data.telefone = dados.telefone?.trim() || null;
   }
 
+  if (dados.whatsapp !== undefined) {
+    data.whatsapp = dados.whatsapp?.trim() || null;
+  }
+
   if (dados.especialidade !== undefined) {
-    data.especialidade = dados.especialidade?.trim() || null;
+    data.especialidade =
+      dados.especialidade?.trim() || null;
+  }
+
+  if (dados.pix_tipo !== undefined) {
+    data.pix_tipo =
+      dados.pix_tipo?.trim() || null;
+  }
+
+  if (dados.pix_chave !== undefined) {
+    data.pix_chave =
+      dados.pix_chave?.trim() || null;
   }
 
   if (dados.percentual_comissao !== undefined) {
-    data.percentual_comissao = dados.percentual_comissao;
+    data.percentual_comissao =
+      dados.percentual_comissao;
   }
 
   if (dados.ativo !== undefined) {
-    data.ativo = dados.ativo === true || dados.ativo === "true";
+    data.ativo =
+      dados.ativo === true ||
+      dados.ativo === "true";
   }
 
   return prisma.barbeiro.update({
@@ -199,11 +252,24 @@ async function desativarBarbeiro(id) {
   });
 }
 
+async function ativarBarbeiro(id) {
+  return prisma.barbeiro.update({
+    where: {
+      id,
+    },
+    data: {
+      ativo: true,
+    },
+  });
+}
+
 module.exports = {
   listarBarbeiros,
   buscarBarbeiroPorId,
   buscarPorUsuarioId,
+  buscarPorCpf,
   criarBarbeiro,
   atualizarBarbeiro,
   desativarBarbeiro,
+  ativarBarbeiro,
 };

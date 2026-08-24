@@ -6,238 +6,212 @@
 
     <title>Agendamentos - System Barber</title>
 
-    <!-- CSS GLOBAL -->
-
     <link rel="stylesheet" href="../css/global.css" />
-    <!-- CSS AGENDAMENTOS -->
-
     <link rel="stylesheet" href="../css/agendamentos.css" />
+
+    <style>
+      #cliente {
+        position: relative;
+      }
+
+      #clienteBusca {
+        width: 100%;
+      }
+
+      #clientesResultados {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 10;
+        max-height: 220px;
+        overflow-y: auto;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-sm);
+        box-shadow: var(--shadow-md);
+      }
+
+      .cliente-resultado {
+        padding: 12px 14px;
+        cursor: pointer;
+        border-bottom: 1px solid var(--color-border);
+      }
+
+      .cliente-resultado:hover {
+        background: var(--color-accent-soft);
+      }
+
+      .cliente-resultado-nome {
+        display: block;
+        font-weight: 600;
+        color: var(--color-text-heading);
+      }
+
+      .cliente-resultado-telefone {
+        display: block;
+        margin-top: 3px;
+        font-size: 0.85rem;
+        color: var(--color-text-muted);
+      }
+
+      #plano {
+        margin-top: 16px;
+      }
+
+      #planoTipo {
+        display: flex;
+        gap: 16px;
+        margin-top: 8px;
+      }
+
+      #planoSelect {
+        width: 100%;
+        margin-top: 10px;
+      }
+
+      #planoInfo {
+        margin-top: 8px;
+        font-size: 0.9rem;
+        color: var(--color-text-muted);
+      }
+    </style>
   </head>
 
   <body>
-    <div id="nome">
-      <label for="nome">Nome do cliente </label>
-      <input type="text" name="nome" />
-    </div>
+    <form id="agendamentoForm">
+      <div id="cliente">
+        <label for="clienteBusca">Cliente</label>
 
-    <div id="data">
-      <input type="date" name="data" />
-    </div>
+        <input
+          type="text"
+          id="clienteBusca"
+          placeholder="Digite o nome do cliente"
+          autocomplete="off"
+          required
+        />
 
-    <div id="horario">
-      <input type="time" name="horario" />
-    </div>
+        <input type="hidden" id="clienteSelect" name="cliente" />
 
-    <div id="cliente">
-      <select id="clienteSelect" name="cliente">
-        <option value="">Selecione o cliente</option>
-      </select>
-    </div>
+        <div id="clientesResultados"></div>
+      </div>
 
-    <div id="barbeiro">
-      <select id="barbeiroSelect" name="barbeiro">
-        <option value="">Selecione o barbeiro</option>
-      </select>
-    </div>
+      <div id="plano">
+        <label>Tipo de atendimento</label>
 
-    <div id="servico">
-      <select id="servicoSelect" name="servico">
-        <option value="">Selecione o serviço</option>
-      </select>
-    </div>
+        <div id="planoTipo">
+          <label>
+            <input type="radio" name="tipoAtendimento" value="AVULSO" checked />
+            Avulso
+          </label>
 
-    <div id="valor">
-      <input type="number" name="valor" placeholder="Valor" />
-    </div>
+          <label>
+            <input
+              type="radio"
+              name="tipoAtendimento"
+              value="PLANO"
+              id="tipoPlano"
+              disabled
+            />
+            Usar plano
+          </label>
+        </div>
 
-    <div id="status">
-      <select name="status">
-        <option value="confirmado">Confirmado</option>
-        <option value="pendente">Pendente</option>
-        <option value="cancelado">Cancelado</option>
-      </select>
-    </div>
+        <select id="planoSelect" disabled>
+          <option value="">Selecione um plano</option>
+        </select>
 
-    <div id="observacao">
-      <textarea name="observacao" placeholder="Observação"></textarea>
-    </div>
+        <div id="planoInfo"></div>
+      </div>
 
-    <div id="btnVolta">
-      <button type="button" onclick="window.location.href = 'index.html'">
-        Voltar
-      </button>
-    </div>
+      <div id="barbeiro">
+        <label for="barbeiroSelect">Barbeiro</label>
+
+        <select id="barbeiroSelect" name="barbeiro" required>
+          <option value="">Selecione o barbeiro</option>
+        </select>
+      </div>
+
+      <div id="servico">
+        <label for="servicoSelect">Serviço</label>
+
+        <select id="servicoSelect" name="servico" required>
+          <option value="">Selecione o serviço</option>
+        </select>
+      </div>
+
+      <div id="semana">
+        <label for="semanaSelect">Semana</label>
+
+        <select id="semanaSelect" required>
+          <option value="atual">Esta semana</option>
+          <option value="proxima">Próxima semana</option>
+        </select>
+      </div>
+
+      <div id="dia">
+        <label for="diaSelect">Dia</label>
+
+        <select id="diaSelect" required></select>
+      </div>
+
+      <div id="horario">
+        <label for="horarioInput">Horário</label>
+
+        <select id="horarioInput" name="horario" required disabled>
+          <option value="">Selecione primeiro barbeiro, serviço e dia</option>
+        </select>
+      </div>
+
+      <div id="valor">
+        <label for="valorInput">Valor</label>
+
+        <input
+          type="number"
+          name="valor"
+          id="valorInput"
+          placeholder="Valor"
+          step="0.01"
+          min="0"
+          required
+        />
+      </div>
+
+      <div id="status">
+        <label for="statusSelect">Status</label>
+
+        <select name="status" id="statusSelect">
+          <option value="AGENDADO">Confirmado</option>
+          <option value="PENDENTE">Pendente</option>
+          <option value="CANCELADO">Cancelado</option>
+        </select>
+      </div>
+
+      <div id="observacao">
+        <label for="observacaoInput">Observação</label>
+
+        <textarea
+          name="observacao"
+          id="observacaoInput"
+          placeholder="Observação"
+        ></textarea>
+      </div>
+
+      <div id="mensagem"></div>
+
+      <div id="btnSalvar">
+        <button type="submit">Salvar agendamento</button>
+      </div>
+
+      <div id="btnVolta">
+        <button type="button" onclick="window.location.href = 'index.html'">
+          Voltar
+        </button>
+      </div>
+    </form>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/agendamentos.js"></script>
   </body>
 </html>
 
-<script>
-  const token = localStorage.getItem("accessToken");
-
-  if (!token) {
-    window.location.href = "/login";
-  }
-
-  const clienteSelect = document.getElementById("clienteSelect");
-  const barbeiroSelect = document.getElementById("barbeiroSelect");
-  const servicoSelect = document.getElementById("servicoSelect");
-  const mensagem = document.getElementById("mensagem");
-
-  // CARREGAR CLIENTES
-
-  async function carregarClientes() {
-    try {
-      const resposta = await fetch("/api/clientes?ativo=true", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const resultado = await resposta.json();
-
-      if (!resposta.ok || !resultado.success) {
-        throw new Error(resultado.message || "Erro ao carregar clientes.");
-      }
-
-      clienteSelect.innerHTML = '<option value="">Selecione o cliente</option>';
-
-      resultado.data.forEach((cliente) => {
-        const option = document.createElement("option");
-
-        option.value = cliente.id;
-
-        option.textContent = `${cliente.nome} - ${cliente.telefone}`;
-
-        clienteSelect.appendChild(option);
-      });
-    } catch (erro) {
-      console.error("Erro ao carregar clientes:", erro);
-
-      mensagem.textContent = "Erro ao carregar clientes.";
-    }
-  }
-
-  // CARREGAR BARBEIROS
-
-  async function carregarBarbeiros() {
-    try {
-      const resposta = await fetch("/api/barbeiros?ativo=true", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const resultado = await resposta.json();
-
-      if (!resposta.ok || !resultado.success) {
-        throw new Error(resultado.message || "Erro ao carregar barbeiros.");
-      }
-
-      barbeiroSelect.innerHTML =
-        '<option value="">Selecione o barbeiro</option>';
-
-      resultado.data.forEach((barbeiro) => {
-        const option = document.createElement("option");
-
-        option.value = barbeiro.id;
-
-        option.textContent = barbeiro.nome;
-
-        barbeiroSelect.appendChild(option);
-      });
-    } catch (erro) {
-      console.error("Erro ao carregar barbeiros:", erro);
-
-      mensagem.textContent = "Erro ao carregar barbeiros.";
-    }
-  }
-
-  // CARREGAR SERVIÇOS
-
-  async function carregarServicos() {
-    try {
-      const resposta = await fetch("/api/servicos", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const resultado = await resposta.json();
-
-      if (!resposta.ok || !resultado.success) {
-        throw new Error(resultado.message || "Erro ao carregar serviços.");
-      }
-
-      servicoSelect.innerHTML = '<option value="">Selecione o serviço</option>';
-
-      resultado.data.forEach((servico) => {
-        const option = document.createElement("option");
-
-        option.value = servico.id;
-
-        option.textContent = `${servico.nome} - R$ ${Number(servico.preco).toFixed(2)}`;
-
-        servicoSelect.appendChild(option);
-      });
-    } catch (erro) {
-      console.error("Erro ao carregar serviços:", erro);
-
-      mensagem.textContent = "Erro ao carregar serviços.";
-    }
-  }
-
-  // QUANDO ESCOLHER O SERVIÇO
-
-  servicoSelect.addEventListener("change", async () => {
-    const servicoId = servicoSelect.value;
-
-    if (!servicoId) {
-      document.getElementById("valor").value = "";
-
-      delete servicoSelect.dataset.duracao;
-
-      return;
-    }
-
-    try {
-      const resposta = await fetch(`/api/servicos/${servicoId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const resultado = await resposta.json();
-
-      if (!resposta.ok || !resultado.success) {
-        throw new Error(resultado.message || "Erro ao buscar serviço.");
-      }
-
-      const servico = resultado.data;
-
-      // Preenche o valor automaticamente
-
-      document.getElementById("valor").value = Number(servico.preco).toFixed(2);
-
-      // Guarda a duração do serviço
-
-      servicoSelect.dataset.duracao = servico.duracao;
-    } catch (erro) {
-      console.error("Erro ao buscar informações do serviço:", erro);
-
-      mensagem.textContent = "Erro ao carregar informações do serviço.";
-    }
-  });
-
-  // CARREGAR TODOS OS DADOS
-
-  async function carregarDados() {
-    await carregarClientes();
-
-    await carregarBarbeiros();
-
-    await carregarServicos();
-  }
-
-  // INICIAR
-
-  carregarDados();
-</script>

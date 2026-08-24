@@ -13,6 +13,25 @@ async function listar(req, res, next) {
   }
 }
 
+async function listarHorariosDisponiveis(req, res, next) {
+  try {
+    const { barbeiro_id, servico_id, data } = req.query;
+
+    const horarios = await agendamentoService.listarHorariosDisponiveis({
+      barbeiro_id,
+      servico_id,
+      data,
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: horarios,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function buscarPorId(req, res, next) {
   try {
     const { id } = req.params;
@@ -41,6 +60,7 @@ async function criar(req, res, next) {
       cliente_id,
       barbeiro_id,
       servico_id,
+      assinatura_plano_id,
       data,
       horario_inicio,
       horario_fim,
@@ -69,6 +89,7 @@ async function criar(req, res, next) {
       cliente_id,
       barbeiro_id,
       servico_id,
+      assinatura_plano_id,
       data,
       horario_inicio,
       horario_fim,
@@ -155,6 +176,7 @@ async function marcarFalta(req, res, next) {
 
 module.exports = {
   listar,
+  listarHorariosDisponiveis,
   buscarPorId,
   criar,
   atualizar,

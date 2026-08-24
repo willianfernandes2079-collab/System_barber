@@ -62,7 +62,6 @@
       <div class="pagination" id="paginacao"></div>
     </main>
 
-    <!-- Modal criar/editar -->
     <div class="modal-overlay" id="modalOverlay" style="display: none">
       <div class="modal">
         <h3 id="modalTitulo" style="margin-bottom: 18px">Novo barbeiro</h3>
@@ -97,9 +96,35 @@
           </div>
 
           <div class="field">
+            <label for="cpf"> CPF </label>
+
+            <input
+              type="text"
+              id="cpf"
+              inputmode="numeric"
+              maxlength="11"
+              minlength="11"
+              placeholder="Somente números"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label for="dataNascimento"> Data de nascimento </label>
+
+            <input type="date" id="dataNascimento" required />
+          </div>
+
+          <div class="field">
             <label for="telefone"> Telefone </label>
 
             <input type="tel" id="telefone" />
+          </div>
+
+          <div class="field">
+            <label for="whatsapp"> WhatsApp </label>
+
+            <input type="tel" id="whatsapp" />
           </div>
 
           <div class="field">
@@ -122,6 +147,33 @@
               max="100"
               step="0.5"
               value="40"
+            />
+          </div>
+
+          <div class="field">
+            <label for="pixTipo"> Tipo da chave PIX </label>
+
+            <select id="pixTipo" required>
+              <option value="">Selecione o tipo</option>
+
+              <option value="CPF">CPF</option>
+
+              <option value="TELEFONE">Telefone</option>
+
+              <option value="EMAIL">E-mail</option>
+
+              <option value="ALEATORIA">Chave aleatória</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="pixChave"> Chave PIX para pagamento </label>
+
+            <input
+              type="text"
+              id="pixChave"
+              placeholder="Digite a chave PIX"
+              required
             />
           </div>
 
@@ -162,7 +214,6 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script src="../js/api.js"></script>
-    <script src="../js/ui.js"></script>
     <script src="../js/layout.js"></script>
     <script src="../js/barbearia.js"></script>
 

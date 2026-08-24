@@ -23,36 +23,80 @@
         <form id="formCadastrarCliente">
           <div class="field">
             <label for="nome">Nome</label>
-            <input type="text" id="nome" name="nome" required />
+
+            <input
+              type="text"
+              id="nome"
+              name="nome"
+              required
+            />
           </div>
 
           <div class="field">
             <label for="telefone">Telefone</label>
-            <input type="tel" id="telefone" name="telefone" required />
+
+            <input
+              type="tel"
+              id="telefone"
+              name="telefone"
+              required
+            />
           </div>
 
           <div class="field">
             <label for="whatsapp">WhatsApp</label>
-            <input type="tel" id="whatsapp" name="whatsapp" />
+
+            <input
+              type="tel"
+              id="whatsapp"
+              name="whatsapp"
+            />
           </div>
 
           <div class="field">
             <label for="email">E-mail</label>
-            <input type="email" id="email" name="email" />
+
+            <input
+              type="email"
+              id="email"
+              name="email"
+            />
           </div>
 
           <div class="field">
-            <label for="dataNascimento">Data de nascimento</label>
-            <input type="date" id="dataNascimento" name="data_nascimento" />
+            <label for="dataNascimento">
+              Data de nascimento
+            </label>
+
+            <input
+              type="date"
+              id="dataNascimento"
+              name="data_nascimento"
+              required
+            />
           </div>
 
           <div class="field">
             <label for="cpf">CPF</label>
-            <input type="text" id="cpf" name="cpf" />
+
+            <input
+              type="text"
+              id="cpf"
+              name="cpf"
+              inputmode="numeric"
+              maxlength="11"
+              minlength="11"
+              pattern="[0-9]{11}"
+              placeholder="Somente números"
+              required
+            />
           </div>
 
           <div class="field">
-            <label for="observacoes">Observações</label>
+            <label for="observacoes">
+              Observações
+            </label>
+
             <textarea
               id="observacoes"
               name="observacoes"
@@ -71,11 +115,19 @@
             class="flex gap-8"
             style="justify-content: flex-end; margin-top: 22px"
           >
-            <button type="button" class="btn btn-ghost" id="btnVoltar">
+            <button
+              type="button"
+              class="btn btn-ghost"
+              id="btnVoltar"
+            >
               Voltar
             </button>
 
-            <button type="submit" class="btn btn-primary" id="btnCadastrar">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              id="btnCadastrar"
+            >
               Cadastrar cliente
             </button>
           </div>
@@ -83,68 +135,18 @@
       </div>
     </main>
 
-    <div class="toast-container" id="toastContainer"></div>
+    <div
+      class="toast-container"
+      id="toastContainer"
+    ></div>
 
     <script src="../js/api.js"></script>
     <script src="../js/ui.js"></script>
     <script src="../js/layout.js"></script>
+    <script src="../js/cadastrarcli.js"></script>
 
     <script>
       inicializarLayout("Cadastrar cliente");
-
-      const form = document.getElementById("formCadastrarCliente");
-      const btnVoltar = document.getElementById("btnVoltar");
-      const formErro = document.getElementById("formErro");
-      const btnCadastrar = document.getElementById("btnCadastrar");
-
-      btnVoltar.addEventListener("click", () => {
-        window.location.href = "cliente.html";
-      });
-
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-
-        formErro.style.display = "none";
-        btnCadastrar.disabled = true;
-        btnCadastrar.textContent = "Cadastrando...";
-
-        const dados = {
-          nome: document.getElementById("nome").value.trim(),
-          telefone: document.getElementById("telefone").value.trim(),
-          whatsapp:
-            document.getElementById("whatsapp").value.trim() || undefined,
-          email: document.getElementById("email").value.trim() || undefined,
-          data_nascimento:
-            document.getElementById("dataNascimento").value || undefined,
-          cpf: document.getElementById("cpf").value.trim() || undefined,
-          observacoes:
-            document.getElementById("observacoes").value.trim() || undefined,
-        };
-
-        try {
-          await api.post("/clientes", dados);
-
-          mostrarToast("Cliente cadastrado com sucesso.", "success");
-
-          form.reset();
-
-          setTimeout(() => {
-            window.location.href = "cliente.html";
-          }, 800);
-        } catch (erro) {
-          console.error("Erro ao cadastrar cliente:", erro);
-
-          formErro.textContent =
-            erro?.data?.message ||
-            erro?.message ||
-            "Não foi possível cadastrar o cliente.";
-
-          formErro.style.display = "block";
-        } finally {
-          btnCadastrar.disabled = false;
-          btnCadastrar.textContent = "Cadastrar cliente";
-        }
-      });
     </script>
   </body>
 </html>

@@ -42,7 +42,7 @@ const env = {
     process.env.EMAIL_HOST || "",
 
   EMAIL_PORT:
-    process.env.EMAIL_PORT || "",
+    Number(process.env.EMAIL_PORT) || 587,
 
   EMAIL_USER:
     process.env.EMAIL_USER || "",

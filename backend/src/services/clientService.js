@@ -7,12 +7,12 @@ async function listarClientes({
   ativo,
 }) {
   const paginaNumerica = Math.max(Number(pagina) || 1, 1);
-  const limiteNumerico = Math.min(
+  const limiteNumerica = Math.min(
     Math.max(Number(limite) || 20, 1),
     100
   );
 
-  const skip = (paginaNumerica - 1) * limiteNumerico;
+  const skip = (paginaNumerica - 1) * limiteNumerica;
 
   const where = {};
 
@@ -52,7 +52,7 @@ async function listarClientes({
         nome: "asc",
       },
       skip,
-      take: limiteNumerico,
+      take: limiteNumerica,
     }),
 
     prisma.cliente.count({
@@ -64,9 +64,9 @@ async function listarClientes({
     clientes,
     paginacao: {
       pagina: paginaNumerica,
-      limite: limiteNumerico,
+      limite: limiteNumerica,
       total,
-      total_paginas: Math.ceil(total / limiteNumerico),
+      total_paginas: Math.ceil(total / limiteNumerica),
     },
   };
 }
@@ -196,6 +196,17 @@ async function desativarCliente(id) {
   });
 }
 
+async function ativarCliente(id) {
+  return prisma.cliente.update({
+    where: {
+      id,
+    },
+    data: {
+      ativo: true,
+    },
+  });
+}
+
 module.exports = {
   listarClientes,
   buscarClientePorId,
@@ -204,4 +215,5 @@ module.exports = {
   criarCliente,
   atualizarCliente,
   desativarCliente,
+  ativarCliente,
 };

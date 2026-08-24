@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Agendar horário - Sistema Barbearia</title>
+
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/cliente-agendamento.css" />
+  </head>
+
+  <body class="page-canvas">
+    <main class="cliente-agendamento-container">
+      <section
+        class="card cliente-agendamento-card"
+        aria-labelledby="tituloAgendamento"
+      >
+        <header class="cliente-agendamento-header">
+          <div class="cliente-agendamento-icone" aria-hidden="true">📅</div>
+
+          <h1 id="tituloAgendamento">Agendar horário</h1>
+
+          <p>Escolha o serviço, o profissional e o melhor horário para você.</p>
+        </header>
+
+        <form id="formAgendamento" novalidate>
+          <!-- SERVIÇO -->
+
+          <div class="field">
+            <label for="servico"> Serviço </label>
+
+            <select id="servico" name="servico_id" required>
+              <option value="">Selecione o serviço</option>
+            </select>
+          </div>
+
+          <!-- BARBEIRO -->
+
+          <div class="field">
+            <label for="barbeiro"> Barbeiro </label>
+
+            <select id="barbeiro" name="barbeiro_id" required disabled>
+              <option value="">Selecione o barbeiro</option>
+            </select>
+          </div>
+
+          <!-- DATA E HORÁRIO -->
+
+          <div class="cliente-agendamento-dupla">
+            <div class="field">
+              <label for="data"> Data </label>
+
+              <input type="date" id="data" name="data" required disabled />
+            </div>
+
+            <div class="field">
+              <label for="horario"> Horário </label>
+
+              <select id="horario" name="horario" required disabled>
+                <option value="">Selecione o horário</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- NOME -->
+
+          <div class="field">
+            <label for="nome"> Nome </label>
+
+            <input
+              type="text"
+              id="nome"
+              name="nome"
+              placeholder="Seu nome completo"
+              autocomplete="name"
+              readonly
+            />
+          </div>
+
+          <!-- WHATSAPP -->
+
+          <div class="field">
+            <label for="whatsapp"> WhatsApp </label>
+
+            <input
+              type="tel"
+              id="whatsapp"
+              name="whatsapp"
+              placeholder="(14) 99999-9999"
+              autocomplete="tel"
+              readonly
+            />
+          </div>
+
+          <!-- RESUMO -->
+
+          <div id="resumoAgendamento" class="cliente-agendamento-resumo" hidden>
+            <h2>Resumo do agendamento</h2>
+
+            <div class="cliente-resumo-item">
+              <span> Serviço </span>
+
+              <strong id="resumoServico"> — </strong>
+            </div>
+
+            <div class="cliente-resumo-item">
+              <span> Barbeiro </span>
+
+              <strong id="resumoBarbeiro"> — </strong>
+            </div>
+
+            <div class="cliente-resumo-item">
+              <span> Data </span>
+
+              <strong id="resumoData"> — </strong>
+            </div>
+
+            <div class="cliente-resumo-item">
+              <span> Horário </span>
+
+              <strong id="resumoHorario"> — </strong>
+            </div>
+
+            <div class="cliente-resumo-item">
+              <span> Valor </span>
+
+              <strong id="resumoValor"> R$ 0,00 </strong>
+            </div>
+          </div>
+
+          <!-- ERRO -->
+
+          <div
+            id="erroAgendamento"
+            class="alert alert-danger"
+            style="display: none"
+            role="alert"
+          ></div>
+
+          <!-- CONFIRMAR -->
+
+          <button
+            type="submit"
+            id="btnConfirmarAgendamento"
+            class="btn btn-primary btn-block"
+            disabled
+          >
+            Confirmar agendamento
+          </button>
+        </form>
+
+        <!-- RODAPÉ -->
+
+        <footer class="cliente-agendamento-footer">
+          <span aria-hidden="true"> 🔒 </span>
+
+          <span> Seus dados estão protegidos e não serão compartilhados. </span>
+        </footer>
+      </section>
+    </main>
+
+    <script src="../js/api.js"></script>
+
+    <script src="../js/cliente-agendamento.js"></script>
+  </body>
+</html>

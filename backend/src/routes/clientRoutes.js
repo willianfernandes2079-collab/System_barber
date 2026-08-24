@@ -21,6 +21,12 @@ router.patch(
   clientController.atualizar,
 );
 
+router.patch(
+  "/:id/ativar",
+  autorizar("ADMIN", "GERENTE"),
+  clientController.ativar,
+);
+
 router.delete(
   "/:id",
   autorizar("ADMIN", "GERENTE"),
@@ -28,4 +34,3 @@ router.delete(
 );
 
 module.exports = router;
-

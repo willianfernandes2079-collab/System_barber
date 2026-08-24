@@ -188,8 +188,7 @@ async function relatorioClientes() {
  * regra configurada em configuracao.regra_retorno_dias.
  */
 async function clientesParaRetorno() {
-  const config = await prisma.configuracao.findFirst();
-  const regraDias = config ? config.regra_retorno_dias : 30;
+  const regraDias = 30;
 
   const agendamentosPassados = await prisma.agendamentos.findMany({
     where: {
