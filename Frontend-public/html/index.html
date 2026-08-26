@@ -3,41 +3,48 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Início - Sistema Barbearia</title>
 
-    <!-- CSS GLOBAL -->
     <link rel="stylesheet" href="../css/global.css">
 
-    <!-- CSS DO DASHBOARD -->
     <link rel="stylesheet" href="../css/dashboard.css">
 
-    <!-- CSS INDEX -->
-     <link rel="stylesheet" href="../css/index.css">
-     
+    <link rel="stylesheet" href="../css/index.css">
+
 </head>
 
 <body>
 
-
     <header>
+
         <div id="titulo">
             <h1>Bem-vindo ao Sistema</h1>
         </div>
 
         <div id="subtitulo">
-            <h2>Escolha uma das opções abaixo para continuar</h2>
+            <h2>
+                Escolha uma das opções abaixo para continuar
+            </h2>
         </div>
-    </header>
 
+    </header>
 
     <main id="menu">
 
         <section id="agendamento" class="card">
-            <div class="icone">📅</div>
 
-            <h3>Agendamentos</h3>
+            <div class="icone">
+                📅
+            </div>
+
+            <h3>
+                Agendamentos
+            </h3>
 
             <p>
                 Gerencie os horários e agendamentos da barbearia.
@@ -46,16 +53,46 @@
             <button
                 type="button"
                 id="btnAgen"
-                onclick="window.location.href='/html/agendamentos.html'">
+                onclick="window.location.href='/html/agendamentos.html'"
+            >
                 Agendamentos
             </button>
+
         </section>
 
+        <section id="caixa" class="card">
+
+            <div class="icone">
+                💵
+            </div>
+
+            <h3>
+                Caixa
+            </h3>
+
+            <p>
+                Registre vendas, pagamentos e controle as comandas.
+            </p>
+
+            <button
+                type="button"
+                id="btnCaixa"
+                onclick="window.location.href='/html/caixa.html'"
+            >
+                Caixa
+            </button>
+
+        </section>
 
         <section id="cliente" class="card">
-            <div class="icone">👥</div>
 
-            <h3>Clientes</h3>
+            <div class="icone">
+                👥
+            </div>
+
+            <h3>
+                Clientes
+            </h3>
 
             <p>
                 Consulte e gerencie os clientes cadastrados.
@@ -64,34 +101,46 @@
             <button
                 type="button"
                 id="btnCli"
-                onclick="window.location.href='/html/cliente.html'">
+                onclick="window.location.href='/html/cliente.html'"
+            >
                 Clientes
             </button>
+
         </section>
 
+        <section id="barbearia" class="card">
 
-        <section id="configuracao" class="card">
-            <div class="icone">⚙️</div>
+            <div class="icone">
+                💈
+            </div>
 
-            <h3>Configurações</h3>
+            <h3>
+                Barbearia
+            </h3>
 
             <p>
-                Configure as opções e informações da barbearia.
+                Gerencie os barbeiros e as informações da equipe.
             </p>
 
             <button
                 type="button"
-                id="btnConfig"
-                onclick="window.location.href='/html/configuracao.html'">
-                Configurações
+                id="btnBarbearia"
+                onclick="window.location.href='/html/barbearia.html'"
+            >
+                Barbearia
             </button>
+
         </section>
 
-
         <section id="servicos" class="card">
-            <div class="icone">✂️</div>
 
-            <h3>Serviços</h3>
+            <div class="icone">
+                ✂️
+            </div>
+
+            <h3>
+                Serviços
+            </h3>
 
             <p>
                 Cadastre e gerencie os serviços oferecidos.
@@ -100,16 +149,94 @@
             <button
                 type="button"
                 id="btnServ"
-                onclick="window.location.href='/html/servicos.html'">
+                onclick="window.location.href='/html/servicos.html'"
+            >
                 Serviços
             </button>
+
         </section>
 
+        <section id="financeiro" class="card">
+
+            <div class="icone">
+                💰
+            </div>
+
+            <h3>
+                Financeiro
+            </h3>
+
+            <p>
+                Acompanhe pagamentos, movimentações e informações financeiras.
+            </p>
+
+            <button
+                type="button"
+                id="btnFinanceiro"
+                onclick="window.location.href='/html/financeiros.html'"
+            >
+                Financeiro
+            </button>
+
+        </section>
+
+        <section id="bloqueios" class="card">
+
+            <div class="icone">
+                🔒
+            </div>
+
+            <h3>
+                Bloqueios de Agenda
+            </h3>
+
+            <p>
+                Bloqueie horários para todos os barbeiros ou para um barbeiro específico.
+            </p>
+
+            <button
+                type="button"
+                id="btnBloqueios"
+                onclick="window.location.href='/html/bloqueios.html'"
+            >
+                Bloqueios
+            </button>
+
+        </section>
+
+        <section id="configuracao" class="card">
+
+            <div class="icone">
+                ⚙️
+            </div>
+
+            <h3>
+                Configurações
+            </h3>
+
+            <p>
+                Configure as opções e informações da barbearia.
+            </p>
+
+            <button
+                type="button"
+                id="btnConfig"
+                onclick="window.location.href='/html/configuracao.html'"
+            >
+                Configurações
+            </button>
+
+        </section>
 
         <section id="relatorios" class="card">
-            <div class="icone">📊</div>
 
-            <h3>Relatórios</h3>
+            <div class="icone">
+                📊
+            </div>
+
+            <h3>
+                Relatórios
+            </h3>
 
             <p>
                 Visualize informações e resultados da barbearia.
@@ -118,30 +245,34 @@
             <button
                 type="button"
                 id="btnRelat"
-                onclick="window.location.href='/html/relatorios.html'">
+                onclick="window.location.href='/html/relatorios.html'"
+            >
                 Relatórios
             </button>
+
         </section>
 
     </main>
-
 
     <footer id="rodape">
 
         <button
             type="button"
             id="btnVoltar"
-            onclick="logout()">
+            onclick="logout()"
+        >
             Sair
         </button>
 
     </footer>
 
+    <script src="../js/api.js"></script>
 
     <script>
         function logout() {
             localStorage.removeItem("accessToken");
             localStorage.removeItem("refreshToken");
+            localStorage.removeItem("usuario");
 
             alert("Você saiu da conta!");
 
@@ -152,4 +283,3 @@
 </body>
 
 </html>
-

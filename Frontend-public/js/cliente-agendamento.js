@@ -109,11 +109,13 @@ function calcularHorarioFim(horarioInicio, duracao) {
   }
 
   const horaFim = Math.floor(total / 60);
+
   const minutoFim = total % 60;
 
-  return `${String(horaFim).padStart(2, "0")}:${String(
-    minutoFim,
-  ).padStart(2, "0")}`;
+  return `${String(horaFim).padStart(2, "0")}:${String(minutoFim).padStart(
+    2,
+    "0",
+  )}`;
 }
 
 function obterServicoSelecionado() {
@@ -126,26 +128,28 @@ function obterBarbeiroSelecionado() {
 
 function atualizarResumo() {
   const servico = obterServicoSelecionado();
+
   const barbeiro = obterBarbeiroSelecionado();
 
   const horario = horarioSelect.value;
+
   const data = dataInput.value;
 
   resumoServico.textContent = servico?.nome || "—";
+
   resumoBarbeiro.textContent = barbeiro?.nome || "—";
+
   resumoData.textContent = formatarData(data);
+
   resumoHorario.textContent = horario || "—";
-  resumoValor.textContent = servico
-    ? formatarMoeda(servico.preco)
-    : "R$ 0,00";
+
+  resumoValor.textContent = servico ? formatarMoeda(servico.preco) : "R$ 0,00";
 
   const completo =
-    Boolean(servico) &&
-    Boolean(barbeiro) &&
-    Boolean(data) &&
-    Boolean(horario);
+    Boolean(servico) && Boolean(barbeiro) && Boolean(data) && Boolean(horario);
 
   resumoAgendamento.hidden = !completo;
+
   btnConfirmarAgendamento.disabled = !completo;
 }
 
@@ -158,6 +162,7 @@ function limparHorarios(mensagem = "Selecione o horário") {
   option.textContent = mensagem;
 
   horarioSelect.appendChild(option);
+
   horarioSelect.disabled = true;
 
   atualizarResumo();
@@ -165,6 +170,7 @@ function limparHorarios(mensagem = "Selecione o horário") {
 
 function atualizarEstadoCampos() {
   const possuiServico = Boolean(servicoSelect.value);
+
   const possuiBarbeiro = Boolean(barbeiroSelect.value);
 
   dataInput.disabled = !(possuiServico && possuiBarbeiro);
@@ -178,6 +184,20 @@ function atualizarEstadoCampos() {
 
 async function carregarClienteLogado() {
   try {
+    const respostaUsuario = await api.get("/auth/me");
+
+    const usuario = respostaUsuario?.data;
+
+    if (!usuario) {
+      throw new Error("Não foi possível identificar o usuário autenticado.");
+    }
+
+    if (usuario.cargo !== "CLIENTE") {
+      window.location.href = "/index";
+
+      return;
+    }
+
     const resposta = await api.get("/clientes/me");
 
     if (!resposta?.success || !resposta.data) {
@@ -210,8 +230,7 @@ async function carregarClienteLogado() {
 async function carregarServicos() {
   servicoSelect.disabled = true;
 
-  servicoSelect.innerHTML =
-    '<option value="">Carregando serviços...</option>';
+  servicoSelect.innerHTML = '<option value="">Carregando serviços...</option>';
 
   try {
     const resposta = await api.get("/servicos");
@@ -224,8 +243,7 @@ async function carregarServicos() {
 
     servicos = Array.isArray(resposta.data) ? resposta.data : [];
 
-    servicoSelect.innerHTML =
-      '<option value="">Selecione o serviço</option>';
+    servicoSelect.innerHTML = '<option value="">Selecione o serviço</option>';
 
     servicos.forEach((servico) => {
       if (servico.ativo === false) {
@@ -235,9 +253,8 @@ async function carregarServicos() {
       const option = document.createElement("option");
 
       option.value = servico.id;
-      option.textContent = `${servico.nome} - ${formatarMoeda(
-        servico.preco,
-      )}`;
+
+      option.textContent = `${servico.nome} - ${formatarMoeda(servico.preco)}`;
 
       servicoSelect.appendChild(option);
     });
@@ -252,11 +269,10 @@ async function carregarServicos() {
     servicoSelect.innerHTML =
       '<option value="">Erro ao carregar serviços</option>';
 
-    mostrarErro(
-      erro.message || "Não foi possível carregar os serviços.",
-    );
+    mostrarErro(erro.message || "Não foi possível carregar os serviços.");
   } finally {
     servicoSelect.disabled = false;
+
     atualizarEstadoCampos();
   }
 }
@@ -278,8 +294,7 @@ async function carregarBarbeiros() {
 
     barbeiros = Array.isArray(resposta.data) ? resposta.data : [];
 
-    barbeiroSelect.innerHTML =
-      '<option value="">Selecione o barbeiro</option>';
+    barbeiroSelect.innerHTML = '<option value="">Selecione o barbeiro</option>';
 
     barbeiros.forEach((barbeiro) => {
       if (barbeiro.ativo === false) {
@@ -289,6 +304,7 @@ async function carregarBarbeiros() {
       const option = document.createElement("option");
 
       option.value = barbeiro.id;
+
       option.textContent =
         barbeiro.nome || barbeiro.usuario?.nome || "Barbeiro";
 
@@ -305,11 +321,10 @@ async function carregarBarbeiros() {
     barbeiroSelect.innerHTML =
       '<option value="">Erro ao carregar barbeiros</option>';
 
-    mostrarErro(
-      erro.message || "Não foi possível carregar os barbeiros.",
-    );
+    mostrarErro(erro.message || "Não foi possível carregar os barbeiros.");
   } finally {
     barbeiroSelect.disabled = false;
+
     atualizarEstadoCampos();
   }
 }
@@ -317,19 +332,21 @@ async function carregarBarbeiros() {
 async function carregarHorariosDisponiveis() {
   esconderMensagem();
 
-  horarioSelect.innerHTML =
-    '<option value="">Carregando horários...</option>';
+  horarioSelect.innerHTML = '<option value="">Carregando horários...</option>';
 
   horarioSelect.disabled = true;
 
   atualizarResumo();
 
   const barbeiro_id = barbeiroSelect.value;
+
   const servico_id = servicoSelect.value;
+
   const data = dataInput.value;
 
   if (!barbeiro_id || !servico_id || !data) {
     limparHorarios("Selecione serviço, barbeiro e data");
+
     return;
   }
 
@@ -350,12 +367,9 @@ async function carregarHorariosDisponiveis() {
       );
     }
 
-    const horarios = Array.isArray(resposta.data)
-      ? resposta.data
-      : [];
+    const horarios = Array.isArray(resposta.data) ? resposta.data : [];
 
-    horarioSelect.innerHTML =
-      '<option value="">Selecione o horário</option>';
+    horarioSelect.innerHTML = '<option value="">Selecione o horário</option>';
 
     if (!horarios.length) {
       horarioSelect.innerHTML =
@@ -370,6 +384,7 @@ async function carregarHorariosDisponiveis() {
       const option = document.createElement("option");
 
       option.value = horario;
+
       option.textContent = horario;
 
       horarioSelect.appendChild(option);
@@ -382,9 +397,7 @@ async function carregarHorariosDisponiveis() {
     horarioSelect.innerHTML =
       '<option value="">Erro ao carregar horários</option>';
 
-    mostrarErro(
-      erro.message || "Não foi possível carregar os horários.",
-    );
+    mostrarErro(erro.message || "Não foi possível carregar os horários.");
   }
 
   atualizarResumo();
@@ -394,7 +407,9 @@ function definirDataMinima() {
   const hoje = new Date();
 
   const ano = hoje.getFullYear();
+
   const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+
   const dia = String(hoje.getDate()).padStart(2, "0");
 
   const hojeFormatado = `${ano}-${mes}-${dia}`;
@@ -413,55 +428,68 @@ async function confirmarAgendamento(evento) {
 
   if (!clienteLogado?.id) {
     mostrarErro("Não foi possível identificar seu cadastro de cliente.");
+
     return;
   }
 
   const servico = obterServicoSelecionado();
+
   const barbeiro = obterBarbeiroSelecionado();
 
   const data = dataInput.value;
+
   const horarioInicio = horarioSelect.value;
 
   if (!servico || !barbeiro || !data || !horarioInicio) {
     mostrarErro("Selecione serviço, barbeiro, data e horário.");
+
     return;
   }
 
-  const horarioFim = calcularHorarioFim(
-    horarioInicio,
-    servico.duracao,
-  );
+  const horarioFim = calcularHorarioFim(horarioInicio, servico.duracao);
 
   if (!horarioFim) {
-    mostrarErro(
-      "Não foi possível calcular o horário final do serviço.",
-    );
+    mostrarErro("Não foi possível calcular o horário final do serviço.");
+
     return;
   }
 
   const inicio = combinarDataHorario(data, horarioInicio);
+
   const fim = combinarDataHorario(data, horarioFim);
 
   if (!inicio || !fim) {
     mostrarErro("Data ou horário inválido.");
+
     return;
   }
 
   btnConfirmarAgendamento.disabled = true;
+
   btnConfirmarAgendamento.textContent = "Confirmando...";
 
   try {
     const resposta = await api.post("/agendamentos", {
       cliente_id: clienteLogado.id,
+
       barbeiro_id: barbeiro.id,
+
       servico_id: servico.id,
+
       assinatura_plano_id: null,
+
       data,
+
       horario_inicio: inicio,
+
       horario_fim: fim,
+
       status: "AGENDADO",
+
       observacoes: null,
+
       valor: Number(servico.preco),
+
       forma_pagamento: null,
     });
 
@@ -476,30 +504,34 @@ async function confirmarAgendamento(evento) {
     formAgendamento.reset();
 
     barbeiroSelect.value = "";
+
     dataInput.value = "";
 
     barbeiroSelect.disabled = false;
+
     dataInput.disabled = true;
 
     prepararHorarioInicial();
 
     resumoAgendamento.hidden = true;
+
     atualizarResumo();
   } catch (erro) {
     console.error("Erro ao criar agendamento:", erro);
 
-    mostrarErro(
-      erro.message || "Não foi possível realizar o agendamento.",
-    );
+    mostrarErro(erro.message || "Não foi possível realizar o agendamento.");
   } finally {
     btnConfirmarAgendamento.disabled = true;
+
     btnConfirmarAgendamento.textContent = "Confirmar agendamento";
   }
 }
 
 servicoSelect.addEventListener("change", () => {
   esconderMensagem();
+
   horarioSelect.value = "";
+
   atualizarEstadoCampos();
 
   if (servicoSelect.value && barbeiroSelect.value && dataInput.value) {
@@ -509,7 +541,9 @@ servicoSelect.addEventListener("change", () => {
 
 barbeiroSelect.addEventListener("change", () => {
   esconderMensagem();
+
   horarioSelect.value = "";
+
   atualizarEstadoCampos();
 
   if (servicoSelect.value && barbeiroSelect.value && dataInput.value) {
@@ -519,11 +553,13 @@ barbeiroSelect.addEventListener("change", () => {
 
 dataInput.addEventListener("change", () => {
   esconderMensagem();
+
   carregarHorariosDisponiveis();
 });
 
 horarioSelect.addEventListener("change", () => {
   esconderMensagem();
+
   atualizarResumo();
 });
 
@@ -531,13 +567,12 @@ formAgendamento.addEventListener("submit", confirmarAgendamento);
 
 document.addEventListener("DOMContentLoaded", async () => {
   definirDataMinima();
+
   prepararHorarioInicial();
 
   await carregarClienteLogado();
-  await Promise.all([
-    carregarServicos(),
-    carregarBarbeiros(),
-  ]);
+
+  await Promise.all([carregarServicos(), carregarBarbeiros()]);
 
   atualizarEstadoCampos();
 });

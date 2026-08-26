@@ -7,38 +7,58 @@ datasource db {
 }
 
 model Usuario {
-  id         String    @id @default(uuid()) @db.Uuid
+  //chave pk 
+  id         String   @id @default(uuid()) @db.Uuid 
+
+//campos
   nome       String
-  email      String    @unique
+  email      String   @unique
   senha_hash String
   telefone   String?
   cargo      String
-  ativo      Boolean   @default(true)
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
-  barbeiro   Barbeiro?
-  sessoes    Sessao[]
+  ativo      Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
+// Relacionamentos
+  barbeiro Barbeiro?
+  sessoes  Sessao[]
+  caixa    Caixa[]
+
+// Índices
   @@map("usuarios")
 }
 
+
 model Sessao {
+  //chave pk
   id         String   @id @default(uuid()) @db.Uuid
+
+  //chave estrangeira
   usuario_id String   @db.Uuid
+
+  //campos
   jti        String   @unique
   created_at DateTime @default(now())
   expires_at DateTime
   user_agent String?
   ip         String?
+
+  // Relacionamentos
   usuario    Usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
 
+  // Índices
   @@index([expires_at])
   @@index([usuario_id])
   @@map("sessoes")
 }
 
+
 model Cliente {
+  //chave pk
   id                   String            @id @default(uuid()) @db.Uuid
+  
+  //campos
   nome                 String
   telefone             String
   whatsapp             String?
@@ -52,10 +72,14 @@ model Cliente {
   ativo                Boolean           @default(true)
   created_at           DateTime          @default(now())
   updated_at           DateTime          @updatedAt
-  agendamentos         agendamentos[]
-  pagamentos           pagamento[]
-  assinaturas_plano    AssinaturaPlano[]
 
+  // Relacionamentos 
+  assinaturas_plano    AssinaturaPlano[]
+  agendamentos         Agendamentos[]
+  pagamento            Pagamento[]
+  caixa                Caixa[]
+
+// Índices
   @@index([nome])
   @@index([telefone])
   @@index([email])
@@ -63,25 +87,36 @@ model Cliente {
   @@map("clientes")
 }
 
-model Barbeiro {
-  id                  String         @id @default(uuid()) @db.Uuid
-  usuario_id          String         @unique @db.Uuid
-  nome                String
-  cpf                 String?        @unique @db.VarChar(14)
-  data_nascimento     DateTime?
-  telefone            String?
-  whatsapp            String?
-  especialidade       String?
-  pix_tipo            String?
-  pix_chave           String?
-  percentual_comissao Decimal        @default(0) @db.Decimal(5, 2)
-  ativo               Boolean        @default(true)
-  created_at          DateTime       @default(now())
-  updated_at          DateTime       @updatedAt
-  agendamentos        agendamentos[]
-  usuario             Usuario        @relation(fields: [usuario_id], references: [id])
-  comissoes           comissao[]
 
+model Barbeiro {
+  //chave pk
+  id         String @id @default(uuid()) @db.Uuid
+  
+  //cahve estrangeira
+  usuario_id String @unique @db.Uuid
+
+  //campos
+  nome                String
+  telefone            String?
+  especialidade       String?
+  percentual_comissao Decimal   @default(0) @db.Decimal(5, 2)
+  ativo               Boolean   @default(true)
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+  cpf                 String?   @unique @db.VarChar(14)
+  data_nascimento     DateTime?
+  pix_chave           String?
+  pix_tipo            String?
+  whatsapp            String?
+
+  // Relacionamentos
+  usuario Usuario @relation(fields: [usuario_id], references: [id])
+  agendamentos     Agendamentos[]
+  comissao         Comissao[]
+  bloqueios_agenda BloqueioAgenda[]
+  caixa            Caixa[]
+
+  // Índices
   @@index([nome])
   @@index([ativo])
   @@index([cpf])
@@ -89,12 +124,17 @@ model Barbeiro {
   @@map("barbeiros")
 }
 
-model agendamentos {
-  id                  String           @id @default(uuid()) @db.Uuid
-  cliente_id          String           @db.Uuid
-  barbeiro_id         String           @db.Uuid
-  servico_id          String           @db.Uuid
-  assinatura_plano_id String?          @db.Uuid
+
+model Agendamentos { 
+  //chave pk
+  id String @id @default(uuid()) @db.Uuid
+
+ //chaves estrangeiras
+  cliente_id  String @db.Uuid
+  barbeiro_id String @db.Uuid
+  servico_id  String @db.Uuid
+
+//campos
   data                DateTime
   horario_inicio      DateTime
   horario_fim         DateTime
@@ -104,12 +144,15 @@ model agendamentos {
   forma_pagamento     String?
   created_at          DateTime         @default(now())
   updated_at          DateTime         @updatedAt
-  barbeiros           Barbeiro         @relation(fields: [barbeiro_id], references: [id])
-  clientes            Cliente          @relation(fields: [cliente_id], references: [id])
-  servicos            servicos         @relation(fields: [servico_id], references: [id])
+  assinatura_plano_id String?          @db.Uuid
+
+  // Relacionamentos
   assinatura_plano    AssinaturaPlano? @relation(fields: [assinatura_plano_id], references: [id])
-  comissao            comissao?
-  pagamento           pagamento?
+  barbeiro            Barbeiro         @relation(fields: [barbeiro_id], references: [id])
+  cliente             Cliente          @relation(fields: [cliente_id], references: [id])
+  servico             Servicos         @relation(fields: [servico_id], references: [id])
+  comissao            Comissao?
+  pagamento           Pagamento?
 
   @@index([barbeiro_id, data])
   @@index([barbeiro_id])
@@ -118,9 +161,12 @@ model agendamentos {
   @@index([servico_id])
   @@index([status])
   @@index([assinatura_plano_id])
+  @@map("agendamentos")
 }
 
-model servicos {
+
+model Servicos {
+  //chave pk
   id                  String         @id @default(uuid()) @db.Uuid
   nome                String
   descricao           String?
@@ -130,15 +176,23 @@ model servicos {
   ativo               Boolean        @default(true)
   created_at          DateTime       @default(now())
   updated_at          DateTime       @updatedAt
-  agendamentos        agendamentos[]
+
+  // Relacionamentos
   planos              Plano[]
+  agendamentos        Agendamentos[]
+  valorcortes         ValorCorte[]
+  caixa               Caixa[]
 
   @@index([ativo])
   @@index([nome])
+  @@map("servicos")
 }
 
 model Configuracao {
+  //chave pk
   id                 String   @id @default(uuid()) @db.Uuid
+
+  //campos
   nome_barbearia     String
   telefone           String?
   endereco           String?
@@ -149,50 +203,17 @@ model Configuracao {
   updated_at         DateTime @updatedAt
   comissao_padrao    Decimal  @default(40) @db.Decimal(5, 2)
 
+// indices
   @@map("configuracoes")
 }
 
-model pagamento {
-  id              String       @id @default(uuid()) @db.Uuid
-  agendamento_id  String       @unique @db.Uuid
-  cliente_id      String       @db.Uuid
-  valor           Decimal      @db.Decimal(10, 2)
-  forma_pagamento String
-  status          String       @default("PAGO")
-  data_pagamento  DateTime     @default(now())
-  observacoes     String?
-  created_at      DateTime     @default(now())
-  updated_at      DateTime     @updatedAt
-  agendamento     agendamentos @relation(fields: [agendamento_id], references: [id])
-  cliente         Cliente      @relation(fields: [cliente_id], references: [id])
-
-  @@index([cliente_id])
-  @@index([data_pagamento])
-  @@index([forma_pagamento])
-  @@index([status])
-}
-
-model comissao {
-  id             String       @id @default(uuid()) @db.Uuid
-  barbeiro_id    String       @db.Uuid
-  agendamento_id String       @unique @db.Uuid
-  valor_servico  Decimal      @db.Decimal(10, 2)
-  percentual     Decimal      @db.Decimal(5, 2)
-  valor_comissao Decimal      @db.Decimal(10, 2)
-  status         String       @default("PENDENTE")
-  data           DateTime     @default(now())
-  created_at     DateTime     @default(now())
-  agendamento    agendamentos @relation(fields: [agendamento_id], references: [id])
-  barbeiro       Barbeiro     @relation(fields: [barbeiro_id], references: [id])
-
-  @@index([barbeiro_id])
-  @@index([status])
-  @@index([data])
-}
 
 model Plano {
+  //chave pk
   id            String            @id @default(uuid()) @db.Uuid
   nome          String
+  
+  //campos
   descricao     String?
   servico_id    String            @db.Uuid
   quantidade    Int
@@ -201,33 +222,251 @@ model Plano {
   ativo         Boolean           @default(true)
   created_at    DateTime          @default(now())
   updated_at    DateTime          @updatedAt
-  servico       servicos          @relation(fields: [servico_id], references: [id])
+  
+  // Relacionamentos inversos
   assinaturas   AssinaturaPlano[]
+  caixa         Caixa[]
 
+// Relacionamentos
+  servico       Servicos          @relation(fields: [servico_id], references: [id])
+
+// Índices
   @@index([servico_id])
   @@index([ativo])
   @@index([nome])
 }
 
+
 model AssinaturaPlano {
-  id                   String         @id @default(uuid()) @db.Uuid
-  cliente_id           String         @db.Uuid
-  plano_id             String         @db.Uuid
+  //chave pk
+  id String @id @default(uuid()) @db.Uuid
+
+//chaves estrangeiras
+  cliente_id String @db.Uuid
+  plano_id   String @db.Uuid
+
+//campos
   quantidade_total     Int
-  quantidade_utilizada Int            @default(0)
-  valor_pago           Decimal        @db.Decimal(10, 2)
+  quantidade_utilizada Int      @default(0)
+  valor_pago           Decimal  @db.Decimal(10, 2)
   data_inicio          DateTime
   data_fim             DateTime
-  status               String         @default("ATIVO")
-  created_at           DateTime       @default(now())
-  updated_at           DateTime       @updatedAt
-  cliente              Cliente        @relation(fields: [cliente_id], references: [id])
-  plano                Plano          @relation(fields: [plano_id], references: [id])
-  agendamentos         agendamentos[]
+  status               String   @default("ATIVO")
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
 
+// Relacionamentos
+  cliente Cliente @relation(fields: [cliente_id], references: [id])
+  plano   Plano   @relation(fields: [plano_id], references: [id])
+
+// Relacionamentos inversos
+  agendamentos Agendamentos[]
+
+// Índices
   @@index([cliente_id])
   @@index([plano_id])
   @@index([status])
   @@index([data_inicio])
   @@index([data_fim])
 }
+
+
+
+model Estoque {
+  //chave pk
+  id                String                @id @default(uuid()) @db.Uuid
+  //campos
+  nome              String
+  descricao         String?
+  categoria         String?
+  quantidade        Int                   @default(0)
+  quantidade_minima Int                   @default(0)
+  unidade           String                @default("UN")
+  preco_custo       Decimal               @default(0) @db.Decimal(10, 2)
+  preco_venda       Decimal?              @db.Decimal(10, 2)
+  fornecedor        String?
+  codigo_barras     String?
+  ativo             Boolean               @default(true)
+  created_at        DateTime              @default(now())
+  updated_at        DateTime              @updatedAt
+
+  // Relacionamentos inversos
+  movimentacoes     MovimentacaoEstoque[]
+  caixa             Caixa[]
+
+// Índices
+  @@index([nome])
+  @@index([categoria])
+  @@index([ativo])
+  @@index([codigo_barras])
+  @@map("estoque")
+}
+
+
+
+model MovimentacaoEstoque {
+  //chave pk
+  id                  String   @id @default(uuid()) @db.Uuid
+
+  //chave estrangeira
+  estoque_id          String   @db.Uuid
+  tipo                String
+  quantidade          Int
+  quantidade_anterior Int
+  quantidade_nova     Int
+  valor_unitario      Decimal? @db.Decimal(10, 2)
+  motivo              String?
+  observacoes         String?
+  created_at          DateTime @default(now())
+
+  // Relacionamentos
+  estoque             Estoque  @relation(fields: [estoque_id], references: [id], onDelete: Cascade)
+
+ // Índices
+  @@index([estoque_id])
+  @@index([tipo])
+  @@index([created_at])
+  @@map("movimentacoes_estoque")
+}
+
+
+model Comissao {
+  //chave pk
+  id             String   @id @db.Uuid
+
+  //chaves estrangeiras
+  barbeiro_id    String   @db.Uuid
+  agendamento_id String   @unique @db.Uuid
+
+  //campos
+  valor_servico  Decimal  @db.Decimal(10, 2)
+  percentual     Decimal  @db.Decimal(5, 2)
+  valor_comissao Decimal  @db.Decimal(10, 2)
+  status         String   @default("PENDENTE")
+  data           DateTime @default(now())
+  created_at     DateTime @default(now())
+// Relacionamentos
+  agendamentos Agendamentos @relation(fields: [agendamento_id], references: [id])
+  barbeiros    Barbeiro     @relation(fields: [barbeiro_id], references: [id])
+
+// Índices
+  @@index([barbeiro_id])
+  @@index([data])
+  @@index([status])
+  @@map("comissao")
+}
+
+
+model Pagamento {
+  //chave pk
+  id              String   @id @db.Uuid
+
+  //chaves estrangeiras
+  agendamento_id  String   @unique @db.Uuid
+  cliente_id      String   @db.Uuid
+
+  //campos
+  valor           Decimal  @db.Decimal(10, 2)
+  forma_pagamento String
+  status          String   @default("PAGO")
+  data_pagamento  DateTime @default(now())
+  observacoes     String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime
+// Relacionamentos
+  agendamentos Agendamentos @relation(fields: [agendamento_id], references: [id])
+  clientes     Cliente      @relation(fields: [cliente_id], references: [id])
+
+// Índices
+  @@index([cliente_id])
+  @@index([data_pagamento])
+  @@index([forma_pagamento])
+  @@index([status])
+  @@map("pagamento")
+}
+
+
+model ValorCorte {
+  //chave pk
+  id          String    @id @default(uuid()) @db.Uuid
+  servicos_id String    @db.Uuid
+  valor       Decimal   @db.Decimal(10, 2)
+  data_inicio DateTime  @default(now())
+  data_fim    DateTime?
+  // Relacionamentos
+  servico Servicos @relation(fields: [servicos_id], references: [id])
+}
+ 
+model BloqueioAgenda {
+  //chave pk
+  id             String    @id @default(uuid()) @db.Uuid
+
+  //chave estrangeira
+  barbeiro_id    String?   @db.Uuid
+  data           DateTime  @db.Date
+  horario_inicio DateTime?
+  horario_fim    DateTime?
+  motivo         String
+  observacoes    String?
+
+  //campos de controle
+  ativo          Boolean   @default(true)
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+
+  // Relacionamentos
+  barbeiro Barbeiro? @relation(fields: [barbeiro_id], references: [id], onDelete: Cascade)
+
+  @@index([barbeiro_id])
+  @@index([data])
+  @@index([ativo])
+  @@map("bloqueios_agenda")
+}
+
+
+model Caixa {
+  //chave pk
+  id String @id @default(uuid()) @db.Uuid
+
+  //chaves estrangeiras
+  usuario_id  String  @db.Uuid // identificar 
+  cliente_id  String? @db.Uuid // selecionar cliente 
+  barbeiro_id String? @db.Uuid
+  estoque_id  String? @db.Uuid
+  servico_id  String? @db.Uuid
+  plano_id    String? @db.Uuid
+
+  //campos
+  //quantidade      Int
+  //preco           Decimal  @db.Decimal(10, 2)
+  //subtotal        Decimal  @db.Decimal(10, 2)
+  desconto          Decimal  @db.Decimal(10, 2) //registrar desconto
+  total             Decimal  @db.Decimal(10, 2) //registarar total
+  forma_pagamento   String                      //registrar forma de pagamento
+  valor_recebido    Decimal? @db.Decimal(10, 2) //valor recebido
+  troco             Decimal? @db.Decimal(10, 2) //registrar troco
+  status            String
+  registrar_venda   Boolean  @default(true) //registrar venda 
+  registrar_produto Boolean  @default(true) //registrar produto
+  registrar_plano   Boolean  @default(true) //registrar plano
+
+//campos de controle
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+// Relacionamentos
+  usuario  Usuario   @relation(fields: [usuario_id], references: [id])
+  cliente  Cliente?  @relation(fields: [cliente_id], references: [id])
+  barbeiro Barbeiro? @relation(fields: [barbeiro_id], references: [id])
+  estoque  Estoque?  @relation(fields: [estoque_id], references: [id])
+  servico  Servicos? @relation(fields: [servico_id], references: [id])
+  plano    Plano?    @relation(fields: [plano_id], references: [id])
+
+// Índices
+  @@index([cliente_id])
+  @@index([barbeiro_id])
+  @@index([estoque_id])
+  @@index([servico_id])
+  @@index([plano_id])
+}
+

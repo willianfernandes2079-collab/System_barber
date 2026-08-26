@@ -11,6 +11,8 @@ router.get("/", clientController.listar);
 
 router.get("/me", clientController.meuCliente);
 
+router.get("/:id/historico", clientController.buscarHistorico);
+
 router.get("/:id", clientController.buscarPorId);
 
 router.post(

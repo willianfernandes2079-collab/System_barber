@@ -129,6 +129,35 @@ async function atualizar(req, res, next) {
   }
 }
 
+async function reagendar(req, res, next) {
+  try {
+    const { id } = req.params;
+
+    const {
+      data,
+      horario_inicio,
+      horario_fim,
+      barbeiro_id,
+    } = req.body;
+
+    const agendamento =
+      await agendamentoService.reagendarAgendamento(id, {
+        data,
+        horario_inicio,
+        horario_fim,
+        barbeiro_id,
+      });
+
+    return res.status(200).json({
+      success: true,
+      data: agendamento,
+      message: "Agendamento reagendado com sucesso.",
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function cancelar(req, res, next) {
   try {
     const { id } = req.params;
@@ -186,6 +215,7 @@ module.exports = {
   buscarPorId,
   criar,
   atualizar,
+  reagendar,
   cancelar,
   concluir,
   marcarFalta,

@@ -281,3 +281,44 @@ body:has(#nome) textarea:focus {
     font-size: 1.55rem;
   }
 }
+#modalHistoricoOverlay {
+  z-index: 910;
+}
+
+#modalHistorico {
+  width: 100%;
+  max-width: 1100px;
+}
+
+#modalHistorico .stat-grid {
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(180px, 1fr)
+  );
+}
+
+#modalHistorico .stat-card {
+  min-width: 0;
+}
+
+#modalHistorico .stat-value {
+  overflow-wrap: anywhere;
+}
+
+#modalHistorico .table-wrapper {
+  overflow-x: auto;
+}
+
+#modalHistorico .table {
+  min-width: 900px;
+}
+
+@media (max-width: 700px) {
+  #modalHistorico {
+    padding: 20px;
+  }
+
+  #modalHistorico .page-header {
+    align-items: flex-start;
+  }
+}

@@ -1,5 +1,5 @@
 const prisma = require("../config/prismaClient");
-const AppError = require("../utils/appError");
+const AppError = require("../utils/AppError");
 const agendamentoService = require("./agendamentoService");
 
 const FORMAS_PAGAMENTO_VALIDAS = [
@@ -212,14 +212,14 @@ async function registrarPagamento({
     },
 
     include: {
-      agendamento: {
+      agendamentos: {
         include: {
           clientes: true,
           barbeiros: true,
           servicos: true,
         },
       },
-      cliente: true,
+      clientes: true,
     },
   });
 
@@ -286,8 +286,8 @@ async function listarPagamentos({
         take: limiteNumerico,
 
         include: {
-          cliente: true,
-          agendamento: {
+          clientes: true,
+          agendamentos: {
             include: {
               barbeiros: true,
               servicos: true,
@@ -302,13 +302,13 @@ async function listarPagamentos({
   const detalhados = pagamentos.map((pagamento) => ({
     ...sanitizarPagamento(pagamento),
 
-    cliente: pagamento.cliente,
+    cliente: pagamento.clientes,
 
     barbeiro:
-      pagamento.agendamento?.barbeiros || null,
+      pagamento.agendamentos?.barbeiros || null,
 
     servico:
-      pagamento.agendamento?.servicos || null,
+      pagamento.agendamentos?.servicos || null,
   }));
 
   return {
@@ -463,14 +463,14 @@ async function listarComissoes({
       },
 
       include: {
-        barbeiro: {
+        barbeiros: {
           select: {
             id: true,
             nome: true,
           },
         },
 
-        agendamento: {
+        agendamentos: {
           include: {
             clientes: {
               select: {
@@ -492,11 +492,11 @@ async function listarComissoes({
 
   return comissoes.map((comissao) => ({
     ...sanitizarComissao(comissao),
-    barbeiro: comissao.barbeiro,
+    barbeiro: comissao.barbeiros,
     cliente:
-      comissao.agendamento?.clientes || null,
+      comissao.agendamentos?.clientes || null,
     servico:
-      comissao.agendamento?.servicos || null,
+      comissao.agendamentos?.servicos || null,
   }));
 }
 

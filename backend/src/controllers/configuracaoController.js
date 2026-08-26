@@ -14,7 +14,7 @@ async function atualizar(req, res) {
 
   return res.status(200).json({
     success: true,
-    message: "Configurações atualizadas com sucesso.",
+    message: "ConfiguraÃ§Ãµes atualizadas com sucesso.",
     data: configuracao,
   });
 }

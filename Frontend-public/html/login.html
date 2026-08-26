@@ -7,10 +7,8 @@
 
     <title>Login - Sistema Barbearia</title>
 
-    <!-- CSS GLOBAL DO SISTEMA -->
     <link rel="stylesheet" href="../css/global.css">
 
-    <!-- CSS ESPECÍFICO DO LOGIN -->
     <link rel="stylesheet" href="../css/style.login.css">
 </head>
 
@@ -20,30 +18,21 @@
 
         <div class="login-card">
 
-            <!-- TÍTULO -->
-
             <div id="title">
                 <h1>Login</h1>
             </div>
- 
-                 <!-- SUBTÍTULO -->
-               
+
             <div id="subtitle">
                 <h2>Entre com suas credenciais para continuar</h2>
             </div>
-          
-                 <!-- FORMULÁRIO DE LOGIN -->
-                
-            <form class="login-form" id="loginForm">
 
-                <!-- USUÁRIO / E-MAIL -->
+            <form class="login-form" id="loginForm">
 
                 <div id="usuario">
                     <label for="usuarioInput">
                         Usuário
                     </label>
                 </div>
-
 
                 <div id="texto">
                     <input
@@ -53,14 +42,11 @@
                         required>
                 </div>
 
-                <!-- SENHA -->
-
                 <div id="senha">
                     <label for="senhaInput">
                         Senha
                     </label>
                 </div>
-
 
                 <div id="digitesen">
                     <input
@@ -69,8 +55,6 @@
                         placeholder="Digite sua senha"
                         required>
                 </div>
-
-                <!-- LEMBRAR DE MIM -->
 
                 <div id="checkbox">
 
@@ -84,15 +68,13 @@
 
                 </div>
 
-                <!-- ESQUECI MINHA SENHA -->
-
                 <div id="esqueci">
 
-                   <a href="esquecisenha.html">Esqueci minha senha</a>
+                    <a href="esquecisenha.html">
+                        Esqueci minha senha
+                    </a>
 
                 </div>
-
-                <!-- BOTÃO ENTRAR -->
 
                 <div id="btnEntrar">
 
@@ -104,14 +86,10 @@
 
             </form>
 
-                 <!-- DIVISOR "OU" -->
-
             <div id="ou">
                 <label>ou</label>
             </div>
-     
-                 <!-- LOGO DA EMPRESA -->
-                        
+
             <div id="imagem">
 
                 <img
@@ -119,9 +97,7 @@
                     alt="Logo da Barbearia">
 
             </div>
-      
-                 <!-- MENSAGEM PRINCIPAL -->
-             
+
             <div id="mensagem2">
 
                 <label>
@@ -130,8 +106,6 @@
 
             </div>
 
-                 <!-- MENSAGEM SECUNDÁRIA -->
-             
             <div id="mensagem3">
 
                 <label>
@@ -144,18 +118,13 @@
 
     </div>
 
-         <!-- SCRIPT DO LOGIN -->     
-
     <script>
 
         document
             .getElementById("loginForm")
             .addEventListener("submit", async (e) => {
 
-                // Impede o formulário de recarregar a página
                 e.preventDefault();
-
-                // PEGA OS DADOS DIGITADOS
 
                 const email =
                     document
@@ -163,12 +132,10 @@
                         .value
                         .trim();
 
-
                 const senha =
                     document
                         .getElementById("senhaInput")
                         .value;
-
 
                 const lembrar =
                     document
@@ -176,11 +143,9 @@
                         .checked;
 
                 try {
-                
-                    // ENVIA OS DADOS PARA O BACKEND
-                  
+
                     const response = await fetch(
-                        "http://localhost:3000/api/auth/login",
+                        "/api/auth/login",
                         {
                             method: "POST",
 
@@ -189,20 +154,15 @@
                             },
 
                             body: JSON.stringify({
-
-                                email: email,
-
-                                senha: senha,
-
+                                email,
+                                senha,
                                 manterConectado: lembrar
-
                             })
                         }
                     );
 
-                    // CONVERTE A RESPOSTA PARA JSON
-                  
-                    const data = await response.json();
+                    const data =
+                        await response.json();
 
                     console.log(
                         "STATUS:",
@@ -214,51 +174,11 @@
                         data
                     );
 
-                    // LOGIN BEM-SUCEDIDO
-              
                     if (
-                        response.ok &&
-                        data.success
+                        !response.ok ||
+                        !data.success ||
+                        !data.data?.accessToken
                     ) {
-
-                        alert(
-                            "Login realizado com sucesso!"
-                        );
-              
-                        // SALVA ACCESS TOKEN
-                    
-                        if (
-                            data.data?.accessToken
-                        ) {
-
-                            localStorage.setItem(
-                                "accessToken",
-                                data.data.accessToken
-                            );
-
-                        }
-                 
-                        // SALVA REFRESH TOKEN
-                     
-                        if (
-                            data.data?.refreshToken
-                        ) {
-
-                            localStorage.setItem(
-                                "refreshToken",
-                                data.data.refreshToken
-                            );
-
-                        }
-                    
-                        // VAI PARA O DASHBOARD
-                   
-                       window.location.href = "/index";
-
-                    } else {
-
-                        // ERRO DE LOGIN
-
                         alert(
                             "Erro no login: " +
                             (
@@ -267,11 +187,70 @@
                             )
                         );
 
+                        return;
                     }
 
+                    localStorage.setItem(
+                        "accessToken",
+                        data.data.accessToken
+                    );
+
+                    if (
+                        data.data?.refreshToken
+                    ) {
+                        localStorage.setItem(
+                            "refreshToken",
+                            data.data.refreshToken
+                        );
+                    }
+
+                    const respostaUsuario =
+                        await fetch(
+                            "/api/auth/me",
+                            {
+                                method: "GET",
+                                headers: {
+                                    Authorization:
+                                        `Bearer ${data.data.accessToken}`
+                                }
+                            }
+                        );
+
+                    const dadosUsuario =
+                        await respostaUsuario.json();
+
+                    if (
+                        !respostaUsuario.ok ||
+                        !dadosUsuario.success ||
+                        !dadosUsuario.data
+                    ) {
+                        throw new Error(
+                            dadosUsuario.message ||
+                            "Não foi possível identificar o usuário logado."
+                        );
+                    }
+
+                    const usuario =
+                        dadosUsuario.data;
+
+                    localStorage.setItem(
+                        "usuario",
+                        JSON.stringify(usuario)
+                    );
+
+                    if (
+                        usuario.cargo === "CLIENTE"
+                    ) {
+                        window.location.href =
+                            "/html/cliente-agendamento.html";
+
+                        return;
+                    }
+
+                    window.location.href =
+                        "/index";
+
                 } catch (error) {
-                  
-                    // ERRO DE CONEXÃO COM O BACKEND                  
 
                     console.error(
                         "Erro:",
@@ -279,11 +258,11 @@
                     );
 
                     alert(
+                        error.message ||
                         "Não foi possível conectar ao servidor."
                     );
 
                 }
-
             });
 
     </script>

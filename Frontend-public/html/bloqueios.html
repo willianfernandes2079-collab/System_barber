@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Bloqueios - Sistema Barbearia</title>
+
+    <link rel="stylesheet" href="../css/global.css" />
+
+    <link rel="stylesheet" href="../css/app-shell.css" />
+
+    <link rel="stylesheet" href="../css/bloqueios.css" />
+  </head>
+
+  <body>
+    <div id="app-sidebar"></div>
+
+    <header id="app-topbar"></header>
+
+    <main class="app-main">
+      <div class="bloqueios-header">
+        <div>
+          <h2 class="stripe-accent">🔒 Bloqueios de Agenda</h2>
+
+          <p class="bloqueios-descricao">
+            Bloqueie horários para todos os barbeiros ou somente para um
+            barbeiro específico.
+          </p>
+        </div>
+      </div>
+
+      <div class="bloqueios-card">
+        <h3>Novo bloqueio</h3>
+
+        <form id="formBloqueio">
+          <div class="bloqueios-form-grid">
+            <div class="bloqueio-campo">
+              <label for="bloqueioData"> Data </label>
+
+              <input type="date" id="bloqueioData" required />
+            </div>
+
+            <div class="bloqueio-campo">
+              <label for="bloqueioBarbeiro"> Barbeiro </label>
+
+              <select id="bloqueioBarbeiro">
+                <option value="">Todos os barbeiros</option>
+              </select>
+              <span class="bloqueio-ajuda">
+                Escolha "Todos os barbeiros" para bloquear a barbearia inteira.
+              </span>
+            </div>
+
+            <div class="bloqueio-campo">
+              <label for="bloqueioHorarioInicio"> Horário inicial </label>
+
+              <input type="time" id="bloqueioHorarioInicio" />
+
+              <span class="bloqueio-ajuda">
+                Deixe em branco para bloquear o dia inteiro.
+              </span>
+            </div>
+
+            <div class="bloqueio-campo">
+              <label for="bloqueioHorarioFim"> Horário final </label>
+
+              <input type="time" id="bloqueioHorarioFim" />
+            </div>
+
+            <div class="bloqueio-campo bloqueio-campo-completo">
+              <label for="bloqueioMotivo"> Motivo </label>
+
+              <input
+                type="text"
+                id="bloqueioMotivo"
+                maxlength="150"
+                placeholder="Ex.: Almoço, reunião, folga, manutenção..."
+                required
+              />
+            </div>
+
+            <div class="bloqueio-campo bloqueio-campo-completo">
+              <label for="bloqueioObservacoes"> Observações </label>
+
+              <textarea
+                id="bloqueioObservacoes"
+                maxlength="500"
+                placeholder="Observações adicionais..."
+              ></textarea>
+            </div>
+          </div>
+
+          <div id="mensagemBloqueios"></div>
+
+          <div class="bloqueio-acoes-form">
+            <button type="reset" class="btn btn-ghost" id="btnLimparBloqueio">
+              Limpar
+            </button>
+
+            <button type="submit" class="btn btn-primary" id="btnCriarBloqueio">
+              🔒 Criar bloqueio
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="bloqueios-card">
+        <h3>Bloqueios cadastrados</h3>
+
+        <div class="bloqueios-filtros">
+          <div class="bloqueio-campo">
+            <label for="filtroData"> Data </label>
+
+            <input type="date" id="filtroData" />
+          </div>
+
+          <div class="bloqueio-campo">
+            <label for="filtroBarbeiro"> Barbeiro </label>
+
+            <select id="filtroBarbeiro">
+              <option value="">Todos os barbeiros</option>
+            </select>
+          </div>
+
+          <div class="bloqueio-campo">
+            <label for="filtroAtivo"> Status </label>
+
+            <select id="filtroAtivo">
+              <option value="true">Ativos</option>
+
+              <option value="">Todos</option>
+
+              <option value="false">Inativos</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="listaBloqueios">
+          <div class="bloqueio-carregando">Carregando bloqueios...</div>
+        </div>
+      </div>
+    </main>
+
+    <script src="../js/api.js"></script>
+    <script src="../js/layout.js"></script>
+    <script src="../js/bloqueios.js"></script>
+
+    <script>
+      inicializarLayout("Bloqueios de Agenda");
+    </script>
+  </body>
+</html>

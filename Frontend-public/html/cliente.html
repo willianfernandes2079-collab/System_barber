@@ -1,209 +1,254 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Clientes - System Barber</title>
+    <title>Clientes - System Barber</title>
 
-  <link rel="stylesheet" href="../css/global.css">
-  <link rel="stylesheet" href="../css/app-shell.css">
-  <link rel="stylesheet" href="../css/clientes.css">
-</head>
+    <link rel="stylesheet" href="../css/global.css" />
+    <link rel="stylesheet" href="../css/app-shell.css" />
+    <link rel="stylesheet" href="../css/clientes.css" />
+  </head>
 
-<body>
-  <div id="app-sidebar"></div>
-  <header id="app-topbar"></header>
+  <body>
+    <div id="app-sidebar"></div>
+    <header id="app-topbar"></header>
 
-  <main class="app-main">
+    <main class="app-main">
+      <div class="page-header">
+        <h2 class="stripe-accent">Clientes</h2>
 
-    <div class="page-header">
-      <h2 class="stripe-accent">Clientes</h2>
-
-      <button
-  type="button"
-  class="btn btn-primary"
-  id="btnNovoCliente"
-  onclick="window.location.href='cadastrarcli.html'"
->
-  + Novo cliente
-</button>
-      </button>
-    </div>
-
-    <div class="toolbar">
-      <input
-        type="text"
-        id="buscaInput"
-        class="search-input"
-        placeholder="Buscar por nome, telefone ou e-mail..."
-      >
-
-      <select id="filtroAtivo">
-        <option value="">Todos</option>
-        <option value="true" selected>Ativos</option>
-        <option value="false">Inativos</option>
-      </select>
-    </div>
-
-    <div class="table-wrapper">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>Telefone</th>
-            <th>E-mail</th>
-            <th>Status</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-
-        <tbody id="tabelaClientes">
-          <tr>
-            <td colspan="5" class="empty-state">
-              Carregando...
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div
-      class="pagination"
-      id="paginacao"
-    ></div>
-
-  </main>
-
-  <div
-    class="modal-overlay"
-    id="modalOverlay"
-    style="display: none;"
-  >
-    <div class="modal">
-
-      <h3
-        id="modalTitulo"
-        style="margin-bottom: 18px;"
-      >
-        Editar cliente
-      </h3>
-
-      <form id="formCliente">
-
-        <input
-          type="hidden"
-          id="clienteId"
+        <button
+          type="button"
+          class="btn btn-primary"
+          id="btnNovoCliente"
+          onclick="window.location.href = 'cadastrarcli.html'"
         >
+          + Novo cliente
+        </button>
+      </div>
 
-        <div class="field">
-          <label for="nome">Nome</label>
-          <input
-            type="text"
-            id="nome"
-            required
+      <div class="toolbar">
+        <input
+          type="text"
+          id="buscaInput"
+          class="search-input"
+          placeholder="Buscar por nome, telefone ou e-mail..."
+        />
+
+        <select id="filtroAtivo">
+          <option value="">Todos</option>
+
+          <option value="true" selected>Ativos</option>
+
+          <option value="false">Inativos</option>
+        </select>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Telefone</th>
+              <th>E-mail</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+
+          <tbody id="tabelaClientes">
+            <tr>
+              <td colspan="5" class="empty-state">Carregando...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination" id="paginacao"></div>
+    </main>
+
+    <div class="modal-overlay" id="modalOverlay" style="display: none">
+      <div class="modal">
+        <h3 id="modalTitulo" style="margin-bottom: 18px">Editar cliente</h3>
+
+        <form id="formCliente">
+          <input type="hidden" id="clienteId" />
+
+          <div class="field">
+            <label for="nome"> Nome </label>
+
+            <input type="text" id="nome" required />
+          </div>
+
+          <div class="field">
+            <label for="telefone"> Telefone </label>
+
+            <input type="tel" id="telefone" required />
+          </div>
+
+          <div class="field">
+            <label for="whatsapp"> WhatsApp </label>
+
+            <input type="tel" id="whatsapp" />
+          </div>
+
+          <div class="field">
+            <label for="email"> E-mail </label>
+
+            <input type="email" id="email" />
+          </div>
+
+          <div class="field">
+            <label for="dataNascimento"> Data de nascimento </label>
+
+            <input type="date" id="dataNascimento" />
+          </div>
+
+          <div class="field">
+            <label for="cpf"> CPF </label>
+
+            <input type="text" id="cpf" />
+          </div>
+
+          <div class="field">
+            <label for="observacoes"> Observações </label>
+
+            <textarea id="observacoes" rows="3"></textarea>
+          </div>
+
+          <div
+            id="modalErro"
+            class="alert alert-danger"
+            style="display: none; margin-bottom: 16px"
+          ></div>
+
+          <div
+            class="flex gap-8"
+            style="justify-content: flex-end; margin-top: 22px"
           >
-        </div>
+            <button type="button" class="btn btn-ghost" id="btnCancelarModal">
+              Cancelar
+            </button>
 
-        <div class="field">
-          <label for="telefone">Telefone</label>
-          <input
-            type="tel"
-            id="telefone"
-            required
-          >
-        </div>
+            <button type="submit" class="btn btn-primary" id="btnSalvarCliente">
+              Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
 
-        <div class="field">
-          <label for="whatsapp">WhatsApp</label>
-          <input
-            type="tel"
-            id="whatsapp"
-          >
-        </div>
+    <div class="modal-overlay" id="modalHistoricoOverlay" style="display: none">
+      <div class="modal" id="modalHistorico">
+        <div class="page-header" style="margin-bottom: 18px">
+          <div>
+            <h3 id="historicoTitulo" style="margin-bottom: 4px">
+              Histórico do cliente
+            </h3>
 
-        <div class="field">
-          <label for="email">E-mail</label>
-          <input
-            type="email"
-            id="email"
-          >
-        </div>
+            <p id="historicoSubtitulo" class="text-muted">Carregando...</p>
+          </div>
 
-        <div class="field">
-          <label for="dataNascimento">
-            Data de nascimento
-          </label>
-
-          <input
-            type="date"
-            id="dataNascimento"
-          >
-        </div>
-
-        <div class="field">
-          <label for="cpf">CPF</label>
-
-          <input
-            type="text"
-            id="cpf"
-          >
-        </div>
-
-        <div class="field">
-          <label for="observacoes">
-            Observações
-          </label>
-
-          <textarea
-            id="observacoes"
-            rows="3"
-          ></textarea>
+          <button type="button" class="btn btn-ghost" id="btnFecharHistorico">
+            Fechar
+          </button>
         </div>
 
         <div
-          id="modalErro"
+          id="historicoErro"
           class="alert alert-danger"
-          style="display: none; margin-bottom: 16px;"
+          style="display: none; margin-bottom: 18px"
         ></div>
 
-        <div
-          class="flex gap-8"
-          style="justify-content: flex-end; margin-top: 22px;"
-        >
-          <button
-            type="button"
-            class="btn btn-ghost"
-            id="btnCancelarModal"
-          >
-            Cancelar
-          </button>
+        <div id="historicoConteudo">
+          <div class="stat-grid" style="margin-bottom: 22px">
+            <div class="card stat-card">
+              <span class="stat-label"> Visitas </span>
 
-          <button
-            type="submit"
-            class="btn btn-primary"
-            id="btnSalvarCliente"
-          >
-            Salvar
-          </button>
+              <span class="stat-value" id="historicoVisitas"> 0 </span>
+            </div>
+
+            <div class="card stat-card">
+              <span class="stat-label"> Total gasto </span>
+
+              <span class="stat-value" id="historicoTotalGasto"> R$ 0,00 </span>
+            </div>
+
+            <div class="card stat-card">
+              <span class="stat-label"> Ticket médio </span>
+
+              <span class="stat-value" id="historicoTicketMedio">
+                R$ 0,00
+              </span>
+            </div>
+
+            <div class="card stat-card">
+              <span class="stat-label"> Último atendimento </span>
+
+              <span class="stat-value" id="historicoUltimoAtendimento">
+                —
+              </span>
+            </div>
+          </div>
+
+          <div class="report-grid" style="margin-bottom: 24px">
+            <div class="card">
+              <h4 class="section-title">Serviço mais utilizado</h4>
+
+              <p id="historicoServicoMaisUtilizado">
+                Nenhum atendimento concluído.
+              </p>
+            </div>
+
+            <div class="card">
+              <h4 class="section-title">Barbeiro mais utilizado</h4>
+
+              <p id="historicoBarbeiroMaisUtilizado">
+                Nenhum atendimento concluído.
+              </p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h4 class="section-title">Histórico de atendimentos</h4>
+
+            <div class="table-wrapper">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Horário</th>
+                    <th>Serviço</th>
+                    <th>Barbeiro</th>
+                    <th>Status</th>
+                    <th>Valor</th>
+                    <th>Pagamento</th>
+                  </tr>
+                </thead>
+
+                <tbody id="tabelaHistorico">
+                  <tr>
+                    <td colspan="7" class="empty-state">Carregando...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-
-      </form>
+      </div>
     </div>
-  </div>
 
-  <div
-    class="toast-container"
-    id="toastContainer"
-  ></div>
+    <div class="toast-container" id="toastContainer"></div>
 
-  <script src="../js/api.js"></script>
-  <script src="../js/ui.js"></script>
-  <script src="../js/layout.js"></script>
-  <script src="../js/clientes.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/layout.js"></script>
+    <script src="../js/clientes.js"></script>
 
-  <script>
-    inicializarLayout("Clientes");
-  </script>
-</body>
+    <script>
+      inicializarLayout("Clientes");
+    </script>
+  </body>
 </html>

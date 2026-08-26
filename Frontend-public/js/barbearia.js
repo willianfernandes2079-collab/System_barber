@@ -1005,7 +1005,7 @@ async function salvarBarbeiro(
         " ",
       ) ||
         erro?.message ||
-        "NÃ£o foi possÃ­vel salvar o barbeiro.",
+        "Não foi possivel salvar o barbeiro.",
     );
   }
 }
@@ -1037,7 +1037,7 @@ async function desativarBarbeiro(
 
     mostrarToast?.(
       erro?.message ||
-        "NÃ£o foi possÃ­vel desativar o barbeiro.",
+        "Não foi possivel desativar o barbeiro.",
       "danger",
     );
   }
@@ -1070,7 +1070,7 @@ async function ativarBarbeiro(
 
     mostrarToast?.(
       erro?.message ||
-        "NÃ£o foi possÃ­vel ativar o barbeiro.",
+        "Não foi possivel ativar o barbeiro.",
       "danger",
     );
   }
@@ -1171,7 +1171,7 @@ document.addEventListener(
             tipo === "ALEATORIA"
           ) {
             campo.placeholder =
-              "Digite a chave aleatÃ³ria";
+              "Digite a chave aleatoria";
           } else {
             campo.placeholder =
               "Digite a chave PIX";

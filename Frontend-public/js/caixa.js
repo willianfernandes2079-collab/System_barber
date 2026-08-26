@@ -14,7 +14,7 @@ const CATALOGO_PRODUTOS = [
   { id: 9, nome: 'Cerveja Long Neck', preco: 10.00, categoria: 'bebidas', icon: '🍺' },
   { id: 10, nome: 'Refrigerante Lata', preco: 6.00, categoria: 'bebidas', icon: '🥤' },
   { id: 11, nome: 'Água Mineral', preco: 4.00, categoria: 'bebidas', icon: '🍾' },
-  { id: 12, nome: 'Whisky Dose', preco: 18.00, categoria: 'bebidas', icon: '🥃' }
+  { id: 12, nome: 'Whisky Dose', preco: 18.00, categoria: 'bebidas', icon: '🥃' }, 
 ];
 
 // Estado da Aplicação

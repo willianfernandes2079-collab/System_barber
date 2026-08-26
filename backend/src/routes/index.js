@@ -9,6 +9,7 @@ const financeiroRoutes = require("./financeiroRoutes");
 const relatorioRoutes = require("./relatorioRoutes");
 const planoRoutes = require("./planoRoutes");
 const assinaturaPlanoRoutes = require("./assinaturaPlanoRoutes");
+const bloqueioAgendaRoutes = require("./bloqueioAgendaRoutes");
 const autenticar = require("../middlewares/authMiddleware");
 
 const router = Router();
@@ -36,5 +37,6 @@ router.use("/financeiro", autenticar, financeiroRoutes);
 router.use("/relatorios", autenticar, relatorioRoutes);
 router.use("/planos", autenticar, planoRoutes);
 router.use("/assinaturas-planos", autenticar, assinaturaPlanoRoutes);
+router.use("/bloqueios", autenticar, bloqueioAgendaRoutes);
 
 module.exports = router;

@@ -1,4 +1,5 @@
 const { Router } = require("express");
+
 const agendamentoController = require("../controllers/agendamentoController");
 
 const router = Router();
@@ -10,6 +11,8 @@ router.get("/disponiveis", agendamentoController.listarHorariosDisponiveis);
 router.get("/:id", agendamentoController.buscarPorId);
 
 router.post("/", agendamentoController.criar);
+
+router.patch("/:id/reagendar", agendamentoController.reagendar);
 
 router.patch("/:id/concluir", agendamentoController.concluir);
 

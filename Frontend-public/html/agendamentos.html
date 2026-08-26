@@ -75,10 +75,144 @@
         font-size: 0.9rem;
         color: var(--color-text-muted);
       }
+
+      #areaBloqueio {
+        width: min(100%, 700px);
+        margin: 0 auto 20px;
+        padding: 16px;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        background: var(--color-surface);
+        box-shadow: var(--shadow-sm);
+      }
+
+      #areaBloqueioTitulo {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+
+      #areaBloqueioTitulo strong {
+        color: var(--color-text-heading);
+      }
+
+      #areaBloqueioDescricao {
+        margin: 0;
+        color: var(--color-text-muted);
+        font-size: 0.9rem;
+      }
+
+      #btnAbrirBloqueio {
+        margin-top: 12px;
+      }
+
+      #modalBloqueioOverlay {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(0, 0, 0, 0.55);
+      }
+
+      #modalBloqueioOverlay.aberto {
+        display: flex;
+      }
+
+      #modalBloqueio {
+        width: min(100%, 520px);
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 22px;
+        border-radius: var(--radius-md);
+        background: var(--color-surface);
+        box-shadow: var(--shadow-lg);
+      }
+
+      #modalBloqueioCabecalho {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      #modalBloqueioCabecalho h2 {
+        margin: 0;
+        color: var(--color-text-heading);
+        font-size: 1.1rem;
+      }
+
+      #btnFecharBloqueio {
+        border: 0;
+        background: transparent;
+        color: var(--color-text-muted);
+        font-size: 1.4rem;
+        cursor: pointer;
+      }
+
+      .campoBloqueio {
+        margin-bottom: 14px;
+      }
+
+      .campoBloqueio label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        color: var(--color-text-heading);
+      }
+
+      .campoBloqueio input,
+      .campoBloqueio select,
+      .campoBloqueio textarea {
+        width: 100%;
+      }
+
+      .campoBloqueio textarea {
+        min-height: 90px;
+        resize: vertical;
+      }
+
+      #mensagemBloqueio {
+        min-height: 22px;
+        margin-bottom: 10px;
+      }
+
+      #acoesBloqueio {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 18px;
+      }
     </style>
   </head>
 
   <body>
+    <section
+      id="areaBloqueio"
+      style="display: none"
+    >
+      <div id="areaBloqueioTitulo">
+        <strong>🔒 Bloqueios de agenda</strong>
+      </div>
+
+      <p id="areaBloqueioDescricao">
+        Bloqueie um período para todos os barbeiros ou somente para um barbeiro específico.
+      </p>
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        id="btnAbrirBloqueio"
+      >
+        🔒 Bloquear horário
+      </button>
+    </section>
+
     <form id="agendamentoForm">
       <div id="cliente">
         <label for="clienteBusca">Cliente</label>
@@ -91,7 +225,11 @@
           required
         />
 
-        <input type="hidden" id="clienteSelect" name="cliente" />
+        <input
+          type="hidden"
+          id="clienteSelect"
+          name="cliente"
+        />
 
         <div id="clientesResultados"></div>
       </div>
@@ -101,7 +239,12 @@
 
         <div id="planoTipo">
           <label>
-            <input type="radio" name="tipoAtendimento" value="AVULSO" checked />
+            <input
+              type="radio"
+              name="tipoAtendimento"
+              value="AVULSO"
+              checked
+            />
             Avulso
           </label>
 
@@ -127,7 +270,11 @@
       <div id="barbeiro">
         <label for="barbeiroSelect">Barbeiro</label>
 
-        <select id="barbeiroSelect" name="barbeiro" required>
+        <select
+          id="barbeiroSelect"
+          name="barbeiro"
+          required
+        >
           <option value="">Selecione o barbeiro</option>
         </select>
       </div>
@@ -135,7 +282,11 @@
       <div id="servico">
         <label for="servicoSelect">Serviço</label>
 
-        <select id="servicoSelect" name="servico" required>
+        <select
+          id="servicoSelect"
+          name="servico"
+          required
+        >
           <option value="">Selecione o serviço</option>
         </select>
       </div>
@@ -143,7 +294,10 @@
       <div id="semana">
         <label for="semanaSelect">Semana</label>
 
-        <select id="semanaSelect" required>
+        <select
+          id="semanaSelect"
+          required
+        >
           <option value="atual">Esta semana</option>
           <option value="proxima">Próxima semana</option>
         </select>
@@ -152,14 +306,24 @@
       <div id="dia">
         <label for="diaSelect">Dia</label>
 
-        <select id="diaSelect" required></select>
+        <select
+          id="diaSelect"
+          required
+        ></select>
       </div>
 
       <div id="horario">
         <label for="horarioInput">Horário</label>
 
-        <select id="horarioInput" name="horario" required disabled>
-          <option value="">Selecione primeiro barbeiro, serviço e dia</option>
+        <select
+          id="horarioInput"
+          name="horario"
+          required
+          disabled
+        >
+          <option value="">
+            Selecione primeiro barbeiro, serviço e dia
+          </option>
         </select>
       </div>
 
@@ -180,7 +344,10 @@
       <div id="status">
         <label for="statusSelect">Status</label>
 
-        <select name="status" id="statusSelect">
+        <select
+          name="status"
+          id="statusSelect"
+        >
           <option value="AGENDADO">Confirmado</option>
           <option value="PENDENTE">Pendente</option>
           <option value="CANCELADO">Cancelado</option>
@@ -204,14 +371,139 @@
       </div>
 
       <div id="btnVolta">
-        <button type="button" onclick="window.location.href = 'index.html'">
+        <button
+          type="button"
+          onclick="window.location.href = 'index.html'"
+        >
           Voltar
         </button>
       </div>
     </form>
 
+    <div
+      id="modalBloqueioOverlay"
+      aria-hidden="true"
+    >
+      <div
+        id="modalBloqueio"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalBloqueioTitulo"
+      >
+        <div id="modalBloqueioCabecalho">
+          <h2 id="modalBloqueioTitulo">
+            🔒 Bloquear horário
+          </h2>
+
+          <button
+            type="button"
+            id="btnFecharBloqueio"
+            aria-label="Fechar"
+          >
+            ×
+          </button>
+        </div>
+
+        <form id="formBloqueio">
+          <div class="campoBloqueio">
+            <label for="bloqueioData">
+              Data
+            </label>
+
+            <input
+              type="date"
+              id="bloqueioData"
+              required
+            />
+          </div>
+
+          <div class="campoBloqueio">
+            <label for="bloqueioBarbeiro">
+              Barbeiro
+            </label>
+
+            <select
+              id="bloqueioBarbeiro"
+              required
+            >
+              <option value="">
+                Todos os barbeiros
+              </option>
+            </select>
+          </div>
+
+          <div class="campoBloqueio">
+            <label for="bloqueioHorarioInicio">
+              Horário inicial
+            </label>
+
+            <input
+              type="time"
+              id="bloqueioHorarioInicio"
+            />
+          </div>
+
+          <div class="campoBloqueio">
+            <label for="bloqueioHorarioFim">
+              Horário final
+            </label>
+
+            <input
+              type="time"
+              id="bloqueioHorarioFim"
+            />
+          </div>
+
+          <div class="campoBloqueio">
+            <label for="bloqueioMotivo">
+              Motivo
+            </label>
+
+            <input
+              type="text"
+              id="bloqueioMotivo"
+              maxlength="150"
+              placeholder="Ex.: Almoço, reunião, manutenção..."
+              required
+            />
+          </div>
+
+          <div class="campoBloqueio">
+            <label for="bloqueioObservacoes">
+              Observações
+            </label>
+
+            <textarea
+              id="bloqueioObservacoes"
+              maxlength="500"
+              placeholder="Observações adicionais..."
+            ></textarea>
+          </div>
+
+          <div id="mensagemBloqueio"></div>
+
+          <div id="acoesBloqueio">
+            <button
+              type="button"
+              class="btn btn-ghost"
+              id="btnCancelarBloqueio"
+            >
+              Cancelar
+            </button>
+
+            <button
+              type="submit"
+              class="btn btn-primary"
+              id="btnSalvarBloqueio"
+            >
+              Criar bloqueio
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <script src="../js/api.js"></script>
     <script src="../js/agendamentos.js"></script>
   </body>
 </html>
-
