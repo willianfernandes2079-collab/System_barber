@@ -3,6 +3,17 @@ const AppError = require("../utils/AppError");
 
 const OFFSET_SAO_PAULO = "-03:00";
 
+function validarBarbeariaId(barbeariaId) {
+  if (!barbeariaId) {
+    throw new AppError(
+      "Usuário não está vinculado a uma barbearia.",
+      403,
+    );
+  }
+
+  return barbeariaId;
+}
+
 function normalizarData(data) {
   const dataObj = new Date(`${data}T00:00:00${OFFSET_SAO_PAULO}`);
 
@@ -77,7 +88,10 @@ async function criarBloqueio({
   horario_fim,
   motivo,
   observacoes,
+  barbeariaId,
 }) {
+  barbeariaId = validarBarbeariaId(barbeariaId);
+
   if (!data) {
     throw new AppError("A data do bloqueio é obrigatória.", 400);
   }
@@ -93,9 +107,10 @@ async function criarBloqueio({
   validarIntervalo(horarioInicioObj, horarioFimObj);
 
   if (barbeiro_id) {
-    const barbeiro = await prisma.barbeiro.findUnique({
+    const barbeiro = await prisma.barbeiros.findFirst({
       where: {
         id: barbeiro_id,
+        barbearia_id: barbeariaId,
       },
     });
 
@@ -113,6 +128,7 @@ async function criarBloqueio({
       motivo: motivo.trim(),
       observacoes: observacoes?.trim() || null,
       ativo: true,
+      barbearia_id: barbeariaId,
     },
     include: {
       barbeiro: true,
@@ -124,8 +140,13 @@ async function listarBloqueios({
   data,
   barbeiro_id,
   ativo,
+  barbeariaId,
 } = {}) {
-  const where = {};
+  barbeariaId = validarBarbeariaId(barbeariaId);
+
+  const where = {
+    barbearia_id: barbeariaId,
+  };
 
   if (data) {
     const dataObj = normalizarData(data);
@@ -165,11 +186,17 @@ async function listarBloqueios({
   });
 }
 
-async function buscarBloqueioPorId(id) {
+async function buscarBloqueioPorId(
+  id,
+  barbeariaId,
+) {
+  barbeariaId = validarBarbeariaId(barbeariaId);
+
   const bloqueio =
-    await prisma.bloqueioAgenda.findUnique({
+    await prisma.bloqueioAgenda.findFirst({
       where: {
         id,
+        barbearia_id: barbeariaId,
       },
       include: {
         barbeiro: true,
@@ -194,8 +221,14 @@ async function atualizarBloqueio(
     observacoes,
     ativo,
   },
+  barbeariaId,
 ) {
-  const bloqueio = await buscarBloqueioPorId(id);
+  barbeariaId = validarBarbeariaId(barbeariaId);
+
+  const bloqueio = await buscarBloqueioPorId(
+    id,
+    barbeariaId,
+  );
 
   const novaData =
     data !== undefined
@@ -219,17 +252,28 @@ async function atualizarBloqueio(
       ? normalizarHorario(dataTexto, horario_fim)
       : bloqueio.horario_fim;
 
-  validarIntervalo(novoHorarioInicio, novoHorarioFim);
+  validarIntervalo(
+    novoHorarioInicio,
+    novoHorarioFim,
+  );
 
-  if (barbeiro_id !== undefined && barbeiro_id !== null) {
-    const barbeiro = await prisma.barbeiro.findUnique({
-      where: {
-        id: barbeiro_id,
-      },
-    });
+  if (
+    barbeiro_id !== undefined &&
+    barbeiro_id !== null
+  ) {
+    const barbeiro =
+      await prisma.barbeiros.findFirst({
+        where: {
+          id: barbeiro_id,
+          barbearia_id: barbeariaId,
+        },
+      });
 
     if (!barbeiro) {
-      throw new AppError("Barbeiro não encontrado.", 404);
+      throw new AppError(
+        "Barbeiro não encontrado.",
+        404,
+      );
     }
   }
 
@@ -240,7 +284,8 @@ async function atualizarBloqueio(
   };
 
   if (barbeiro_id !== undefined) {
-    dados.barbeiro_id = barbeiro_id || null;
+    dados.barbeiro_id =
+      barbeiro_id || null;
   }
 
   if (motivo !== undefined) {
@@ -275,8 +320,14 @@ async function atualizarBloqueio(
   });
 }
 
-async function desativarBloqueio(id) {
-  await buscarBloqueioPorId(id);
+async function desativarBloqueio(
+  id,
+  barbeariaId,
+) {
+  await buscarBloqueioPorId(
+    id,
+    barbeariaId,
+  );
 
   return prisma.bloqueioAgenda.update({
     where: {
@@ -288,8 +339,14 @@ async function desativarBloqueio(id) {
   });
 }
 
-async function ativarBloqueio(id) {
-  await buscarBloqueioPorId(id);
+async function ativarBloqueio(
+  id,
+  barbeariaId,
+) {
+  await buscarBloqueioPorId(
+    id,
+    barbeariaId,
+  );
 
   return prisma.bloqueioAgenda.update({
     where: {
@@ -301,8 +358,14 @@ async function ativarBloqueio(id) {
   });
 }
 
-async function excluirBloqueio(id) {
-  await buscarBloqueioPorId(id);
+async function excluirBloqueio(
+  id,
+  barbeariaId,
+) {
+  await buscarBloqueioPorId(
+    id,
+    barbeariaId,
+  );
 
   return prisma.bloqueioAgenda.delete({
     where: {
@@ -316,12 +379,17 @@ async function existeBloqueioNoIntervalo({
   data,
   inicioMinutos,
   fimMinutos,
+  barbeariaId,
 }) {
-  const bloqueios = await listarBloqueios({
-    data,
-    barbeiro_id,
-    ativo: true,
-  });
+  barbeariaId = validarBarbeariaId(barbeariaId);
+
+  const bloqueios =
+    await listarBloqueios({
+      data,
+      barbeiro_id,
+      ativo: true,
+      barbeariaId,
+    });
 
   return bloqueios.some((bloqueio) => {
     // Bloqueio sem horário = dia inteiro.

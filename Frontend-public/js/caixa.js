@@ -1,26 +1,33 @@
-
+//
 //    SISTEMA DE CAIXA BARBEARIA - LÓGICA & ESTADO
 
 // Catálogo Base de Itens do Sistema
 const CATALOGO_PRODUTOS = [
-  { id: 1, nome: 'Corte Masculino', preco: 40.00, categoria: 'servicos', icon: '✂️' },
-  { id: 2, nome: 'Barba Completa', preco: 30.00, categoria: 'servicos', icon: '🪒' },
-  { id: 3, nome: 'Corte + Barba', preco: 65.00, categoria: 'servicos', icon: '💈' },
-  { id: 4, nome: 'Sobrancelha', preco: 15.00, categoria: 'servicos', icon: '👁️' },
-  { id: 5, nome: 'Pigmentação Barba', preco: 25.00, categoria: 'servicos', icon: '🎨' },
-  { id: 6, nome: 'Pomada Matte 150g', preco: 35.00, categoria: 'produtos', icon: '🧴' },
-  { id: 7, nome: 'Óleo para Barba', preco: 28.00, categoria: 'produtos', icon: '💧' },
-  { id: 8, nome: 'Shampoo Barba', preco: 32.00, categoria: 'produtos', icon: '🧼' },
-  { id: 9, nome: 'Cerveja Long Neck', preco: 10.00, categoria: 'bebidas', icon: '🍺' },
-  { id: 10, nome: 'Refrigerante Lata', preco: 6.00, categoria: 'bebidas', icon: '🥤' },
-  { id: 11, nome: 'Água Mineral', preco: 4.00, categoria: 'bebidas', icon: '🍾' },
-  { id: 12, nome: 'Whisky Dose', preco: 18.00, categoria: 'bebidas', icon: '🥃' }, 
+  { id: 1, nome: 'Corte Masculino', preco: 4000.00, categoria: 'servicos', },
+  { id: 2, nome: 'Barba Completa', preco: 30.00, categoria: 'servicos',},
+  { id: 3, nome: 'Corte + Barba', preco: 65.00, categoria: 'servicos', },
+  { id: 4, nome: 'Sobrancelha', preco: 15.00, categoria: 'servicos', },
+  { id: 5, nome: 'Pigmentação Barba', preco: 25.00, categoria: 'servicos', },
+  { id: 6, nome: 'Pomada Matte 150g', preco: 35.00, categoria: 'produtos', },
+  { id: 7, nome: 'Óleo para Barba', preco: 28.00, categoria: 'produtos', },
+  { id: 8, nome: 'Shampoo Barba', preco: 32.00, categoria: 'produtos', },
+  { id: 9, nome: 'Cerveja Long Neck', preco: 10.00, categoria: 'bebidas', },
+  { id: 10, nome: 'Refrigerante Lata', preco: 6.00, categoria: 'bebidas', },
+  { id: 11, nome: 'Água Mineral', preco: 4.00, categoria: 'bebidas', },
+  { id: 12, nome: 'Whisky Dose', preco: 18.00, categoria: 'bebidas', }, 
+  { id: 13, nome: 'Pigmentação de Cabelo', preco: 18.00, categoria: 'servicos', }, 
 ];
 
 // Estado da Aplicação
 let cart = [];
 let categoriaAtiva = 'todos';
 let totalCalculado = 0;
+
+function escaparHtml(valor) {
+  const div = document.createElement('div');
+  div.textContent = String(valor ?? '');
+  return div.innerHTML;
+}
 
 // Inicialização da Aplicação
 document.addEventListener('DOMContentLoaded', () => {
@@ -52,8 +59,8 @@ function renderizarCatalogo() {
     card.onclick = () => adicionarAoCarrinho(item.id);
 
     card.innerHTML = `
-      <div class="product-icon">${item.icon}</div>
-      <div class="product-title">${item.nome}</div>
+      <div class="product-icon">${escaparHtml(item.icon)}</div>
+      <div class="product-title">${escaparHtml(item.nome)}</div>
       <div class="product-price">R$ ${item.preco.toFixed(2).replace('.', ',')}</div>
     `;
     grid.appendChild(card);
@@ -125,7 +132,7 @@ function renderizarCarrinho() {
 
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td><strong>${item.nome}</strong></td>
+        <td><strong>${escaparHtml(item.nome)}</strong></td>
         <td>
           <div class="qty-controls">
             <button class="btn-qty" onclick="alterarQuantidade(${item.id}, -1)">-</button>
@@ -229,7 +236,7 @@ function finalizarVenda() {
 
   let itensHTML = cart.map(i => `
     <div class="receipt-line">
-      <span>${i.qtd}x ${i.nome}</span>
+      <span>${i.qtd}x ${escaparHtml(i.nome)}</span>
       <span>R$ ${(i.preco * i.qtd).toFixed(2)}</span>
     </div>
   `).join('');
@@ -237,8 +244,8 @@ function finalizarVenda() {
   const trocoValor = (forma === 'dinheiro' && recebido > totalCalculado) ? (recebido - totalCalculado).toFixed(2) : "0.00";
 
   reciboConteudo.innerHTML = `
-    <p><strong>Cliente:</strong> ${cliente}</p>
-    <p><strong>Pagamento:</strong> ${forma.toUpperCase()}</p>
+    <p><strong>Cliente:</strong> ${escaparHtml(cliente)}</p>
+    <p><strong>Pagamento:</strong> ${escaparHtml(forma.toUpperCase())}</p>
     <br>
     ${itensHTML}
     <br>

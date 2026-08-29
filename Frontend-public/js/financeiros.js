@@ -8,6 +8,12 @@ const LABEL_FORMA_PAGAMENTO = {
   OUTROS: "Outros",
 };
 
+function escaparHtml(valor) {
+  const div = document.createElement("div");
+  div.textContent = String(valor ?? "");
+  return div.innerHTML;
+}
+
 async function carregarFinanceiro() {
   try {
     const [hojeResp, mesResp, pagamentosResp, comissoesResp] =
@@ -82,10 +88,10 @@ function renderizarFormasPagamento(porForma) {
       (item) => `
         <tr>
           <td>
-            ${
+            ${escaparHtml(
               LABEL_FORMA_PAGAMENTO[item.forma_pagamento] ||
-              item.forma_pagamento
-            }
+                item.forma_pagamento,
+            )}
           </td>
 
           <td>
@@ -126,18 +132,22 @@ function renderizarPagamentos(pagamentos) {
           </td>
 
           <td>
-            ${pagamento.cliente?.nome || "—"}
+            ${escaparHtml(
+              pagamento.cliente?.nome || "—",
+            )}
           </td>
 
           <td>
-            ${pagamento.servico?.nome || "—"}
+            ${escaparHtml(
+              pagamento.servico?.nome || "—",
+            )}
           </td>
 
           <td>
-            ${
+            ${escaparHtml(
               LABEL_FORMA_PAGAMENTO[pagamento.forma_pagamento] ||
-              pagamento.forma_pagamento
-            }
+                pagamento.forma_pagamento,
+            )}
           </td>
 
           <td>
@@ -146,7 +156,11 @@ function renderizarPagamentos(pagamentos) {
 
           <td>
             <span class="badge badge-success">
-              ${pagamento.status === "PAGO" ? "Pago" : pagamento.status}
+              ${
+                pagamento.status === "PAGO"
+                  ? "Pago"
+                  : escaparHtml(pagamento.status)
+              }
             </span>
           </td>
         </tr>
@@ -176,7 +190,9 @@ function renderizarComissoes(comissoes) {
       (comissao) => `
         <tr>
           <td>
-            ${comissao.barbeiro?.nome || "—"}
+            ${escaparHtml(
+              comissao.barbeiro?.nome || "—",
+            )}
           </td>
 
           <td>
@@ -194,10 +210,16 @@ function renderizarComissoes(comissoes) {
           <td>
             <span
               class="badge ${
-                comissao.status === "PAGA" ? "badge-success" : "badge-warning"
+                comissao.status === "PAGA"
+                  ? "badge-success"
+                  : "badge-warning"
               }"
             >
-              ${comissao.status === "PAGA" ? "Paga" : "Pendente"}
+              ${
+                comissao.status === "PAGA"
+                  ? "Paga"
+                  : escaparHtml(comissao.status)
+              }
             </span>
           </td>
 
@@ -208,7 +230,7 @@ function renderizarComissoes(comissoes) {
                   <button
                     type="button"
                     class="btn btn-outline"
-                    data-pagar="${comissao.id}"
+                    data-pagar="${escaparHtml(comissao.id)}"
                   >
                     Marcar como paga
                   </button>
@@ -263,7 +285,9 @@ async function carregarAgendamentosPagamento() {
   try {
     const resposta = await api.get("/agendamentos");
 
-    const agendamentos = Array.isArray(resposta?.data) ? resposta.data : [];
+    const agendamentos = Array.isArray(resposta?.data)
+      ? resposta.data
+      : [];
 
     const disponiveis = agendamentos.filter(
       (agendamento) =>
@@ -289,19 +313,29 @@ async function carregarAgendamentosPagamento() {
     disponiveis.forEach((agendamento) => {
       const inicio = new Date(agendamento.horario_inicio);
 
-      const cliente = agendamento.clientes?.nome || "Cliente não informado";
+      const cliente =
+        agendamento.clientes?.nome ||
+        "Cliente não informado";
 
-      const barbeiro = agendamento.barbeiros?.nome || "Barbeiro não informado";
+      const barbeiro =
+        agendamento.barbeiros?.nome ||
+        "Barbeiro não informado";
 
-      const servico = agendamento.servicos?.nome || "Serviço não informado";
+      const servico =
+        agendamento.servicos?.nome ||
+        "Serviço não informado";
 
-      const valor = Number(agendamento.valor) || 0;
+      const valor =
+        Number(agendamento.valor) || 0;
 
-      const option = document.createElement("option");
+      const option =
+        document.createElement("option");
 
-      option.value = agendamento.id;
+      option.value =
+        agendamento.id;
 
-      option.dataset.valor = String(valor);
+      option.dataset.valor =
+        String(valor);
 
       option.textContent =
         `${cliente} — ${servico} — ${barbeiro} — ` +
@@ -314,7 +348,10 @@ async function carregarAgendamentosPagamento() {
       select.appendChild(option);
     });
   } catch (erro) {
-    console.error("Erro ao carregar agendamentos:", erro);
+    console.error(
+      "Erro ao carregar agendamentos:",
+      erro,
+    );
 
     select.innerHTML = `
       <option value="">
@@ -323,22 +360,35 @@ async function carregarAgendamentosPagamento() {
     `;
 
     mostrarToast(
-      erro?.message || "Não foi possível carregar os agendamentos.",
+      erro?.message ||
+        "Não foi possível carregar os agendamentos.",
       "danger",
     );
   }
 }
 
 function atualizarValorAgendamento() {
-  const select = document.getElementById("agendamentoId");
+  const select =
+    document.getElementById(
+      "agendamentoId",
+    );
 
-  const valorInput = document.getElementById("valorPagamento");
+  const valorInput =
+    document.getElementById(
+      "valorPagamento",
+    );
 
-  const info = document.getElementById("infoAgendamento");
+  const info =
+    document.getElementById(
+      "infoAgendamento",
+    );
 
   if (!select || !valorInput) return;
 
-  const option = select.options[select.selectedIndex];
+  const option =
+    select.options[
+      select.selectedIndex
+    ];
 
   if (!option?.value) {
     valorInput.value = "";
@@ -350,11 +400,13 @@ function atualizarValorAgendamento() {
     return;
   }
 
-  const valor = Number(option.dataset.valor);
+  const valor =
+    Number(option.dataset.valor);
 
   if (!Number.isFinite(valor)) return;
 
-  valorInput.value = valor.toFixed(2);
+  valorInput.value =
+    valor.toFixed(2);
 
   if (info) {
     info.textContent =
@@ -363,20 +415,34 @@ function atualizarValorAgendamento() {
 }
 
 function abrirModalPagamento() {
-  const form = document.getElementById("formPagamento");
+  const form =
+    document.getElementById(
+      "formPagamento",
+    );
 
-  const erro = document.getElementById("modalErro");
+  const erro =
+    document.getElementById(
+      "modalErro",
+    );
 
-  const modal = document.getElementById("modalOverlay");
+  const modal =
+    document.getElementById(
+      "modalOverlay",
+    );
 
-  const select = document.getElementById("agendamentoId");
+  const select =
+    document.getElementById(
+      "agendamentoId",
+    );
 
   if (!form || !modal) return;
 
   form.reset();
 
   if (erro) {
-    erro.style.display = "none";
+    erro.style.display =
+      "none";
+
     erro.textContent = "";
   }
 
@@ -390,57 +456,97 @@ function abrirModalPagamento() {
 
   carregarAgendamentosPagamento();
 
-  modal.style.display = "flex";
+  modal.style.display =
+    "flex";
 }
 
 function fecharModal() {
-  const modal = document.getElementById("modalOverlay");
+  const modal =
+    document.getElementById(
+      "modalOverlay",
+    );
 
   if (modal) {
-    modal.style.display = "none";
+    modal.style.display =
+      "none";
   }
 }
 
 async function registrarPagamento(event) {
   event.preventDefault();
 
-  const agendamentoId = document.getElementById("agendamentoId");
+  const agendamentoId =
+    document.getElementById(
+      "agendamentoId",
+    );
 
-  const formaPagamento = document.getElementById("formaPagamento");
+  const formaPagamento =
+    document.getElementById(
+      "formaPagamento",
+    );
 
-  const valorPagamento = document.getElementById("valorPagamento");
+  const valorPagamento =
+    document.getElementById(
+      "valorPagamento",
+    );
 
-  const observacoes = document.getElementById("observacoesPagamento");
+  const observacoes =
+    document.getElementById(
+      "observacoesPagamento",
+    );
 
-  const modalErro = document.getElementById("modalErro");
+  const modalErro =
+    document.getElementById(
+      "modalErro",
+    );
 
-  const agendamento_id = agendamentoId?.value.trim();
+  const agendamento_id =
+    agendamentoId?.value.trim();
 
-  const forma_pagamento = formaPagamento?.value;
+  const forma_pagamento =
+    formaPagamento?.value;
 
-  const valorTexto = valorPagamento?.value;
+  const valorTexto =
+    valorPagamento?.value;
 
-  const observacoesTexto = observacoes?.value.trim();
+  const observacoesTexto =
+    observacoes?.value.trim();
 
-  if (!agendamento_id || !forma_pagamento) {
+  if (
+    !agendamento_id ||
+    !forma_pagamento
+  ) {
     if (modalErro) {
-      modalErro.textContent = "Informe o agendamento e a forma de pagamento.";
+      modalErro.textContent =
+        "Informe o agendamento e a forma de pagamento.";
 
-      modalErro.style.display = "block";
+      modalErro.style.display =
+        "block";
     }
 
     return;
   }
 
   try {
-    await api.post("/financeiro/pagamentos", {
-      agendamento_id,
-      forma_pagamento,
-      valor: valorTexto === "" ? undefined : Number(valorTexto),
-      observacoes: observacoesTexto || undefined,
-    });
+    await api.post(
+      "/financeiro/pagamentos",
+      {
+        agendamento_id,
+        forma_pagamento,
+        valor:
+          valorTexto === ""
+            ? undefined
+            : Number(valorTexto),
+        observacoes:
+          observacoesTexto ||
+          undefined,
+      },
+    );
 
-    mostrarToast("Pagamento registrado com sucesso.", "success");
+    mostrarToast(
+      "Pagamento registrado com sucesso.",
+      "success",
+    );
 
     fecharModal();
 
@@ -448,29 +554,54 @@ async function registrarPagamento(event) {
   } catch (erro) {
     if (modalErro) {
       modalErro.textContent =
-        erro?.message || "Não foi possível registrar o pagamento.";
+        erro?.message ||
+        "Não foi possível registrar o pagamento.";
 
-      modalErro.style.display = "block";
+      modalErro.style.display =
+        "block";
     }
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  carregarFinanceiro();
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+    carregarFinanceiro();
 
-  document
-    .getElementById("btnRegistrarPagamento")
-    ?.addEventListener("click", abrirModalPagamento);
+    document
+      .getElementById(
+        "btnRegistrarPagamento",
+      )
+      ?.addEventListener(
+        "click",
+        abrirModalPagamento,
+      );
 
-  document
-    .getElementById("btnCancelarModal")
-    ?.addEventListener("click", fecharModal);
+    document
+      .getElementById(
+        "btnCancelarModal",
+      )
+      ?.addEventListener(
+        "click",
+        fecharModal,
+      );
 
-  document
-    .getElementById("formPagamento")
-    ?.addEventListener("submit", registrarPagamento);
+    document
+      .getElementById(
+        "formPagamento",
+      )
+      ?.addEventListener(
+        "submit",
+        registrarPagamento,
+      );
 
-  document
-    .getElementById("agendamentoId")
-    ?.addEventListener("change", atualizarValorAgendamento);
-});
+    document
+      .getElementById(
+        "agendamentoId",
+      )
+      ?.addEventListener(
+        "change",
+        atualizarValorAgendamento,
+      );
+  },
+);

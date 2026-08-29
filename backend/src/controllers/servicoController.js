@@ -3,7 +3,10 @@ const asyncHandler = require("../utils/asyncHandler");
 const { isNonEmptyString } = require("../utils/validators");
 
 const listar = asyncHandler(async (req, res) => {
-  const servicos = await servicoService.listarServicos();
+  const servicos =
+    await servicoService.listarServicos(
+      req.user.barbearia_id,
+    );
 
   return res.status(200).json({
     success: true,
@@ -14,7 +17,11 @@ const listar = asyncHandler(async (req, res) => {
 const buscarPorId = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const servico = await servicoService.buscarServicoPorId(id);
+  const servico =
+    await servicoService.buscarServicoPorId(
+      id,
+      req.user.barbearia_id,
+    );
 
   if (!servico) {
     return res.status(404).json({
@@ -30,7 +37,13 @@ const buscarPorId = asyncHandler(async (req, res) => {
 });
 
 const criar = asyncHandler(async (req, res) => {
-  const { nome, descricao, duracao, preco, percentual_comissao } = req.body;
+  const {
+    nome,
+    descricao,
+    duracao,
+    preco,
+    percentual_comissao,
+  } = req.body;
 
   if (!isNonEmptyString(nome)) {
     return res.status(400).json({
@@ -39,30 +52,59 @@ const criar = asyncHandler(async (req, res) => {
     });
   }
 
-  if (!Number.isFinite(Number(duracao)) || Number(duracao) <= 0) {
+  if (
+    !Number.isFinite(Number(duracao)) ||
+    Number(duracao) <= 0
+  ) {
     return res.status(400).json({
       success: false,
-      message: "Informe uma duração válida, em minutos.",
+      message:
+        "Informe uma duração válida, em minutos.",
     });
   }
 
-  if (!Number.isFinite(Number(preco)) || Number(preco) < 0) {
+  if (
+    !Number.isFinite(Number(preco)) ||
+    Number(preco) < 0
+  ) {
     return res.status(400).json({
       success: false,
       message: "Informe um preço válido.",
     });
   }
 
-  const servico = await servicoService.criarServico({
-    nome: nome.trim(),
-    descricao: descricao || null,
-    duracao: Number(duracao),
-    preco: Number(preco),
-    percentual_comissao:
-      percentual_comissao !== undefined && percentual_comissao !== null
-        ? Number(percentual_comissao)
-        : undefined,
-  });
+  if (
+    percentual_comissao !== undefined &&
+    percentual_comissao !== null &&
+    (
+      !Number.isFinite(
+        Number(percentual_comissao),
+      ) ||
+      Number(percentual_comissao) < 0 ||
+      Number(percentual_comissao) > 100
+    )
+  ) {
+    return res.status(400).json({
+      success: false,
+      message:
+        "Informe uma comissão válida entre 0 e 100%.",
+    });
+  }
+
+  const servico =
+    await servicoService.criarServico({
+      nome: nome.trim(),
+      descricao: descricao || null,
+      duracao: Number(duracao),
+      preco: Number(preco),
+      percentual_comissao:
+        percentual_comissao !== undefined &&
+        percentual_comissao !== null
+          ? Number(percentual_comissao)
+          : undefined,
+      barbeariaId:
+        req.user.barbearia_id,
+    });
 
   return res.status(201).json({
     success: true,
@@ -74,7 +116,11 @@ const criar = asyncHandler(async (req, res) => {
 const atualizar = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const existente = await servicoService.buscarServicoPorId(id);
+  const existente =
+    await servicoService.buscarServicoPorId(
+      id,
+      req.user.barbearia_id,
+    );
 
   if (!existente) {
     return res.status(404).json({
@@ -83,7 +129,18 @@ const atualizar = asyncHandler(async (req, res) => {
     });
   }
 
-  const servico = await servicoService.atualizarServico(id, req.body);
+  const dados = {
+    ...req.body,
+  };
+
+  delete dados.barbearia_id;
+
+  const servico =
+    await servicoService.atualizarServico(
+      id,
+      dados,
+      req.user.barbearia_id,
+    );
 
   return res.status(200).json({
     success: true,
@@ -95,7 +152,11 @@ const atualizar = asyncHandler(async (req, res) => {
 const desativar = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const existente = await servicoService.buscarServicoPorId(id);
+  const existente =
+    await servicoService.buscarServicoPorId(
+      id,
+      req.user.barbearia_id,
+    );
 
   if (!existente) {
     return res.status(404).json({
@@ -104,7 +165,10 @@ const desativar = asyncHandler(async (req, res) => {
     });
   }
 
-  await servicoService.desativarServico(id);
+  await servicoService.desativarServico(
+    id,
+    req.user.barbearia_id,
+  );
 
   return res.status(200).json({
     success: true,

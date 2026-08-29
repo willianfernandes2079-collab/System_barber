@@ -7,7 +7,8 @@ const loginLimiter = rateLimit({
   legacyHeaders: false,
   message: {
     success: false,
-    message: "Muitas tentativas de login. Tente novamente em alguns minutos.",
+    message:
+      "Muitas tentativas de login. Tente novamente em alguns minutos.",
   },
 });
 
@@ -30,7 +31,27 @@ const forgotPasswordDailyLimiter = rateLimit({
   legacyHeaders: false,
   message: {
     success: false,
-    message: "Limite diário de recuperação atingido. Tente novamente amanhã.",
+    message:
+      "Limite diário de recuperação atingido. Tente novamente amanhã.",
+  },
+});
+
+const apiWriteLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+
+  skip: (req) => {
+    return ["GET", "HEAD", "OPTIONS"].includes(
+      req.method,
+    );
+  },
+
+  message: {
+    success: false,
+    message:
+      "Muitas operações em pouco tempo. Tente novamente em alguns minutos.",
   },
 });
 
@@ -38,4 +59,5 @@ module.exports = {
   loginLimiter,
   forgotPasswordLimiter,
   forgotPasswordDailyLimiter,
+  apiWriteLimiter,
 };

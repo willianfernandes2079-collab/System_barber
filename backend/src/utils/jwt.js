@@ -2,12 +2,16 @@ const jwt = require("jsonwebtoken");
 
 const env = require("../config/env");
 
-function signAccessToken(usuario) {
+function signAccessToken(usuario, barbeariaId = undefined) {
   return jwt.sign(
     {
       sub: usuario.id,
       cargo: usuario.cargo,
       nome: usuario.nome,
+      barbearia_id:
+        barbeariaId !== undefined
+          ? barbeariaId
+          : usuario.barbearia_id || null,
     },
     env.JWT_SECRET,
     {
@@ -16,7 +20,10 @@ function signAccessToken(usuario) {
   );
 }
 
-function signRefreshToken(usuario, { remember = false } = {}) {
+function signRefreshToken(
+  usuario,
+  { remember = false, barbeariaId = undefined } = {},
+) {
   const expiresIn = remember
     ? env.JWT_REFRESH_EXPIRES_IN_REMEMBER
     : env.JWT_REFRESH_EXPIRES_IN;
@@ -26,6 +33,10 @@ function signRefreshToken(usuario, { remember = false } = {}) {
       sub: usuario.id,
       cargo: usuario.cargo,
       nome: usuario.nome,
+      barbearia_id:
+        barbeariaId !== undefined
+          ? barbeariaId
+          : usuario.barbearia_id || null,
     },
     env.JWT_REFRESH_SECRET,
     {

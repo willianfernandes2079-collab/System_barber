@@ -1,7 +1,3 @@
-if (!localStorage.getItem("accessToken")) {
-  window.location.href = "/login";
-}
-
 const form = document.getElementById("agendamentoForm");
 
 const cliente = document.getElementById("cliente");

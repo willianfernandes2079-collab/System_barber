@@ -1,7 +1,3 @@
-if (!localStorage.getItem("accessToken")) {
-  window.location.href = "/login";
-}
-
 const formBloqueio =
   document.getElementById("formBloqueio");
 
@@ -560,7 +556,7 @@ function renderizarBloqueios(
             <div class="bloqueio-item-cabecalho">
               <div>
                 <div class="bloqueio-item-titulo">
-                  🔒 ${escaparHtml(
+                   ${escaparHtml(
                     bloqueio.motivo ||
                       "Bloqueio",
                   )}
@@ -976,7 +972,7 @@ function cancelarEdicao() {
   }
 
   btnCriarBloqueio.textContent =
-    "🔒 Criar bloqueio";
+    "Criar bloqueio";
 
   btnLimparBloqueio.textContent =
     "Limpar";

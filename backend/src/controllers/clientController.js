@@ -15,12 +15,15 @@ async function listar(req, res) {
       limite,
       busca,
       ativo,
+      barbeariaId:
+        req.user.barbearia_id,
     });
 
   return res.status(200).json({
     success: true,
     data: resultado.clientes,
-    paginacao: resultado.paginacao,
+    paginacao:
+      resultado.paginacao,
   });
 }
 
@@ -28,12 +31,16 @@ async function buscarPorId(req, res) {
   const { id } = req.params;
 
   const cliente =
-    await clientService.buscarClientePorId(id);
+    await clientService.buscarClientePorId(
+      id,
+      req.user.barbearia_id,
+    );
 
   if (!cliente) {
     return res.status(404).json({
       success: false,
-      message: "Cliente não encontrado.",
+      message:
+        "Cliente não encontrado.",
     });
   }
 
@@ -47,12 +54,16 @@ async function buscarHistorico(req, res) {
   const { id } = req.params;
 
   const resultado =
-    await clientService.buscarHistoricoCliente(id);
+    await clientService.buscarHistoricoCliente(
+      id,
+      req.user.barbearia_id,
+    );
 
   if (!resultado) {
     return res.status(404).json({
       success: false,
-      message: "Cliente não encontrado.",
+      message:
+        "Cliente não encontrado.",
     });
   }
 
@@ -66,25 +77,29 @@ async function buscarHistorico(req, res) {
 
 async function meuCliente(req, res) {
   const usuario =
-    await userStore.findById(req.user.sub);
+    await userStore.findById(
+      req.user.sub,
+    );
 
   if (!usuario) {
     return res.status(404).json({
       success: false,
-      message: "Usuário não encontrado.",
+      message:
+        "Usuário não encontrado.",
     });
   }
 
   const cliente =
-    await clientService.buscarPorEmail(
+    await clientService.buscarClientePortalPorEmail(
       usuario.email,
+      req.user.barbearia_id,
     );
 
   if (!cliente) {
     return res.status(404).json({
       success: false,
       message:
-        "Nenhum cliente vinculado ao usuário autenticado.",
+        "Nenhum cliente vinculado ao usuário autenticado nesta barbearia.",
     });
   }
 
@@ -96,9 +111,30 @@ async function meuCliente(req, res) {
     });
   }
 
+  const clientePortal =
+    await clientService.buscarClientePortal(
+      cliente.id,
+    );
+
+  if (!clientePortal) {
+    return res.status(404).json({
+      success: false,
+      message:
+        "Cliente não encontrado.",
+    });
+  }
+
+  if (!clientePortal.ativo) {
+    return res.status(403).json({
+      success: false,
+      message:
+        "O cadastro do cliente está inativo.",
+    });
+  }
+
   return res.status(200).json({
     success: true,
-    data: cliente,
+    data: clientePortal,
   });
 }
 
@@ -135,6 +171,7 @@ async function criar(req, res) {
     const clienteComEmail =
       await clientService.buscarPorEmail(
         email,
+        req.user.barbearia_id,
       );
 
     if (clienteComEmail) {
@@ -148,7 +185,10 @@ async function criar(req, res) {
 
   if (cpf) {
     const clienteComCpf =
-      await clientService.buscarPorCpf(cpf);
+      await clientService.buscarPorCpf(
+        cpf,
+        req.user.barbearia_id,
+      );
 
     if (clienteComCpf) {
       return res.status(409).json({
@@ -170,6 +210,8 @@ async function criar(req, res) {
       observacoes,
       preferencia_barbeiro,
       preferencia_servico,
+      barbearia_id:
+        req.user.barbearia_id,
     });
 
   return res.status(201).json({
@@ -184,21 +226,27 @@ async function atualizar(req, res) {
   const { id } = req.params;
 
   const clienteExistente =
-    await clientService.buscarClientePorId(id);
+    await clientService.buscarClientePorId(
+      id,
+      req.user.barbearia_id,
+    );
 
   if (!clienteExistente) {
     return res.status(404).json({
       success: false,
-      message: "Cliente não encontrado.",
+      message:
+        "Cliente não encontrado.",
     });
   }
 
-  const { email, cpf } = req.body;
+  const { email, cpf } =
+    req.body;
 
   if (email) {
     const clienteComEmail =
       await clientService.buscarPorEmail(
         email,
+        req.user.barbearia_id,
       );
 
     if (
@@ -215,7 +263,10 @@ async function atualizar(req, res) {
 
   if (cpf) {
     const clienteComCpf =
-      await clientService.buscarPorCpf(cpf);
+      await clientService.buscarPorCpf(
+        cpf,
+        req.user.barbearia_id,
+      );
 
     if (
       clienteComCpf &&
@@ -224,7 +275,7 @@ async function atualizar(req, res) {
       return res.status(409).json({
         success: false,
         message:
-          "Já existe outro cliente com este CPF.",
+          "Já existe outro cliente cadastrado com este CPF.",
       });
     }
   }
@@ -233,7 +284,16 @@ async function atualizar(req, res) {
     await clientService.atualizarCliente(
       id,
       req.body,
+      req.user.barbearia_id,
     );
+
+  if (!cliente) {
+    return res.status(404).json({
+      success: false,
+      message:
+        "Cliente não encontrado.",
+    });
+  }
 
   return res.status(200).json({
     success: true,
@@ -247,16 +307,23 @@ async function desativar(req, res) {
   const { id } = req.params;
 
   const clienteExistente =
-    await clientService.buscarClientePorId(id);
+    await clientService.buscarClientePorId(
+      id,
+      req.user.barbearia_id,
+    );
 
   if (!clienteExistente) {
     return res.status(404).json({
       success: false,
-      message: "Cliente não encontrado.",
+      message:
+        "Cliente não encontrado.",
     });
   }
 
-  await clientService.desativarCliente(id);
+  await clientService.desativarCliente(
+    id,
+    req.user.barbearia_id,
+  );
 
   return res.status(200).json({
     success: true,
@@ -269,16 +336,23 @@ async function ativar(req, res) {
   const { id } = req.params;
 
   const clienteExistente =
-    await clientService.buscarClientePorId(id);
+    await clientService.buscarClientePorId(
+      id,
+      req.user.barbearia_id,
+    );
 
   if (!clienteExistente) {
     return res.status(404).json({
       success: false,
-      message: "Cliente não encontrado.",
+      message:
+        "Cliente não encontrado.",
     });
   }
 
-  await clientService.ativarCliente(id);
+  await clientService.ativarCliente(
+    id,
+    req.user.barbearia_id,
+  );
 
   return res.status(200).json({
     success: true,

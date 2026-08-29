@@ -4,52 +4,32 @@
 
 const API_BASE = "/api";
 
-function getAccessToken() {
-  return localStorage.getItem("accessToken");
-}
-
-function getRefreshToken() {
-  return localStorage.getItem("refreshToken");
-}
-
 function paginaAtual() {
   return window.location.pathname.split("/").pop() || "";
 }
 
 function paginaPortalCliente() {
-  return paginaAtual() === "cliente-agendamento.html";
+  const pagina = paginaAtual();
+
+  return (
+    pagina === "cliente-agendamento.html" ||
+    window.location.pathname === "/cliente-agendamento"
+  );
 }
 
 async function tentarRenovarToken() {
-  const refreshToken = getRefreshToken();
-
-  if (!refreshToken) {
-    return false;
-  }
-
   try {
     const response = await fetch(`${API_BASE}/auth/refresh`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        refreshToken,
-      }),
+      credentials: "include",
     });
 
-    const data = await response.json();
+    const data = await response.json().catch(() => null);
 
-    if (response.ok && data.success && data.data?.accessToken) {
-      localStorage.setItem("accessToken", data.data.accessToken);
-
-      return true;
-    }
+    return response.ok && data?.success;
   } catch {
-    // Falha de conexão ou refresh expirado.
+    return false;
   }
-
-  return false;
 }
 
 async function apiRequest(
@@ -60,17 +40,10 @@ async function apiRequest(
     "Content-Type": "application/json",
   };
 
-  if (auth) {
-    const token = getAccessToken();
-
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-  }
-
   const response = await fetch(`${API_BASE}${path}`, {
     method,
     headers,
+    credentials: "include",
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 
@@ -94,8 +67,6 @@ async function apiRequest(
       });
     }
 
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
     localStorage.removeItem("usuario");
 
     window.location.href = "/login";
@@ -109,6 +80,7 @@ async function apiRequest(
     );
 
     erro.status = response.status;
+
     erro.data = data;
 
     throw erro;
@@ -148,16 +120,6 @@ const api = {
 };
 
 async function protegerAcessoInterno() {
-  const token = getAccessToken();
-
-  if (!token) {
-    if (!paginaPortalCliente()) {
-      return;
-    }
-
-    return;
-  }
-
   if (paginaPortalCliente()) {
     return;
   }
@@ -184,7 +146,7 @@ async function protegerAcessoInterno() {
     localStorage.setItem("usuario", JSON.stringify(usuario));
 
     if (usuario.cargo === "CLIENTE") {
-      window.location.href = "/html/cliente-agendamento.html";
+      window.location.href = "/cliente-agendamento";
     }
   } catch (erro) {
     console.error("Erro ao verificar acesso:", erro);

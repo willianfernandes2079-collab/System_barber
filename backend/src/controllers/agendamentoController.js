@@ -2,7 +2,10 @@ const agendamentoService = require("../services/agendamentoService");
 
 async function listar(req, res, next) {
   try {
-    const agendamentos = await agendamentoService.listarAgendamentos();
+    const agendamentos =
+      await agendamentoService.listarAgendamentos(
+        req.user,
+      );
 
     return res.status(200).json({
       success: true,
@@ -15,13 +18,19 @@ async function listar(req, res, next) {
 
 async function listarHorariosDisponiveis(req, res, next) {
   try {
-    const { barbeiro_id, servico_id, data } = req.query;
-
-    const horarios = await agendamentoService.listarHorariosDisponiveis({
+    const {
       barbeiro_id,
       servico_id,
       data,
-    });
+    } = req.query;
+
+    const horarios =
+      await agendamentoService.listarHorariosDisponiveis({
+        barbeiro_id,
+        servico_id,
+        data,
+        usuario: req.user,
+      });
 
     return res.status(200).json({
       success: true,
@@ -37,7 +46,10 @@ async function buscarPorId(req, res, next) {
     const { id } = req.params;
 
     const agendamento =
-      await agendamentoService.buscarAgendamentoPorId(id);
+      await agendamentoService.buscarAgendamentoPorId(
+        id,
+        req.user,
+      );
 
     if (!agendamento) {
       return res.status(404).json({
@@ -72,7 +84,6 @@ async function criar(req, res, next) {
     } = req.body;
 
     if (
-      !cliente_id ||
       !barbeiro_id ||
       !servico_id ||
       !data ||
@@ -99,6 +110,7 @@ async function criar(req, res, next) {
         observacoes,
         valor,
         forma_pagamento,
+        usuario: req.user,
       });
 
     return res.status(201).json({
@@ -118,6 +130,7 @@ async function atualizar(req, res, next) {
       await agendamentoService.atualizarAgendamento(
         id,
         req.body,
+        req.user,
       );
 
     return res.status(200).json({
@@ -141,12 +154,16 @@ async function reagendar(req, res, next) {
     } = req.body;
 
     const agendamento =
-      await agendamentoService.reagendarAgendamento(id, {
-        data,
-        horario_inicio,
-        horario_fim,
-        barbeiro_id,
-      });
+      await agendamentoService.reagendarAgendamento(
+        id,
+        {
+          data,
+          horario_inicio,
+          horario_fim,
+          barbeiro_id,
+        },
+        req.user,
+      );
 
     return res.status(200).json({
       success: true,
@@ -163,7 +180,10 @@ async function cancelar(req, res, next) {
     const { id } = req.params;
 
     const agendamento =
-      await agendamentoService.cancelarAgendamento(id);
+      await agendamentoService.cancelarAgendamento(
+        id,
+        req.user,
+      );
 
     return res.status(200).json({
       success: true,
@@ -180,7 +200,10 @@ async function concluir(req, res, next) {
     const { id } = req.params;
 
     const agendamento =
-      await agendamentoService.concluirAgendamento(id);
+      await agendamentoService.concluirAgendamento(
+        id,
+        req.user,
+      );
 
     return res.status(200).json({
       success: true,
@@ -197,7 +220,10 @@ async function marcarFalta(req, res, next) {
     const { id } = req.params;
 
     const agendamento =
-      await agendamentoService.marcarFalta(id);
+      await agendamentoService.marcarFalta(
+        id,
+        req.user,
+      );
 
     return res.status(200).json({
       success: true,

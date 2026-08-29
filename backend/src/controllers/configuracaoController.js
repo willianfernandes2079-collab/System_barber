@@ -1,7 +1,10 @@
 const configuracaoService = require("../services/configuracaoService");
 
 async function buscar(req, res) {
-  const configuracao = await configuracaoService.buscar();
+  const configuracao =
+    await configuracaoService.buscar(
+      req.user.barbearia_id,
+    );
 
   return res.status(200).json({
     success: true,
@@ -10,7 +13,11 @@ async function buscar(req, res) {
 }
 
 async function atualizar(req, res) {
-  const configuracao = await configuracaoService.atualizar(req.body);
+  const configuracao =
+    await configuracaoService.atualizar(
+      req.body,
+      req.user.barbearia_id,
+    );
 
   return res.status(200).json({
     success: true,

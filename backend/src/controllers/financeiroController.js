@@ -4,7 +4,12 @@ const asyncHandler = require("../utils/asyncHandler");
 const auditLogger = require("../utils/auditLogger");
 
 const registrarPagamento = asyncHandler(async (req, res) => {
-  const { agendamento_id, forma_pagamento, valor, observacoes } = req.body;
+  const {
+    agendamento_id,
+    forma_pagamento,
+    valor,
+    observacoes,
+  } = req.body;
 
   if (!agendamento_id || !forma_pagamento) {
     return res.status(400).json({
@@ -13,12 +18,15 @@ const registrarPagamento = asyncHandler(async (req, res) => {
     });
   }
 
-  const pagamento = await financeiroService.registrarPagamento({
-    agendamento_id,
-    forma_pagamento,
-    valor,
-    observacoes,
-  });
+  const pagamento =
+    await financeiroService.registrarPagamento({
+      agendamento_id,
+      forma_pagamento,
+      valor,
+      observacoes,
+      barbeariaId:
+        req.user.barbearia_id,
+    });
 
   auditLogger.registrar({
     usuarioId: req.user.sub,
@@ -43,13 +51,16 @@ const listarPagamentos = asyncHandler(async (req, res) => {
     forma_pagamento,
   } = req.query;
 
-  const resultado = await financeiroService.listarPagamentos({
-    pagina,
-    limite,
-    data_inicio,
-    data_fim,
-    forma_pagamento,
-  });
+  const resultado =
+    await financeiroService.listarPagamentos({
+      pagina,
+      limite,
+      data_inicio,
+      data_fim,
+      forma_pagamento,
+      barbeariaId:
+        req.user.barbearia_id,
+    });
 
   return res.status(200).json({
     success: true,
@@ -58,6 +69,19 @@ const listarPagamentos = asyncHandler(async (req, res) => {
   });
 });
 
+const listarAgendamentosParaPagamento =
+  asyncHandler(async (req, res) => {
+    const agendamentos =
+      await financeiroService.listarAgendamentosParaPagamento(
+        req.user.barbearia_id,
+      );
+
+    return res.status(200).json({
+      success: true,
+      data: agendamentos,
+    });
+  });
+
 const resumo = asyncHandler(async (req, res) => {
   const {
     periodo,
@@ -65,11 +89,14 @@ const resumo = asyncHandler(async (req, res) => {
     data_fim,
   } = req.query;
 
-  const dados = await financeiroService.resumoFinanceiro({
-    periodo,
-    data_inicio,
-    data_fim,
-  });
+  const dados =
+    await financeiroService.resumoFinanceiro({
+      periodo,
+      data_inicio,
+      data_fim,
+      barbeariaId:
+        req.user.barbearia_id,
+    });
 
   return res.status(200).json({
     success: true,
@@ -88,7 +115,10 @@ const listarComissoes = asyncHandler(async (req, res) => {
 
   if (req.user.cargo === "BARBEIRO") {
     const barbeiro =
-      await barbeiroService.buscarPorUsuarioId(req.user.sub);
+      await barbeiroService.buscarPorUsuarioId(
+        req.user.sub,
+        req.user.barbearia_id,
+      );
 
     if (!barbeiro) {
       return res.status(200).json({
@@ -106,6 +136,8 @@ const listarComissoes = asyncHandler(async (req, res) => {
       status,
       data_inicio,
       data_fim,
+      barbeariaId:
+        req.user.barbearia_id,
     });
 
   return res.status(200).json({
@@ -118,7 +150,10 @@ const marcarComissaoPaga = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
   const comissao =
-    await financeiroService.marcarComissaoPaga(id);
+    await financeiroService.marcarComissaoPaga(
+      id,
+      req.user.barbearia_id,
+    );
 
   auditLogger.registrar({
     usuarioId: req.user.sub,
@@ -136,6 +171,7 @@ const marcarComissaoPaga = asyncHandler(async (req, res) => {
 module.exports = {
   registrarPagamento,
   listarPagamentos,
+  listarAgendamentosParaPagamento,
   resumo,
   listarComissoes,
   marcarComissaoPaga,

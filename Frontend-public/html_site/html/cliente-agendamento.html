@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+
+    <title>Área do Cliente - MW System</title>
+
+    <link
+      rel="stylesheet"
+      href="/html_site/css/cliente-agendamento.css"
+    />
+  </head>
+
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <div
+          class="brand-badge"
+          aria-hidden="true"
+        >
+          <img src="/frontend-public/html/Imagem/Logo-MWsystem.jpeg" alt="Logo-MWsystem">
+        </div>
+
+        <div class="brand-name">
+          MW<span>System</span>
+        </div>
+      </div>
+
+      <nav
+        class="cliente-navigation"
+        aria-label="Navegação principal"
+      >
+        <a
+          class="nav-link active"
+          href="/cliente-agendamento"
+        >
+          <span
+            class="ic"
+            aria-hidden="true"
+          >
+            ▪
+          </span>
+
+          <span>Início</span>
+        </a>
+
+        <a
+          class="nav-link"
+          href="#"
+          id="linkMeusAgendamentos"
+        >
+          <span
+            class="ic"
+            aria-hidden="true"
+          >
+            📅
+          </span>
+
+          <span>Meus agendamentos</span>
+        </a>
+
+        <a
+          class="nav-link"
+          href="#"
+          id="linkMeuPerfil"
+        >
+          <span
+            class="ic"
+            aria-hidden="true"
+          >
+            ◍
+          </span>
+
+          <span>Meu perfil</span>
+        </a>
+
+        <a
+          class="nav-link"
+          href="#"
+          id="linkConfiguracoes"
+        >
+          <span
+            class="ic"
+            aria-hidden="true"
+          >
+            ⚙
+          </span>
+
+          <span>Configurações</span>
+        </a>
+      </nav>
+
+      <button
+        type="button"
+        class="nav-link nav-logout"
+        id="btnLogout"
+      >
+        <span
+          class="ic"
+          aria-hidden="true"
+        >
+          ⏻
+        </span>
+
+        <span>Sair</span>
+      </button>
+    </aside>
+
+    <main class="main">
+      <div class="page-head">
+        <div>
+          <h1>
+            Olá,
+            <span id="nomeCliente">Visitante</span>! 👋
+          </h1>
+
+          <p>
+            Acesse rapidamente sua barbearia e seus agendamentos.
+          </p>
+        </div>
+
+        <a
+          href="/login"
+          class="btn-gold"
+          id="btnLogin"
+        >
+          🔐 Fazer login
+        </a>
+      </div>
+
+      <div class="cards-row">
+        <section class="stat-card">
+          <div class="stat-card-label">
+            <span>Próximo agendamento</span>
+
+            <span aria-hidden="true">
+              📅
+            </span>
+          </div>
+
+          <div
+            class="stat-empty"
+            id="proximoAgendamento"
+          >
+            Faça login para visualizar seu próximo agendamento.
+          </div>
+
+          <button
+            type="button"
+            class="btn-outline-gold btn-full"
+            id="btnMeusAgendamentos"
+          >
+            Meus agendamentos
+          </button>
+        </section>
+
+        <section class="stat-card">
+          <div class="stat-card-label">
+            <span>Minha conta</span>
+
+            <span aria-hidden="true">
+              👤
+            </span>
+          </div>
+
+          <div class="account-info">
+            <strong id="nomeConta">
+              Visitante
+            </strong>
+
+            <span id="emailConta">
+              Faça login para acessar sua conta.
+            </span>
+          </div>
+
+          <button
+            type="button"
+            class="btn-outline-gold btn-full"
+            id="btnMinhaConta"
+          >
+            Meu perfil
+          </button>
+        </section>
+      </div>
+
+      <section class="find-head">
+        <div class="section-heading">
+          <div>
+            <h2>
+              Minhas barbearias
+            </h2>
+
+            <p>
+              Selecione a barbearia que deseja utilizar nesta sessão.
+            </p>
+          </div>
+
+          <span
+            class="barbearia-status"
+            id="statusBarbearia"
+          >
+            Nenhuma selecionada
+          </span>
+        </div>
+
+        <div
+          class="barbershop-grid"
+          id="barbeariasGrid"
+        >
+          <article class="shop-card">
+            <div class="shop-thumb">
+              <span
+                class="shop-logo"
+                aria-hidden="true"
+              >
+                💈
+              </span>
+            </div>
+
+            <div class="shop-info">
+              <h4 id="nomeBarbearia">
+                Carregando...
+              </h4>
+
+              <p id="infoBarbearia">
+                Carregando suas barbearias...
+              </p>
+
+              <button
+                type="button"
+                class="btn-gold shop-button"
+                id="btnAgendarBarbearia"
+                disabled
+              >
+                Agendar atendimento
+              </button>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script
+      src="/html_site/js/cliente-agendamento.js"
+    ></script>
+  </body>
+</html>

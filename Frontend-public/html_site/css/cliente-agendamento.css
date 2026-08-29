@@ -1,0 +1,432 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #0a0a0b;
+  --sidebar-bg: #111113;
+  --surface: #17171a;
+  --surface-alt: #1e1e22;
+  --border: #2a2a2e;
+  --text-heading: #f5f4f1;
+  --text-body: #c9c8c4;
+  --text-muted: #8a8a86;
+  --gold: #e3b341;
+  --gold-hover: #f0c563;
+  --gold-soft: rgba(227, 179, 65, 0.12);
+  --on-gold: #1a1408;
+  --success: #67c58b;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --sidebar-width: 250px;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text-body);
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  color: var(--text-heading);
+  font-weight: 700;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* ===== SIDEBAR ===== */
+
+.sidebar {
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  padding: 22px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px 26px;
+}
+
+.brand-badge {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--gold-soft);
+  border: 1px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.brand-name {
+  font-family: Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-heading);
+}
+
+.brand-name span {
+  color: var(--gold);
+}
+
+.cliente-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  text-align: left;
+}
+
+.nav-link .ic {
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.nav-link:hover {
+  background: var(--surface);
+  color: var(--text-heading);
+}
+
+.nav-link.active {
+  background: var(--surface-alt);
+  color: var(--text-heading);
+}
+
+.nav-logout {
+  margin-top: auto;
+  color: #e0736b;
+  width: 100%;
+  cursor: pointer;
+}
+
+.nav-logout:hover {
+  background: rgba(224, 115, 107, 0.1);
+  color: #e0736b;
+}
+
+/* ===== MAIN ===== */
+
+.main {
+  padding: 34px 40px 60px;
+  max-width: 1180px;
+  width: 100%;
+}
+
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 26px;
+}
+
+.page-head h1 {
+  font-size: 1.9rem;
+}
+
+.page-head p {
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* ===== BUTTONS ===== */
+
+.btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 22px;
+  background: var(--gold);
+  color: var(--on-gold);
+  font-weight: 700;
+  font-size: 0.92rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+
+.btn-gold:hover {
+  background: var(--gold-hover);
+}
+
+.btn-outline-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  background: transparent;
+  color: var(--text-heading);
+  font-weight: 600;
+  font-size: 0.88rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.btn-outline-gold:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* ===== CARDS ===== */
+
+.cards-row {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(280px, 1fr)
+  );
+  gap: 18px;
+  margin-bottom: 42px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-card-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.stat-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70px;
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 0.86rem;
+  font-style: italic;
+  text-align: center;
+}
+
+.account-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 70px;
+  margin-bottom: 16px;
+  justify-content: center;
+}
+
+.account-info strong {
+  color: var(--text-heading);
+  font-size: 1.1rem;
+}
+
+.account-info span {
+  color: var(--text-muted);
+  font-size: 0.86rem;
+}
+
+/* ===== BARBEARIA ===== */
+
+.find-head {
+  width: 100%;
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+
+.section-heading h2 {
+  font-size: 1.5rem;
+}
+
+.section-heading p {
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.barbearia-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: var(--gold-soft);
+  border: 1px solid rgba(227, 179, 65, 0.28);
+  color: var(--gold);
+  font-size: 0.76rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.barbershop-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 440px);
+  gap: 18px;
+}
+
+.shop-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.shop-thumb {
+  height: 150px;
+  background: var(--surface-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shop-logo {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--gold-soft);
+  border: 1px solid var(--gold);
+  font-size: 1.7rem;
+}
+
+.shop-info {
+  padding: 18px;
+}
+
+.shop-info h4 {
+  font-size: 1.05rem;
+  margin-bottom: 6px;
+}
+
+.shop-info p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+}
+
+.shop-button {
+  width: 100%;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+
+@media (max-width: 900px) {
+  body {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .main {
+    padding: 24px 20px 48px;
+  }
+}
+
+@media (max-width: 600px) {
+  .main {
+    padding: 20px 14px 40px;
+  }
+
+  .page-head {
+    margin-bottom: 20px;
+  }
+
+  .page-head h1 {
+    font-size: 1.55rem;
+  }
+
+  .page-head .btn-gold {
+    width: 100%;
+  }
+
+  .section-heading {
+    flex-direction: column;
+  }
+
+  .barbearia-status {
+    align-self: flex-start;
+  }
+
+  .barbershop-grid {
+    grid-template-columns: 1fr;
+  }
+}

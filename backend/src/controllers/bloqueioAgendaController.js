@@ -1,4 +1,5 @@
 const bloqueioAgendaService = require("../services/bloqueioAgendaService");
+
 const asyncHandler = require("../utils/asyncHandler");
 
 const criar = asyncHandler(async (req, res) => {
@@ -11,14 +12,16 @@ const criar = asyncHandler(async (req, res) => {
     observacoes,
   } = req.body;
 
-  const bloqueio = await bloqueioAgendaService.criarBloqueio({
-    barbeiro_id,
-    data,
-    horario_inicio,
-    horario_fim,
-    motivo,
-    observacoes,
-  });
+  const bloqueio =
+    await bloqueioAgendaService.criarBloqueio({
+      barbeiro_id,
+      data,
+      horario_inicio,
+      horario_fim,
+      motivo,
+      observacoes,
+      barbeariaId: req.user.barbearia_id,
+    });
 
   return res.status(201).json({
     success: true,
@@ -30,11 +33,13 @@ const criar = asyncHandler(async (req, res) => {
 const listar = asyncHandler(async (req, res) => {
   const { data, barbeiro_id, ativo } = req.query;
 
-  const bloqueios = await bloqueioAgendaService.listarBloqueios({
-    data,
-    barbeiro_id,
-    ativo,
-  });
+  const bloqueios =
+    await bloqueioAgendaService.listarBloqueios({
+      data,
+      barbeiro_id,
+      ativo,
+      barbeariaId: req.user.barbearia_id,
+    });
 
   return res.status(200).json({
     success: true,
@@ -45,7 +50,11 @@ const listar = asyncHandler(async (req, res) => {
 const buscarPorId = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const bloqueio = await bloqueioAgendaService.buscarBloqueioPorId(id);
+  const bloqueio =
+    await bloqueioAgendaService.buscarBloqueioPorId(
+      id,
+      req.user.barbearia_id,
+    );
 
   return res.status(200).json({
     success: true,
@@ -56,7 +65,12 @@ const buscarPorId = asyncHandler(async (req, res) => {
 const atualizar = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  const bloqueio = await bloqueioAgendaService.atualizarBloqueio(id, req.body);
+  const bloqueio =
+    await bloqueioAgendaService.atualizarBloqueio(
+      id,
+      req.body,
+      req.user.barbearia_id,
+    );
 
   return res.status(200).json({
     success: true,
@@ -68,7 +82,10 @@ const atualizar = asyncHandler(async (req, res) => {
 const desativar = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  await bloqueioAgendaService.desativarBloqueio(id);
+  await bloqueioAgendaService.desativarBloqueio(
+    id,
+    req.user.barbearia_id,
+  );
 
   return res.status(200).json({
     success: true,
@@ -79,7 +96,10 @@ const desativar = asyncHandler(async (req, res) => {
 const ativar = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  await bloqueioAgendaService.ativarBloqueio(id);
+  await bloqueioAgendaService.ativarBloqueio(
+    id,
+    req.user.barbearia_id,
+  );
 
   return res.status(200).json({
     success: true,
@@ -90,7 +110,10 @@ const ativar = asyncHandler(async (req, res) => {
 const excluir = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  await bloqueioAgendaService.excluirBloqueio(id);
+  await bloqueioAgendaService.excluirBloqueio(
+    id,
+    req.user.barbearia_id,
+  );
 
   return res.status(200).json({
     success: true,

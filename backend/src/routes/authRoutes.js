@@ -28,10 +28,17 @@ router.patch("/me", autenticar, authController.atualizarPerfil);
 router.post("/change-password", autenticar, authController.alterarSenha);
 router.post("/logout-all", autenticar, authController.logoutTodasSessoes);
 
+router.post(
+  "/barbearia",
+  autenticar,
+  authController.selecionarBarbearia,
+);
+
 // Criar usuário: só ADMIN e GERENTE podem cadastrar novos usuários do
 // sistema (item 7). Exceção: se ainda não existir nenhum usuário no
 // sistema (primeiro boot), a rota fica aberta para criar o admin inicial —
 // isso é resolvido pelo seed, então aqui a rota já nasce protegida.
+
 router.post(
   "/register",
   autenticar,

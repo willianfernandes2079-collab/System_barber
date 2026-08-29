@@ -112,9 +112,11 @@ function validarPix(tipo, chave) {
     chave.trim();
 
   if (tipo === "CPF") {
-    if (!/^\d{11}$/.test(
-      chaveNormalizada.replace(/\D/g, ""),
-    )) {
+    if (
+      !/^\d{11}$/.test(
+        chaveNormalizada.replace(/\D/g, ""),
+      )
+    ) {
       return "A chave PIX CPF deve conter 11 números.";
     }
   }
@@ -169,6 +171,8 @@ const listarBarbeiros = asyncHandler(
         limite,
         busca,
         ativo,
+        barbeariaId:
+          req.user.barbearia_id,
       });
 
     return res.status(200).json({
@@ -187,12 +191,14 @@ const buscarBarbeiroPorId =
     const barbeiro =
       await barbeiroService.buscarBarbeiroPorId(
         id,
+        req.user.barbearia_id,
       );
 
     if (!barbeiro) {
       return res.status(404).json({
         success: false,
-        message: "Barbeiro não encontrado.",
+        message:
+          "Barbeiro não encontrado.",
       });
     }
 
@@ -216,6 +222,14 @@ const criarBarbeiro =
       pix_chave,
       percentual_comissao,
     } = req.body;
+
+    if (!req.user?.barbearia_id) {
+      return res.status(403).json({
+        success: false,
+        message:
+          "Usuário não está vinculado a uma barbearia.",
+      });
+    }
 
     if (!usuario_id) {
       return res.status(400).json({
@@ -275,6 +289,7 @@ const criarBarbeiro =
     const barbeiroComCpf =
       await barbeiroService.buscarPorCpf(
         cpfNormalizado,
+        req.user.barbearia_id,
       );
 
     if (barbeiroComCpf) {
@@ -315,6 +330,8 @@ const criarBarbeiro =
         pix_chave,
         percentual_comissao:
           comissao,
+        barbearia_id:
+          req.user.barbearia_id,
       });
 
     return res.status(201).json({
@@ -333,6 +350,7 @@ const atualizarBarbeiro =
     const barbeiroExistente =
       await barbeiroService.buscarBarbeiroPorId(
         id,
+        req.user.barbearia_id,
       );
 
     if (!barbeiroExistente) {
@@ -365,6 +383,7 @@ const atualizarBarbeiro =
       const barbeiroComCpf =
         await barbeiroService.buscarPorCpf(
           dados.cpf,
+          req.user.barbearia_id,
         );
 
       if (
@@ -444,7 +463,16 @@ const atualizarBarbeiro =
       await barbeiroService.atualizarBarbeiro(
         id,
         dados,
+        req.user.barbearia_id,
       );
+
+    if (!barbeiro) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "Barbeiro não encontrado.",
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -462,6 +490,7 @@ const desativarBarbeiro =
     const barbeiroExistente =
       await barbeiroService.buscarBarbeiroPorId(
         id,
+        req.user.barbearia_id,
       );
 
     if (!barbeiroExistente) {
@@ -472,9 +501,19 @@ const desativarBarbeiro =
       });
     }
 
-    await barbeiroService.desativarBarbeiro(
-      id,
-    );
+    const barbeiro =
+      await barbeiroService.desativarBarbeiro(
+        id,
+        req.user.barbearia_id,
+      );
+
+    if (!barbeiro) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "Barbeiro não encontrado.",
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -491,6 +530,7 @@ const ativarBarbeiro =
     const barbeiroExistente =
       await barbeiroService.buscarBarbeiroPorId(
         id,
+        req.user.barbearia_id,
       );
 
     if (!barbeiroExistente) {
@@ -501,9 +541,19 @@ const ativarBarbeiro =
       });
     }
 
-    await barbeiroService.ativarBarbeiro(
-      id,
-    );
+    const barbeiro =
+      await barbeiroService.ativarBarbeiro(
+        id,
+        req.user.barbearia_id,
+      );
+
+    if (!barbeiro) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "Barbeiro não encontrado.",
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -520,3 +570,4 @@ module.exports = {
   desativarBarbeiro,
   ativarBarbeiro,
 };
+

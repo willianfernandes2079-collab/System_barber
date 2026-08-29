@@ -1,272 +1,171 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Login - Sistema Barbearia</title>
 
-    <link rel="stylesheet" href="../css/global.css">
+    <link rel="stylesheet" href="../css/global.css" />
 
-    <link rel="stylesheet" href="../css/style.login.css">
-</head>
+    <link rel="stylesheet" href="../css/style.login.css" />
+  </head>
 
-<body>
-
+  <body>
     <div class="login-wrapper">
-
-        <div class="login-card">
-
-            <div id="title">
-                <h1>Login</h1>
-            </div>
-
-            <div id="subtitle">
-                <h2>Entre com suas credenciais para continuar</h2>
-            </div>
-
-            <form class="login-form" id="loginForm">
-
-                <div id="usuario">
-                    <label for="usuarioInput">
-                        Usuário
-                    </label>
-                </div>
-
-                <div id="texto">
-                    <input
-                        type="text"
-                        id="usuarioInput"
-                        placeholder="Digite seu usuário"
-                        required>
-                </div>
-
-                <div id="senha">
-                    <label for="senhaInput">
-                        Senha
-                    </label>
-                </div>
-
-                <div id="digitesen">
-                    <input
-                        type="password"
-                        id="senhaInput"
-                        placeholder="Digite sua senha"
-                        required>
-                </div>
-
-                <div id="checkbox">
-
-                    <input
-                        type="checkbox"
-                        id="lembrar">
-
-                    <label for="lembrar">
-                        Lembrar de mim
-                    </label>
-
-                </div>
-
-                <div id="esqueci">
-
-                    <a href="esquecisenha.html">
-                        Esqueci minha senha
-                    </a>
-
-                </div>
-
-                <div id="btnEntrar">
-
-                    <button type="submit">
-                        Entrar
-                    </button>
-
-                </div>
-
-            </form>
-
-            <div id="ou">
-                <label>ou</label>
-            </div>
-
-            <div id="imagem">
-
-                <img
-                    src="../html/Imagem/Logo-MWsystem.jpeg"
-                    alt="Logo da Barbearia">
-
-            </div>
-
-            <div id="mensagem2">
-
-                <label>
-                    Bem-vindo, usuário
-                </label>
-
-            </div>
-
-            <div id="mensagem3">
-
-                <label>
-                    Faça seu login para acessar sua conta
-                </label>
-
-            </div>
-
+      <div class="login-card">
+        <div id="title">
+          <h1>Login</h1>
         </div>
 
+        <div id="subtitle">
+          <h2>Entre com suas credenciais para continuar</h2>
+        </div>
+
+        <form class="login-form" id="loginForm">
+          <div id="usuario">
+            <label for="usuarioInput"> Usuário </label>
+          </div>
+
+          <div id="texto">
+            <input
+              type="text"
+              id="usuarioInput"
+              placeholder="Digite seu usuário"
+              required
+            />
+          </div>
+
+          <div id="senha">
+            <label for="senhaInput"> Senha </label>
+          </div>
+
+          <div id="digitesen">
+            <input
+              type="password"
+              id="senhaInput"
+              placeholder="Digite sua senha"
+              required
+            />
+          </div>
+
+          <div id="checkbox">
+            <input type="checkbox" id="lembrar" />
+
+            <label for="lembrar"> Lembrar de mim </label>
+          </div>
+
+          <div id="esqueci">
+            <a href="esquecisenha.html"> Esqueci minha senha </a>
+          </div>
+
+          <div id="btnEntrar">
+            <button type="submit">Entrar</button>
+          </div>
+        </form>
+
+        <div id="ou">
+          <label>ou</label>
+        </div>
+
+        <div id="imagem">
+          <img
+            src="../html/Imagem/Logo-MWsystem.jpeg"
+            alt="Logo da Barbearia"
+          />
+        </div>
+
+        <div id="mensagem2">
+          <label> Bem-vindo, usuário </label>
+        </div>
+
+        <div id="mensagem3">
+          <label> Faça seu login para acessar sua conta </label>
+        </div>
+      </div>
     </div>
 
     <script>
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
 
-        document
-            .getElementById("loginForm")
-            .addEventListener("submit", async (e) => {
+          const email = document.getElementById("usuarioInput").value.trim();
 
-                e.preventDefault();
+          const senha = document.getElementById("senhaInput").value;
 
-                const email =
-                    document
-                        .getElementById("usuarioInput")
-                        .value
-                        .trim();
+          const lembrar = document.getElementById("lembrar").checked;
 
-                const senha =
-                    document
-                        .getElementById("senhaInput")
-                        .value;
+          try {
+            const response = await fetch("/api/auth/login", {
+              method: "POST",
 
-                const lembrar =
-                    document
-                        .getElementById("lembrar")
-                        .checked;
+              headers: {
+                "Content-Type": "application/json",
+              },
 
-                try {
+              credentials: "include",
 
-                    const response = await fetch(
-                        "/api/auth/login",
-                        {
-                            method: "POST",
-
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-
-                            body: JSON.stringify({
-                                email,
-                                senha,
-                                manterConectado: lembrar
-                            })
-                        }
-                    );
-
-                    const data =
-                        await response.json();
-
-                    console.log(
-                        "STATUS:",
-                        response.status
-                    );
-
-                    console.log(
-                        "RESPOSTA:",
-                        data
-                    );
-
-                    if (
-                        !response.ok ||
-                        !data.success ||
-                        !data.data?.accessToken
-                    ) {
-                        alert(
-                            "Erro no login: " +
-                            (
-                                data.message ||
-                                "E-mail ou senha incorretos."
-                            )
-                        );
-
-                        return;
-                    }
-
-                    localStorage.setItem(
-                        "accessToken",
-                        data.data.accessToken
-                    );
-
-                    if (
-                        data.data?.refreshToken
-                    ) {
-                        localStorage.setItem(
-                            "refreshToken",
-                            data.data.refreshToken
-                        );
-                    }
-
-                    const respostaUsuario =
-                        await fetch(
-                            "/api/auth/me",
-                            {
-                                method: "GET",
-                                headers: {
-                                    Authorization:
-                                        `Bearer ${data.data.accessToken}`
-                                }
-                            }
-                        );
-
-                    const dadosUsuario =
-                        await respostaUsuario.json();
-
-                    if (
-                        !respostaUsuario.ok ||
-                        !dadosUsuario.success ||
-                        !dadosUsuario.data
-                    ) {
-                        throw new Error(
-                            dadosUsuario.message ||
-                            "Não foi possível identificar o usuário logado."
-                        );
-                    }
-
-                    const usuario =
-                        dadosUsuario.data;
-
-                    localStorage.setItem(
-                        "usuario",
-                        JSON.stringify(usuario)
-                    );
-
-                    if (
-                        usuario.cargo === "CLIENTE"
-                    ) {
-                        window.location.href =
-                            "/html/cliente-agendamento.html";
-
-                        return;
-                    }
-
-                    window.location.href =
-                        "/index";
-
-                } catch (error) {
-
-                    console.error(
-                        "Erro:",
-                        error
-                    );
-
-                    alert(
-                        error.message ||
-                        "Não foi possível conectar ao servidor."
-                    );
-
-                }
+              body: JSON.stringify({
+                email,
+                senha,
+                manterConectado: lembrar,
+              }),
             });
 
+            const data = await response.json();
+
+            if (!response.ok || !data.success || !data.data?.usuario) {
+              alert(
+                "Erro no login: " +
+                  (data.message || "E-mail ou senha incorretos."),
+              );
+
+              return;
+            }
+
+            localStorage.removeItem("accessToken");
+
+            localStorage.removeItem("refreshToken");
+
+            localStorage.setItem("usuario", JSON.stringify(data.data.usuario));
+
+            const respostaUsuario = await fetch("/api/auth/me", {
+              method: "GET",
+              credentials: "include",
+            });
+
+            const dadosUsuario = await respostaUsuario.json();
+
+            if (
+              !respostaUsuario.ok ||
+              !dadosUsuario.success ||
+              !dadosUsuario.data
+            ) {
+              throw new Error(
+                dadosUsuario.message ||
+                  "Não foi possível identificar o usuário logado.",
+              );
+            }
+
+            const usuario = dadosUsuario.data;
+
+            localStorage.setItem("usuario", JSON.stringify(usuario));
+
+            if (usuario.cargo === "CLIENTE") {
+              window.location.href = "/cliente-agendamento";
+
+              return;
+            }
+
+            window.location.href = "/index";
+          } catch (error) {
+            console.error("Erro:", error);
+
+            alert(error.message || "Não foi possível conectar ao servidor.");
+          }
+        });
     </script>
-
-</body>
-
+  </body>
 </html>

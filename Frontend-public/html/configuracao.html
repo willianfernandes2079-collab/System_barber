@@ -58,12 +58,6 @@
     <p id="mensagem"></p>
 
     <script>
-      const token = localStorage.getItem("accessToken");
-
-      if (!token) {
-        window.location.href = "/login";
-      }
-
       const form = document.getElementById("configForm");
 
       const mensagem = document.getElementById("mensagem");
@@ -71,9 +65,8 @@
       async function carregarConfiguracoes() {
         try {
           const resposta = await fetch("/api/configuracoes", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            method: "GET",
+            credentials: "include",
           });
 
           const resultado = await resposta.json();
@@ -89,9 +82,11 @@
           document.getElementById("nome_barbearia").value =
             config.nome_barbearia || "";
 
-          document.getElementById("telefone").value = config.telefone || "";
+          document.getElementById("telefone").value =
+            config.telefone || "";
 
-          document.getElementById("endereco").value = config.endereco || "";
+          document.getElementById("endereco").value =
+            config.endereco || "";
 
           document.getElementById("horario_abertura").value =
             config.horario_abertura || "";
@@ -110,13 +105,17 @@
         evento.preventDefault();
 
         const dados = {
-          nome_barbearia: document.getElementById("nome_barbearia").value,
+          nome_barbearia:
+            document.getElementById("nome_barbearia").value,
 
-          telefone: document.getElementById("telefone").value,
+          telefone:
+            document.getElementById("telefone").value,
 
-          endereco: document.getElementById("endereco").value,
+          endereco:
+            document.getElementById("endereco").value,
 
-          horario_abertura: document.getElementById("horario_abertura").value,
+          horario_abertura:
+            document.getElementById("horario_abertura").value,
 
           horario_fechamento:
             document.getElementById("horario_fechamento").value,
@@ -131,9 +130,9 @@
 
             headers: {
               "Content-Type": "application/json",
-
-              Authorization: `Bearer ${token}`,
             },
+
+            credentials: "include",
 
             body: JSON.stringify(dados),
           });
@@ -142,11 +141,13 @@
 
           if (!resposta.ok || !resultado.success) {
             throw new Error(
-              resultado.message || "Erro ao salvar configurações.",
+              resultado.message ||
+                "Erro ao salvar configurações.",
             );
           }
 
-          mensagem.textContent = "Configurações salvas com sucesso!";
+          mensagem.textContent =
+            "Configurações salvas com sucesso!";
         } catch (erro) {
           mensagem.textContent = erro.message;
         }

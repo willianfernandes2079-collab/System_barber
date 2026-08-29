@@ -1,19 +1,18 @@
 const NAV_ITEMS = [
-  { href: "index.html", label: "Dashboard", icon: "🏠" },
-  { href: "agendamentos.html", label: "Agendamentos", icon: "📅" },
-  { href: "caixa.html", label: "Caixa", icon: "💵" },
-  { href: "cliente.html", label: "Clientes", icon: "👥" },
-  { href: "barbearia.html", label: "Barbearia", icon: "💈" },
-  { href: "servicos.html", label: "Serviços", icon: "✂️" },
-  { href: "financeiros.html", label: "Financeiro", icon: "💰" },
-  { href: "relatorios.html", label: "Relatórios", icon: "📊" },
+  { href: "index.html", label: "Dashboard", },
+  { href: "agendamentos.html", label: "Agendamentos", },
+  { href: "caixa.html", label: "Caixa", },
+  { href: "cliente.html", label: "Clientes", },
+  { href: "barbearia.html", label: "Barbearia", },
+  { href: "servicos.html", label: "Serviços", },
+  { href: "financeiros.html", label: "Financeiro", },
+  { href: "relatorios.html", label: "Relatórios", },
   {
     href: "bloqueios.html",
     label: "Bloqueios",
-    icon: "🔒",
     cargos: ["ADMIN", "GERENTE"],
   },
-  { href: "configuracao.html", label: "Configurações", icon: "⚙️" },
+  { href: "configuracao.html", label: "Configurações",},
 ];
 
 function paginaAtual() {
@@ -23,14 +22,13 @@ function paginaAtual() {
 function montarSidebar(cargoUsuario = null) {
   const atual = paginaAtual();
 
-  const links = NAV_ITEMS
-    .filter((item) => {
-      if (!item.cargos) {
-        return true;
-      }
+  const links = NAV_ITEMS.filter((item) => {
+    if (!item.cargos) {
+      return true;
+    }
 
-      return item.cargos.includes(cargoUsuario);
-    })
+    return item.cargos.includes(cargoUsuario);
+  })
     .map(
       (item) => `
       <a
@@ -122,35 +120,25 @@ async function carregarUsuarioLogado() {
       }
     }
   } catch {
-    // Se o token estiver inválido,
-    // o api.js já tenta renovar ou redireciona para o login.
+    // Se a sessão estiver inválida,
+    // o api.js tenta renovar ou redireciona para o login.
   }
 }
 
 async function fazerLogout() {
-  const refreshToken = localStorage.getItem("refreshToken");
-
   try {
-    await api.post("/auth/logout", { refreshToken });
+    await api.post("/auth/logout");
   } catch {
     // Mesmo se a chamada falhar,
-    // limpa os tokens localmente e sai.
+    // segue para o login.
   }
 
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
+  localStorage.removeItem("usuario");
 
   window.location.href = "/login";
 }
 
 function inicializarLayout(tituloPagina) {
-  const accessToken = localStorage.getItem("accessToken");
-
-  if (!accessToken) {
-    window.location.href = "/login";
-    return;
-  }
-
   const sidebarRoot = document.getElementById("app-sidebar");
   const topbarRoot = document.getElementById("app-topbar");
 
@@ -178,4 +166,3 @@ function inicializarLayout(tituloPagina) {
 
   carregarUsuarioLogado();
 }
-

@@ -73,37 +73,60 @@ function obterMinutosHorarioSaoPaulo(data) {
 }
 
 /**
- * Formata qualquer Date/string de data-hora como "HH:mm" NO HORÁRIO DE
- * SÃO PAULO — usando o Intl.DateTimeFormat acima, nunca substring ou
- * toISOString() (que é sempre UTC e desalinha 3h do horário local).
- * Use esta função em qualquer lugar que precise comparar um horário de
- * agendamento com o horário de funcionamento da barbearia.
+ * Formata qualquer Date/string de data-hora como "HH:mm" no horário de
+ * São Paulo usando Intl.DateTimeFormat.
  */
 function formatarHorarioSaoPaulo(dataOuTexto) {
   const minutos = obterMinutosHorarioSaoPaulo(dataOuTexto);
+
   return minutos === null ? null : minutosParaHorario(minutos);
 }
 
 function criarDataInicioDoDiaSaoPaulo(data) {
-  const dataObj = new Date(`${data}T00:00:00`);
+  if (
+    typeof data !== "string" ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(data)
+  ) {
+    return null;
+  }
+
+  const [ano, mes, dia] = data
+    .split("-")
+    .map(Number);
+
+  const dataObj = new Date(
+    Date.UTC(ano, mes - 1, dia, 3, 0, 0, 0),
+  );
 
   if (isNaN(dataObj.getTime())) {
     return null;
   }
 
-  const ano = dataObj.getFullYear();
-  const mes = String(dataObj.getMonth() + 1).padStart(2, "0");
-  const dia = String(dataObj.getDate()).padStart(2, "0");
+  return dataObj;
+}
 
-  return new Date(`${ano}-${mes}-${dia}T03:00:00.000Z`);
+function obterBarbeariaId(usuario) {
+  if (!usuario || !usuario.barbearia_id) {
+    throw new AppError(
+      "Usuário não está vinculado a uma barbearia.",
+      403,
+    );
+  }
+
+  return usuario.barbearia_id;
 }
 
 async function validarHorarioFuncionamento(
   data,
   horarioInicio,
   horarioFim,
+  barbeariaId,
 ) {
-  const configuracao = await prisma.configuracao.findFirst();
+  const configuracao = await prisma.configuracao.findFirst({
+    where: {
+      barbearia_id: barbeariaId,
+    },
+  });
 
   if (!configuracao) {
     return;
@@ -173,13 +196,101 @@ async function validarHorarioFuncionamento(
   }
 }
 
+// OBTER CLIENTE VINCULADO AO USUÁRIO
+
+async function obterClienteDoUsuario(usuarioId, barbeariaId) {
+  const usuario = await prisma.usuario.findUnique({
+    where: {
+      id: usuarioId,
+    },
+
+    select: {
+      id: true,
+      email: true,
+    },
+  });
+
+  if (!usuario || !usuario.email) {
+    return null;
+  }
+
+  return prisma.cliente.findFirst({
+    where: {
+      email: {
+        equals: usuario.email,
+        mode: "insensitive",
+      },
+
+      ativo: true,
+
+      vinculos_barbearias: {
+        some: {
+          barbearia_id: barbeariaId,
+          ativo: true,
+
+          barbearia: {
+            ativo: true,
+          },
+        },
+      },
+    },
+
+    select: {
+      id: true,
+      email: true,
+    },
+  });
+}
+
+// VALIDAR ACESSO AO AGENDAMENTO
+
+async function validarAcessoAgendamento(id, usuario) {
+  const barbeariaId = obterBarbeariaId(usuario);
+
+  const agendamento = await prisma.agendamentos.findFirst({
+    where: {
+      id,
+      barbearia_id: barbeariaId,
+    },
+
+    select: {
+      id: true,
+      cliente_id: true,
+      barbeiro_id: true,
+      barbearia_id: true,
+    },
+  });
+
+  if (!agendamento) {
+    throw new AppError("Agendamento não encontrado.", 404);
+  }
+
+  if (usuario.cargo !== "CLIENTE") {
+    return agendamento;
+  }
+
+  const cliente = await obterClienteDoUsuario(
+    usuario.sub,
+    barbeariaId,
+  );
+
+  if (!cliente || agendamento.cliente_id !== cliente.id) {
+    throw new AppError("Agendamento não encontrado.", 404);
+  }
+
+  return agendamento;
+}
+
 // LISTAR HORÁRIOS DISPONÍVEIS
 
 async function listarHorariosDisponiveis({
   barbeiro_id,
   servico_id,
   data,
+  usuario,
 }) {
+  const barbeariaId = obterBarbeariaId(usuario);
+
   if (!barbeiro_id || !servico_id || !data) {
     throw new AppError(
       "Barbeiro, serviço e data são obrigatórios.",
@@ -194,11 +305,13 @@ async function listarHorariosDisponiveis({
   }
 
   const dataFim = new Date(dataInicio);
+
   dataFim.setUTCDate(dataFim.getUTCDate() + 1);
 
-  const servico = await prisma.servicos.findUnique({
+  const servico = await prisma.servicos.findFirst({
     where: {
       id: servico_id,
+      barbearia_id: barbeariaId,
     },
   });
 
@@ -210,9 +323,10 @@ async function listarHorariosDisponiveis({
     throw new AppError("Este serviço está inativo.", 400);
   }
 
-  const barbeiro = await prisma.barbeiro.findUnique({
+  const barbeiro = await prisma.barbeiros.findFirst({
     where: {
       id: barbeiro_id,
+      barbearia_id: barbeariaId,
     },
   });
 
@@ -224,7 +338,11 @@ async function listarHorariosDisponiveis({
     throw new AppError("Este barbeiro está inativo.", 400);
   }
 
-  const configuracao = await prisma.configuracao.findFirst();
+  const configuracao = await prisma.configuracao.findFirst({
+    where: {
+      barbearia_id: barbeariaId,
+    },
+  });
 
   if (!configuracao) {
     throw new AppError(
@@ -267,6 +385,7 @@ async function listarHorariosDisponiveis({
   const agendamentos = await prisma.agendamentos.findMany({
     where: {
       barbeiro_id,
+      barbearia_id: barbeariaId,
 
       status: {
         not: "CANCELADO",
@@ -299,7 +418,6 @@ async function listarHorariosDisponiveis({
 
   const horariosDisponiveis = [];
 
-  // Os horários serão oferecidos de 30 em 30 minutos.
   const intervalo = 30;
 
   for (
@@ -310,15 +428,13 @@ async function listarHorariosDisponiveis({
     const fim = inicio + duracao;
 
     const conflito = agendamentos.some((agendamento) => {
-      const inicioAgendamento =
-        obterMinutosHorarioSaoPaulo(
-          agendamento.horario_inicio,
-        );
+      const inicioAgendamento = obterMinutosHorarioSaoPaulo(
+        agendamento.horario_inicio,
+      );
 
-      const fimAgendamento =
-        obterMinutosHorarioSaoPaulo(
-          agendamento.horario_fim,
-        );
+      const fimAgendamento = obterMinutosHorarioSaoPaulo(
+        agendamento.horario_fim,
+      );
 
       if (
         inicioAgendamento === null ||
@@ -343,6 +459,7 @@ async function listarHorariosDisponiveis({
         data,
         inicioMinutos: inicio,
         fimMinutos: fim,
+        barbeariaId,
       });
 
     if (existeBloqueio) {
@@ -359,8 +476,29 @@ async function listarHorariosDisponiveis({
 
 // LISTAR AGENDAMENTOS
 
-async function listarAgendamentos() {
+async function listarAgendamentos(usuario) {
+  const barbeariaId = obterBarbeariaId(usuario);
+
+  const where = {
+    barbearia_id: barbeariaId,
+  };
+
+  if (usuario.cargo === "CLIENTE") {
+    const cliente = await obterClienteDoUsuario(
+      usuario.sub,
+      barbeariaId,
+    );
+
+    if (!cliente) {
+      return [];
+    }
+
+    where.cliente_id = cliente.id;
+  }
+
   return prisma.agendamentos.findMany({
+    where,
+
     include: {
       clientes: {
         select: {
@@ -394,6 +532,7 @@ async function listarAgendamentos() {
           status: true,
           data_inicio: true,
           data_fim: true,
+
           plano: {
             select: {
               id: true,
@@ -413,10 +552,15 @@ async function listarAgendamentos() {
 
 // BUSCAR AGENDAMENTO POR ID
 
-async function buscarAgendamentoPorId(id) {
-  return prisma.agendamentos.findUnique({
+async function buscarAgendamentoPorId(id, usuario) {
+  await validarAcessoAgendamento(id, usuario);
+
+  const barbeariaId = obterBarbeariaId(usuario);
+
+  return prisma.agendamentos.findFirst({
     where: {
       id,
+      barbearia_id: barbeariaId,
     },
 
     include: {
@@ -443,12 +587,73 @@ async function criarAgendamento({
   data,
   horario_inicio,
   horario_fim,
-  status,
   observacoes,
-  valor,
-  forma_pagamento,
+  usuario,
 }) {
+  if (!usuario || !usuario.sub) {
+    throw new AppError("Não autenticado.", 401);
+  }
+
+  const barbeariaId = obterBarbeariaId(usuario);
+
+  if (usuario.cargo === "CLIENTE") {
+    const clienteUsuario =
+      await obterClienteDoUsuario(
+        usuario.sub,
+        barbeariaId,
+      );
+
+    if (!clienteUsuario) {
+      throw new AppError(
+        "Cliente não encontrado.",
+        404,
+      );
+    }
+
+    cliente_id = clienteUsuario.id;
+  }
+
+  if (
+    !cliente_id ||
+    !barbeiro_id ||
+    !servico_id ||
+    !data ||
+    !horario_inicio ||
+    !horario_fim
+  ) {
+    throw new AppError(
+      "Dados obrigatórios não informados.",
+      400,
+    );
+  }
+
+  const cliente = await prisma.cliente.findFirst({
+    where: {
+      id: cliente_id,
+      ativo: true,
+
+      vinculos_barbearias: {
+        some: {
+          barbearia_id: barbeariaId,
+          ativo: true,
+
+          barbearia: {
+            ativo: true,
+          },
+        },
+      },
+    },
+  });
+
+  if (!cliente) {
+    throw new AppError(
+      "Cliente não encontrado.",
+      404,
+    );
+  }
+
   const inicio = new Date(horario_inicio);
+
   const fim = new Date(horario_fim);
 
   if (
@@ -472,6 +677,7 @@ async function criarAgendamento({
     data,
     formatarHorarioSaoPaulo(inicio),
     formatarHorarioSaoPaulo(fim),
+    barbeariaId,
   );
 
   const inicioMinutos =
@@ -490,12 +696,57 @@ async function criarAgendamento({
     );
   }
 
+  const barbeiro =
+    await prisma.barbeiros.findFirst({
+      where: {
+        id: barbeiro_id,
+        barbearia_id: barbeariaId,
+      },
+    });
+
+  if (!barbeiro) {
+    throw new AppError(
+      "Barbeiro não encontrado.",
+      404,
+    );
+  }
+
+  if (!barbeiro.ativo) {
+    throw new AppError(
+      "Este barbeiro está inativo.",
+      400,
+    );
+  }
+
+  const servico =
+    await prisma.servicos.findFirst({
+      where: {
+        id: servico_id,
+        barbearia_id: barbeariaId,
+      },
+    });
+
+  if (!servico) {
+    throw new AppError(
+      "Serviço não encontrado.",
+      404,
+    );
+  }
+
+  if (!servico.ativo) {
+    throw new AppError(
+      "Este serviço está inativo.",
+      400,
+    );
+  }
+
   const existeBloqueio =
     await existeBloqueioNoIntervalo({
       barbeiro_id,
       data,
       inicioMinutos,
       fimMinutos,
+      barbeariaId,
     });
 
   if (existeBloqueio) {
@@ -505,24 +756,11 @@ async function criarAgendamento({
     );
   }
 
-  const usarPlano = Boolean(
-    assinatura_plano_id,
-  );
-
-  if (
-    usarPlano &&
-    status === "CANCELADO"
-  ) {
-    throw new AppError(
-      "Não é possível utilizar um plano em um agendamento cancelado.",
-      400,
-    );
-  }
-
   const conflito =
     await prisma.agendamentos.findFirst({
       where: {
         barbeiro_id,
+        barbearia_id: barbeariaId,
 
         status: {
           not: "CANCELADO",
@@ -545,6 +783,9 @@ async function criarAgendamento({
     );
   }
 
+  const usarPlano =
+    Boolean(assinatura_plano_id);
+
   if (!usarPlano) {
     return prisma.agendamentos.create({
       data: {
@@ -553,20 +794,24 @@ async function criarAgendamento({
         cliente_id,
         barbeiro_id,
         servico_id,
+        barbearia_id: barbeariaId,
 
         data: new Date(data),
 
         horario_inicio: inicio,
         horario_fim: fim,
 
-        status: status || "AGENDADO",
+        // O status inicial é definido pelo servidor.
+        status: "AGENDADO",
 
-        observacoes: observacoes || null,
+        observacoes:
+          observacoes || null,
 
-        valor,
+        // O valor é obtido do serviço no banco.
+        valor: servico.preco,
 
-        forma_pagamento:
-          forma_pagamento || null,
+        // Pagamento é tratado separadamente pelo fluxo financeiro.
+        forma_pagamento: null,
       },
 
       include: {
@@ -578,10 +823,13 @@ async function criarAgendamento({
   }
 
   return prisma.$transaction(async (tx) => {
+    const agora = new Date();
+
     const assinatura =
-      await tx.assinaturaPlano.findUnique({
+      await tx.assinaturaPlano.findFirst({
         where: {
           id: assinatura_plano_id,
+          barbearia_id: barbeariaId,
         },
 
         include: {
@@ -600,11 +848,27 @@ async function criarAgendamento({
       );
     }
 
-    if (
-      assinatura.cliente_id !== cliente_id
-    ) {
+    if (assinatura.cliente_id !== cliente_id) {
       throw new AppError(
         "A assinatura de plano não pertence a este cliente.",
+        403,
+      );
+    }
+
+    if (assinatura.plano.barbearia_id !== barbeariaId) {
+      throw new AppError(
+        "O plano não pertence a esta barbearia.",
+        403,
+      );
+    }
+
+    if (
+      !assinatura.plano.servico ||
+      assinatura.plano.servico.barbearia_id !==
+        barbeariaId
+    ) {
+      throw new AppError(
+        "O serviço do plano não pertence a esta barbearia.",
         403,
       );
     }
@@ -616,30 +880,9 @@ async function criarAgendamento({
       );
     }
 
-    const agora = new Date();
-
     if (assinatura.data_fim < agora) {
-      await tx.assinaturaPlano.update({
-        where: {
-          id: assinatura.id,
-        },
-        data: {
-          status: "VENCIDO",
-        },
-      });
-
       throw new AppError(
         "A assinatura de plano está vencida.",
-        409,
-      );
-    }
-
-    if (
-      assinatura.quantidade_utilizada >=
-      assinatura.quantidade_total
-    ) {
-      throw new AppError(
-        "O cliente não possui mais cortes disponíveis neste plano.",
         409,
       );
     }
@@ -650,6 +893,37 @@ async function criarAgendamento({
     ) {
       throw new AppError(
         "O serviço escolhido não faz parte deste plano.",
+        409,
+      );
+    }
+
+    const consumo =
+      await tx.assinaturaPlano.updateMany({
+        where: {
+          id: assinatura.id,
+          barbearia_id: barbeariaId,
+
+          status: "ATIVO",
+
+          data_fim: {
+            gte: agora,
+          },
+
+          quantidade_utilizada: {
+            lt: assinatura.quantidade_total,
+          },
+        },
+
+        data: {
+          quantidade_utilizada: {
+            increment: 1,
+          },
+        },
+      });
+
+    if (consumo.count !== 1) {
+      throw new AppError(
+        "Não há mais utilizações disponíveis neste plano.",
         409,
       );
     }
@@ -666,22 +940,24 @@ async function criarAgendamento({
           assinatura_plano_id:
             assinatura.id,
 
+          barbearia_id: barbeariaId,
+
           data: new Date(data),
 
           horario_inicio: inicio,
           horario_fim: fim,
 
-          status:
-            status || "AGENDADO",
+          // O status inicial é definido pelo servidor.
+          status: "AGENDADO",
 
           observacoes:
             observacoes || null,
 
-          // O serviço já foi pago na contratação do plano.
+          // O serviço foi pago na contratação do plano.
           valor: 0,
 
-          forma_pagamento:
-            forma_pagamento || null,
+          // Pagamento é tratado separadamente.
+          forma_pagamento: null,
         },
 
         include: {
@@ -697,18 +973,6 @@ async function criarAgendamento({
         },
       });
 
-    await tx.assinaturaPlano.update({
-      where: {
-        id: assinatura.id,
-      },
-
-      data: {
-        quantidade_utilizada: {
-          increment: 1,
-        },
-      },
-    });
-
     return agendamento;
   });
 }
@@ -718,24 +982,210 @@ async function criarAgendamento({
 async function atualizarAgendamento(
   id,
   dados,
+  usuario,
 ) {
-  const dadosAtualizados = {
-    ...dados,
-  };
+  await validarAcessoAgendamento(
+    id,
+    usuario,
+  );
+
+  const barbeariaId =
+    obterBarbeariaId(usuario);
+
+  const dadosAtualizados = {};
+
+  const camposPermitidos = [
+    "cliente_id",
+    "barbeiro_id",
+    "servico_id",
+    "assinatura_plano_id",
+    "data",
+    "horario_inicio",
+    "horario_fim",
+    "status",
+    "observacoes",
+    "valor",
+    "forma_pagamento",
+  ];
+
+  for (const campo of camposPermitidos) {
+    if (dados[campo] !== undefined) {
+      dadosAtualizados[campo] =
+        dados[campo];
+    }
+  }
+
+  if (
+    usuario.cargo === "CLIENTE"
+  ) {
+    delete dadosAtualizados.cliente_id;
+    delete dadosAtualizados.status;
+    delete dadosAtualizados.valor;
+    delete dadosAtualizados.forma_pagamento;
+  }
+
+  if (
+    dadosAtualizados.cliente_id !==
+    undefined
+  ) {
+    const cliente =
+      await prisma.cliente.findFirst({
+        where: {
+          id: dadosAtualizados.cliente_id,
+          ativo: true,
+
+          vinculos_barbearias: {
+            some: {
+              barbearia_id:
+                barbeariaId,
+
+              ativo: true,
+
+              barbearia: {
+                ativo: true,
+              },
+            },
+          },
+        },
+      });
+
+    if (!cliente) {
+      throw new AppError(
+        "Cliente não encontrado.",
+        404,
+      );
+    }
+  }
+
+  if (
+    dadosAtualizados.barbeiro_id !==
+    undefined
+  ) {
+    const barbeiro =
+      await prisma.barbeiros.findFirst({
+        where: {
+          id: dadosAtualizados.barbeiro_id,
+          barbearia_id: barbeariaId,
+        },
+      });
+
+    if (!barbeiro) {
+      throw new AppError(
+        "Barbeiro não encontrado.",
+        404,
+      );
+    }
+
+    if (!barbeiro.ativo) {
+      throw new AppError(
+        "Este barbeiro está inativo.",
+        400,
+      );
+    }
+  }
+
+  if (
+    dadosAtualizados.servico_id !==
+    undefined
+  ) {
+    const servico =
+      await prisma.servicos.findFirst({
+        where: {
+          id: dadosAtualizados.servico_id,
+          barbearia_id: barbeariaId,
+        },
+      });
+
+    if (!servico) {
+      throw new AppError(
+        "Serviço não encontrado.",
+        404,
+      );
+    }
+
+    if (!servico.ativo) {
+      throw new AppError(
+        "Este serviço está inativo.",
+        400,
+      );
+    }
+  }
+
+  if (
+    dadosAtualizados.assinatura_plano_id !==
+      undefined &&
+    dadosAtualizados.assinatura_plano_id !==
+      null
+  ) {
+    const assinatura =
+      await prisma.assinaturaPlano.findFirst({
+        where: {
+          id:
+            dadosAtualizados.assinatura_plano_id,
+          barbearia_id: barbeariaId,
+        },
+        include: {
+          plano: {
+            include: {
+              servico: true,
+            },
+          },
+        },
+      });
+
+    if (!assinatura) {
+      throw new AppError(
+        "Assinatura de plano não encontrada.",
+        404,
+      );
+    }
+
+    const clienteId =
+      dadosAtualizados.cliente_id;
+
+    if (
+      clienteId !== undefined &&
+      assinatura.cliente_id !== clienteId
+    ) {
+      throw new AppError(
+        "A assinatura de plano não pertence a este cliente.",
+        403,
+      );
+    }
+
+    if (
+      assinatura.plano.barbearia_id !==
+        barbeariaId ||
+      !assinatura.plano.servico ||
+      assinatura.plano.servico.barbearia_id !==
+        barbeariaId
+    ) {
+      throw new AppError(
+        "O plano ou o serviço do plano não pertence a esta barbearia.",
+        403,
+      );
+    }
+  }
 
   if (dadosAtualizados.data) {
     dadosAtualizados.data =
-      new Date(dadosAtualizados.data);
+      new Date(
+        dadosAtualizados.data,
+      );
   }
 
-  if (dadosAtualizados.horario_inicio) {
+  if (
+    dadosAtualizados.horario_inicio
+  ) {
     dadosAtualizados.horario_inicio =
       new Date(
         dadosAtualizados.horario_inicio,
       );
   }
 
-  if (dadosAtualizados.horario_fim) {
+  if (
+    dadosAtualizados.horario_fim
+  ) {
     dadosAtualizados.horario_fim =
       new Date(
         dadosAtualizados.horario_fim,
@@ -749,9 +1199,10 @@ async function atualizarAgendamento(
     dadosAtualizados.barbeiro_id
   ) {
     const agendamentoAtual =
-      await prisma.agendamentos.findUnique({
+      await prisma.agendamentos.findFirst({
         where: {
           id,
+          barbearia_id: barbeariaId,
         },
       });
 
@@ -775,7 +1226,7 @@ async function atualizarAgendamento(
       agendamentoAtual.horario_fim;
 
     const dataAgendamento =
-      dados.data ||
+      dadosAtualizados.data ||
       agendamentoAtual.data
         .toISOString()
         .slice(0, 10);
@@ -789,8 +1240,11 @@ async function atualizarAgendamento(
 
     await validarHorarioFuncionamento(
       dataAgendamento,
-      formatarHorarioSaoPaulo(inicio),
+      formatarHorarioSaoPaulo(
+        inicio,
+      ),
       formatarHorarioSaoPaulo(fim),
+      barbeariaId,
     );
 
     const inicioMinutos =
@@ -819,6 +1273,7 @@ async function atualizarAgendamento(
         data: dataAgendamento,
         inicioMinutos,
         fimMinutos,
+        barbeariaId,
       });
 
     if (existeBloqueio) {
@@ -836,6 +1291,7 @@ async function atualizarAgendamento(
           },
 
           barbeiro_id: barbeiroId,
+          barbearia_id: barbeariaId,
 
           status: {
             not: "CANCELADO",
@@ -884,22 +1340,32 @@ async function reagendarAgendamento(
     horario_fim,
     barbeiro_id,
   },
+  usuario,
 ) {
+  await validarAcessoAgendamento(
+    id,
+    usuario,
+  );
+
+  const barbeariaId =
+    obterBarbeariaId(usuario);
+
   if (
     !data ||
     !horario_inicio ||
     !horario_fim
   ) {
     throw new AppError(
-      "Data, horário de início e horário de fim são obrigatórios para reagendar.",
+      "Data, horário de início e horário de fim são obrigatórios.",
       400,
     );
   }
 
   const agendamento =
-    await prisma.agendamentos.findUnique({
+    await prisma.agendamentos.findFirst({
       where: {
         id,
+        barbearia_id: barbeariaId,
       },
     });
 
@@ -932,7 +1398,8 @@ async function reagendarAgendamento(
   }
 
   const novoBarbeiroId =
-    barbeiro_id || agendamento.barbeiro_id;
+    barbeiro_id ||
+    agendamento.barbeiro_id;
 
   const novoInicio =
     new Date(horario_inicio);
@@ -958,9 +1425,10 @@ async function reagendarAgendamento(
   }
 
   const barbeiro =
-    await prisma.barbeiro.findUnique({
+    await prisma.barbeiros.findFirst({
       where: {
         id: novoBarbeiroId,
+        barbearia_id: barbeariaId,
       },
     });
 
@@ -980,8 +1448,11 @@ async function reagendarAgendamento(
 
   await validarHorarioFuncionamento(
     data,
-    formatarHorarioSaoPaulo(novoInicio),
+    formatarHorarioSaoPaulo(
+      novoInicio,
+    ),
     formatarHorarioSaoPaulo(novoFim),
+    barbeariaId,
   );
 
   const inicioMinutos =
@@ -1010,6 +1481,7 @@ async function reagendarAgendamento(
       data,
       inicioMinutos,
       fimMinutos,
+      barbeariaId,
     });
 
   if (existeBloqueio) {
@@ -1027,6 +1499,7 @@ async function reagendarAgendamento(
         },
 
         barbeiro_id: novoBarbeiroId,
+        barbearia_id: barbeariaId,
 
         status: {
           not: "CANCELADO",
@@ -1077,11 +1550,23 @@ async function reagendarAgendamento(
 
 // CANCELAR AGENDAMENTO
 
-async function cancelarAgendamento(id) {
+async function cancelarAgendamento(
+  id,
+  usuario,
+) {
+  await validarAcessoAgendamento(
+    id,
+    usuario,
+  );
+
+  const barbeariaId =
+    obterBarbeariaId(usuario);
+
   const agendamento =
-    await prisma.agendamentos.findUnique({
+    await prisma.agendamentos.findFirst({
       where: {
         id,
+        barbearia_id: barbeariaId,
       },
     });
 
@@ -1089,6 +1574,27 @@ async function cancelarAgendamento(id) {
     throw new AppError(
       "Agendamento não encontrado.",
       404,
+    );
+  }
+
+  if (agendamento.status === "CANCELADO") {
+    throw new AppError(
+      "Este agendamento já está cancelado.",
+      409,
+    );
+  }
+
+  if (agendamento.status === "CONCLUIDO") {
+    throw new AppError(
+      "Não é possível cancelar um agendamento já concluído.",
+      409,
+    );
+  }
+
+  if (agendamento.status === "FALTOU") {
+    throw new AppError(
+      "Não é possível cancelar um agendamento marcado como falta.",
+      409,
     );
   }
 
@@ -1105,10 +1611,24 @@ async function cancelarAgendamento(id) {
 
 // CONCLUIR ATENDIMENTO
 
-async function concluirAgendamento(id) {
+async function concluirAgendamento(
+  id,
+  usuario,
+) {
+  await validarAcessoAgendamento(
+    id,
+    usuario,
+  );
+
+  const barbeariaId =
+    obterBarbeariaId(usuario);
+
   const agendamento =
-    await prisma.agendamentos.findUnique({
-      where: { id },
+    await prisma.agendamentos.findFirst({
+      where: {
+        id,
+        barbearia_id: barbeariaId,
+      },
     });
 
   if (!agendamento) {
@@ -1133,8 +1653,14 @@ async function concluirAgendamento(id) {
   }
 
   return prisma.agendamentos.update({
-    where: { id },
-    data: { status: "CONCLUIDO" },
+    where: {
+      id,
+    },
+
+    data: {
+      status: "CONCLUIDO",
+    },
+
     include: {
       clientes: true,
       barbeiros: true,
@@ -1145,10 +1671,24 @@ async function concluirAgendamento(id) {
 
 // MARCAR FALTA DO CLIENTE
 
-async function marcarFalta(id) {
+async function marcarFalta(
+  id,
+  usuario,
+) {
+  await validarAcessoAgendamento(
+    id,
+    usuario,
+  );
+
+  const barbeariaId =
+    obterBarbeariaId(usuario);
+
   const agendamento =
-    await prisma.agendamentos.findUnique({
-      where: { id },
+    await prisma.agendamentos.findFirst({
+      where: {
+        id,
+        barbearia_id: barbeariaId,
+      },
     });
 
   if (!agendamento) {
@@ -1172,9 +1712,22 @@ async function marcarFalta(id) {
     );
   }
 
+  if (agendamento.status === "FALTOU") {
+    throw new AppError(
+      "Este agendamento já está marcado como falta.",
+      409,
+    );
+  }
+
   return prisma.agendamentos.update({
-    where: { id },
-    data: { status: "FALTOU" },
+    where: {
+      id,
+    },
+
+    data: {
+      status: "FALTOU",
+    },
+
     include: {
       clientes: true,
       barbeiros: true,

@@ -1,23 +1,62 @@
 const { Router } = require("express");
 
 const agendamentoController = require("../controllers/agendamentoController");
+const autorizar = require("../middlewares/permissionMiddleware");
 
 const router = Router();
 
-router.get("/", agendamentoController.listar);
+// Leitura da agenda
+router.get(
+  "/",
+  autorizar("ADMIN", "GERENTE", "BARBEIRO", "RECEPCIONISTA", "CLIENTE"),
+  agendamentoController.listar,
+);
 
-router.get("/disponiveis", agendamentoController.listarHorariosDisponiveis);
+router.get(
+  "/disponiveis",
+  autorizar("ADMIN", "GERENTE", "BARBEIRO", "RECEPCIONISTA", "CLIENTE"),
+  agendamentoController.listarHorariosDisponiveis,
+);
 
-router.get("/:id", agendamentoController.buscarPorId);
+router.get(
+  "/:id",
+  autorizar("ADMIN", "GERENTE", "BARBEIRO", "RECEPCIONISTA", "CLIENTE"),
+  agendamentoController.buscarPorId,
+);
 
-router.post("/", agendamentoController.criar);
+// Criar agendamento
+router.post(
+  "/",
+  autorizar("ADMIN", "GERENTE", "RECEPCIONISTA", "CLIENTE"),
+  agendamentoController.criar,
+);
 
-router.patch("/:id/reagendar", agendamentoController.reagendar);
+// Reagendar
+router.patch(
+  "/:id/reagendar",
+  autorizar("ADMIN", "GERENTE", "BARBEIRO", "RECEPCIONISTA", "CLIENTE"),
+  agendamentoController.reagendar,
+);
 
-router.patch("/:id/concluir", agendamentoController.concluir);
+// Concluir atendimento
+router.patch(
+  "/:id/concluir",
+  autorizar("ADMIN", "GERENTE", "BARBEIRO"),
+  agendamentoController.concluir,
+);
 
-router.patch("/:id/faltou", agendamentoController.marcarFalta);
+// Marcar falta
+router.patch(
+  "/:id/faltou",
+  autorizar("ADMIN", "GERENTE", "BARBEIRO"),
+  agendamentoController.marcarFalta,
+);
 
-router.delete("/:id", agendamentoController.cancelar);
+// Cancelar
+router.delete(
+  "/:id",
+  autorizar("ADMIN", "GERENTE", "BARBEIRO", "RECEPCIONISTA", "CLIENTE"),
+  agendamentoController.cancelar,
+);
 
 module.exports = router;

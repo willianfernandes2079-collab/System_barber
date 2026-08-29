@@ -6,11 +6,36 @@ datasource db {
   provider = "postgresql"
 }
 
-model Usuario {
-  //chave pk 
-  id         String   @id @default(uuid()) @db.Uuid 
+model Barbearia {
+  id         String   @id @default(uuid()) @db.Uuid
+  nome       String
+  ativo      Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
-//campos
+  usuarios            Usuario[]
+  clientes            Cliente[]
+  clientes_vinculados ClienteBarbearia[]
+  barbeiros           barbeiros[]
+  servicos            servicos[]
+  configuracao        Configuracao?
+  planos              Plano[]
+  estoque             Estoque[]
+  movimentacoes       MovimentacaoEstoque[]
+  agendamentos        Agendamentos[]
+  assinaturas         AssinaturaPlano[]
+  comissoes           Comissao[]
+  pagamentos          Pagamento[]
+  valores_corte       ValorCorte[]
+  bloqueios_agenda    BloqueioAgenda[]
+  caixas              Caixa[]
+  sessaos             Sessao[]
+
+  @@map("barbearias")
+}
+
+model Usuario {
+  id         String   @id @default(uuid()) @db.Uuid
   nome       String
   email      String   @unique
   senha_hash String
@@ -20,82 +45,89 @@ model Usuario {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-// Relacionamentos
-  barbeiro Barbeiro?
-  sessoes  Sessao[]
-  caixa    Caixa[]
+  barbearia_id String? @db.Uuid
 
-// Índices
+  caixa     Caixa[]
+  barbeiro  barbeiros?
+  sessoes   Sessao[]
+  barbearia Barbearia? @relation(fields: [barbearia_id], references: [id])
+
+  @@index([barbearia_id])
   @@map("usuarios")
 }
 
-
 model Sessao {
-  //chave pk
-  id         String   @id @default(uuid()) @db.Uuid
+  id           String   @id @default(uuid()) @db.Uuid
+  usuario_id   String   @db.Uuid
+  jti          String   @unique
+  barbearia_id String?  @db.Uuid
+  created_at   DateTime @default(now())
+  expires_at   DateTime
+  user_agent   String?
+  ip           String?
 
-  //chave estrangeira
-  usuario_id String   @db.Uuid
+  usuario   Usuario    @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  barbearia Barbearia? @relation(fields: [barbearia_id], references: [id])
 
-  //campos
-  jti        String   @unique
-  created_at DateTime @default(now())
-  expires_at DateTime
-  user_agent String?
-  ip         String?
-
-  // Relacionamentos
-  usuario    Usuario  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
-
-  // Índices
   @@index([expires_at])
   @@index([usuario_id])
+  @@index([barbearia_id])
   @@map("sessoes")
 }
 
-
 model Cliente {
-  //chave pk
-  id                   String            @id @default(uuid()) @db.Uuid
-  
-  //campos
+  id                   String    @id @default(uuid()) @db.Uuid
   nome                 String
   telefone             String
   whatsapp             String?
   email                String?
   data_nascimento      DateTime?
-  cpf                  String?           @unique @db.VarChar(14)
+  cpf                  String?   @unique @db.VarChar(14)
   observacoes          String?
   preferencia_barbeiro String?
   preferencia_servico  String?
   ultimo_atendimento   DateTime?
-  ativo                Boolean           @default(true)
-  created_at           DateTime          @default(now())
-  updated_at           DateTime          @updatedAt
+  ativo                Boolean   @default(true)
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @updatedAt
 
-  // Relacionamentos 
-  assinaturas_plano    AssinaturaPlano[]
-  agendamentos         Agendamentos[]
-  pagamento            Pagamento[]
-  caixa                Caixa[]
+  barbearia_id String? @db.Uuid
 
-// Índices
+  assinaturas_plano AssinaturaPlano[]
+  caixa             Caixa[]
+  agendamentos      Agendamentos[]
+  pagamento         Pagamento[]
+  barbearia         Barbearia?        @relation(fields: [barbearia_id], references: [id])
+
+  vinculos_barbearias ClienteBarbearia[]
+
   @@index([nome])
   @@index([telefone])
   @@index([email])
-  @@index([ativo])
+  @@index([barbearia_id])
   @@map("clientes")
 }
 
+model ClienteBarbearia {
+  id           String   @id @default(uuid()) @db.Uuid
+  cliente_id   String   @db.Uuid
+  barbearia_id String   @db.Uuid
+  ativo        Boolean  @default(true)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 
-model Barbeiro {
-  //chave pk
-  id         String @id @default(uuid()) @db.Uuid
-  
-  //cahve estrangeira
-  usuario_id String @unique @db.Uuid
+  cliente   Cliente   @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
+  barbearia Barbearia @relation(fields: [barbearia_id], references: [id], onDelete: Cascade)
 
-  //campos
+  @@unique([cliente_id, barbearia_id])
+  @@index([cliente_id])
+  @@index([barbearia_id])
+  @@map("clientes_barbearias")
+}
+
+model barbeiros {
+  id                  String    @id @default(uuid()) @db.Uuid
+  usuario_id          String    @unique @db.Uuid
   nome                String
   telefone            String?
   especialidade       String?
@@ -109,50 +141,48 @@ model Barbeiro {
   pix_tipo            String?
   whatsapp            String?
 
-  // Relacionamentos
-  usuario Usuario @relation(fields: [usuario_id], references: [id])
-  agendamentos     Agendamentos[]
-  comissao         Comissao[]
-  bloqueios_agenda BloqueioAgenda[]
-  caixa            Caixa[]
+  barbearia_id String? @db.Uuid
 
-  // Índices
+  caixa            Caixa[]
+  agendamentos     Agendamentos[]
+  usuario          Usuario          @relation(fields: [usuario_id], references: [id])
+  bloqueios_agenda BloqueioAgenda[]
+  comissao         Comissao[]
+  barbearia        Barbearia?       @relation(fields: [barbearia_id], references: [id])
+
   @@index([nome])
   @@index([ativo])
   @@index([cpf])
   @@index([pix_tipo])
+  @@index([barbearia_id])
   @@map("barbeiros")
 }
 
-
-model Agendamentos { 
-  //chave pk
-  id String @id @default(uuid()) @db.Uuid
-
- //chaves estrangeiras
-  cliente_id  String @db.Uuid
-  barbeiro_id String @db.Uuid
-  servico_id  String @db.Uuid
-
-//campos
+model Agendamentos {
+  id                  String   @id @default(uuid()) @db.Uuid
+  cliente_id          String   @db.Uuid
+  barbeiro_id         String   @db.Uuid
+  servico_id          String   @db.Uuid
   data                DateTime
   horario_inicio      DateTime
   horario_fim         DateTime
-  status              String           @default("AGENDADO")
+  status              String   @default("AGENDADO")
   observacoes         String?
-  valor               Decimal          @db.Decimal(10, 2)
+  valor               Decimal  @db.Decimal(10, 2)
   forma_pagamento     String?
-  created_at          DateTime         @default(now())
-  updated_at          DateTime         @updatedAt
-  assinatura_plano_id String?          @db.Uuid
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+  assinatura_plano_id String?  @db.Uuid
 
-  // Relacionamentos
-  assinatura_plano    AssinaturaPlano? @relation(fields: [assinatura_plano_id], references: [id])
-  barbeiro            Barbeiro         @relation(fields: [barbeiro_id], references: [id])
-  cliente             Cliente          @relation(fields: [cliente_id], references: [id])
-  servico             Servicos         @relation(fields: [servico_id], references: [id])
-  comissao            Comissao?
-  pagamento           Pagamento?
+  barbearia_id String? @db.Uuid
+
+  assinatura_plano AssinaturaPlano? @relation(fields: [assinatura_plano_id], references: [id])
+  barbeiros        barbeiros        @relation(fields: [barbeiro_id], references: [id])
+  clientes         Cliente          @relation(fields: [cliente_id], references: [id])
+  servicos         servicos         @relation(fields: [servico_id], references: [id])
+  barbearia        Barbearia?       @relation(fields: [barbearia_id], references: [id])
+  comissao         Comissao?
+  pagamento        Pagamento?
 
   @@index([barbeiro_id, data])
   @@index([barbeiro_id])
@@ -161,38 +191,37 @@ model Agendamentos {
   @@index([servico_id])
   @@index([status])
   @@index([assinatura_plano_id])
+  @@index([barbearia_id])
   @@map("agendamentos")
 }
 
-
-model Servicos {
-  //chave pk
-  id                  String         @id @default(uuid()) @db.Uuid
+model servicos {
+  id                  String   @id @default(uuid()) @db.Uuid
   nome                String
   descricao           String?
   duracao             Int
-  preco               Decimal        @db.Decimal(10, 2)
-  percentual_comissao Decimal?       @db.Decimal(5, 2)
-  ativo               Boolean        @default(true)
-  created_at          DateTime       @default(now())
-  updated_at          DateTime       @updatedAt
+  preco               Decimal  @db.Decimal(10, 2)
+  percentual_comissao Decimal? @db.Decimal(5, 2)
+  ativo               Boolean  @default(true)
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
 
-  // Relacionamentos
-  planos              Plano[]
-  agendamentos        Agendamentos[]
-  valorcortes         ValorCorte[]
-  caixa               Caixa[]
+  barbearia_id String? @db.Uuid
+
+  caixa        Caixa[]
+  planos       Plano[]
+  valorcortes  ValorCorte[]
+  agendamentos Agendamentos[]
+  barbearia    Barbearia?     @relation(fields: [barbearia_id], references: [id])
 
   @@index([ativo])
   @@index([nome])
+  @@index([barbearia_id])
   @@map("servicos")
 }
 
 model Configuracao {
-  //chave pk
   id                 String   @id @default(uuid()) @db.Uuid
-
-  //campos
   nome_barbearia     String
   telefone           String?
   endereco           String?
@@ -203,49 +232,42 @@ model Configuracao {
   updated_at         DateTime @updatedAt
   comissao_padrao    Decimal  @default(40) @db.Decimal(5, 2)
 
-// indices
+  barbearia_id String? @unique @db.Uuid
+
+  barbearia Barbearia? @relation(fields: [barbearia_id], references: [id])
+
   @@map("configuracoes")
 }
 
-
 model Plano {
-  //chave pk
-  id            String            @id @default(uuid()) @db.Uuid
+  id            String   @id @default(uuid()) @db.Uuid
   nome          String
-  
-  //campos
   descricao     String?
-  servico_id    String            @db.Uuid
+  servico_id    String   @db.Uuid
   quantidade    Int
-  preco         Decimal           @db.Decimal(10, 2)
-  validade_dias Int               @default(30)
-  ativo         Boolean           @default(true)
-  created_at    DateTime          @default(now())
-  updated_at    DateTime          @updatedAt
-  
-  // Relacionamentos inversos
-  assinaturas   AssinaturaPlano[]
-  caixa         Caixa[]
+  preco         Decimal  @db.Decimal(10, 2)
+  validade_dias Int      @default(30)
+  ativo         Boolean  @default(true)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
 
-// Relacionamentos
-  servico       Servicos          @relation(fields: [servico_id], references: [id])
+  barbearia_id String? @db.Uuid
 
-// Índices
+  assinaturas AssinaturaPlano[]
+  caixa       Caixa[]
+  servico     servicos          @relation(fields: [servico_id], references: [id])
+  barbearia   Barbearia?        @relation(fields: [barbearia_id], references: [id])
+
   @@index([servico_id])
   @@index([ativo])
   @@index([nome])
+  @@index([barbearia_id])
 }
 
-
 model AssinaturaPlano {
-  //chave pk
-  id String @id @default(uuid()) @db.Uuid
-
-//chaves estrangeiras
-  cliente_id String @db.Uuid
-  plano_id   String @db.Uuid
-
-//campos
+  id                   String   @id @default(uuid()) @db.Uuid
+  cliente_id           String   @db.Uuid
+  plano_id             String   @db.Uuid
   quantidade_total     Int
   quantidade_utilizada Int      @default(0)
   valor_pago           Decimal  @db.Decimal(10, 2)
@@ -255,60 +277,53 @@ model AssinaturaPlano {
   created_at           DateTime @default(now())
   updated_at           DateTime @updatedAt
 
-// Relacionamentos
-  cliente Cliente @relation(fields: [cliente_id], references: [id])
-  plano   Plano   @relation(fields: [plano_id], references: [id])
+  barbearia_id String? @db.Uuid
 
-// Relacionamentos inversos
+  cliente      Cliente        @relation(fields: [cliente_id], references: [id])
+  plano        Plano          @relation(fields: [plano_id], references: [id])
   agendamentos Agendamentos[]
+  barbearia    Barbearia?     @relation(fields: [barbearia_id], references: [id])
 
-// Índices
   @@index([cliente_id])
   @@index([plano_id])
   @@index([status])
   @@index([data_inicio])
   @@index([data_fim])
+  @@index([barbearia_id])
 }
 
-
-
 model Estoque {
-  //chave pk
-  id                String                @id @default(uuid()) @db.Uuid
-  //campos
+  id                String   @id @default(uuid()) @db.Uuid
   nome              String
   descricao         String?
   categoria         String?
-  quantidade        Int                   @default(0)
-  quantidade_minima Int                   @default(0)
-  unidade           String                @default("UN")
-  preco_custo       Decimal               @default(0) @db.Decimal(10, 2)
-  preco_venda       Decimal?              @db.Decimal(10, 2)
+  quantidade        Int      @default(0)
+  quantidade_minima Int      @default(0)
+  unidade           String   @default("UN")
+  preco_custo       Decimal  @default(0) @db.Decimal(10, 2)
+  preco_venda       Decimal? @db.Decimal(10, 2)
   fornecedor        String?
   codigo_barras     String?
-  ativo             Boolean               @default(true)
-  created_at        DateTime              @default(now())
-  updated_at        DateTime              @updatedAt
+  ativo             Boolean  @default(true)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
 
-  // Relacionamentos inversos
-  movimentacoes     MovimentacaoEstoque[]
-  caixa             Caixa[]
+  barbearia_id String? @db.Uuid
 
-// Índices
+  caixa         Caixa[]
+  movimentacoes MovimentacaoEstoque[]
+  barbearia     Barbearia?            @relation(fields: [barbearia_id], references: [id])
+
   @@index([nome])
   @@index([categoria])
   @@index([ativo])
   @@index([codigo_barras])
+  @@index([barbearia_id])
   @@map("estoque")
 }
 
-
-
 model MovimentacaoEstoque {
-  //chave pk
   id                  String   @id @default(uuid()) @db.Uuid
-
-  //chave estrangeira
   estoque_id          String   @db.Uuid
   tipo                String
   quantidade          Int
@@ -319,154 +334,141 @@ model MovimentacaoEstoque {
   observacoes         String?
   created_at          DateTime @default(now())
 
-  // Relacionamentos
-  estoque             Estoque  @relation(fields: [estoque_id], references: [id], onDelete: Cascade)
+  barbearia_id String? @db.Uuid
 
- // Índices
+  estoque   Estoque    @relation(fields: [estoque_id], references: [id], onDelete: Cascade)
+  barbearia Barbearia? @relation(fields: [barbearia_id], references: [id])
+
   @@index([estoque_id])
   @@index([tipo])
   @@index([created_at])
+  @@index([barbearia_id])
   @@map("movimentacoes_estoque")
 }
 
-
 model Comissao {
-  //chave pk
-  id             String   @id @db.Uuid
-
-  //chaves estrangeiras
+  id             String   @id @default(uuid()) @db.Uuid
   barbeiro_id    String   @db.Uuid
   agendamento_id String   @unique @db.Uuid
-
-  //campos
   valor_servico  Decimal  @db.Decimal(10, 2)
   percentual     Decimal  @db.Decimal(5, 2)
   valor_comissao Decimal  @db.Decimal(10, 2)
   status         String   @default("PENDENTE")
   data           DateTime @default(now())
   created_at     DateTime @default(now())
-// Relacionamentos
-  agendamentos Agendamentos @relation(fields: [agendamento_id], references: [id])
-  barbeiros    Barbeiro     @relation(fields: [barbeiro_id], references: [id])
 
-// Índices
+  barbearia_id String? @db.Uuid
+
+  agendamentos Agendamentos @relation(fields: [agendamento_id], references: [id])
+  barbeiros    barbeiros    @relation(fields: [barbeiro_id], references: [id])
+  barbearia    Barbearia?   @relation(fields: [barbearia_id], references: [id])
+
   @@index([barbeiro_id])
   @@index([data])
   @@index([status])
+  @@index([barbearia_id])
   @@map("comissao")
 }
 
-
 model Pagamento {
-  //chave pk
   id              String   @id @db.Uuid
-
-  //chaves estrangeiras
   agendamento_id  String   @unique @db.Uuid
   cliente_id      String   @db.Uuid
-
-  //campos
   valor           Decimal  @db.Decimal(10, 2)
   forma_pagamento String
   status          String   @default("PAGO")
   data_pagamento  DateTime @default(now())
   observacoes     String?
   created_at      DateTime @default(now())
-  updated_at      DateTime
-// Relacionamentos
+  updated_at      DateTime @updatedAt
+
+  barbearia_id String? @db.Uuid
+
   agendamentos Agendamentos @relation(fields: [agendamento_id], references: [id])
   clientes     Cliente      @relation(fields: [cliente_id], references: [id])
+  barbearia    Barbearia?   @relation(fields: [barbearia_id], references: [id])
 
-// Índices
   @@index([cliente_id])
   @@index([data_pagamento])
   @@index([forma_pagamento])
   @@index([status])
+  @@index([barbearia_id])
   @@map("pagamento")
 }
 
-
 model ValorCorte {
-  //chave pk
   id          String    @id @default(uuid()) @db.Uuid
-  servicos_id String    @db.Uuid
   valor       Decimal   @db.Decimal(10, 2)
   data_inicio DateTime  @default(now())
   data_fim    DateTime?
-  // Relacionamentos
-  servico Servicos @relation(fields: [servicos_id], references: [id])
-}
- 
-model BloqueioAgenda {
-  //chave pk
-  id             String    @id @default(uuid()) @db.Uuid
+  servicos_id String    @db.Uuid
 
-  //chave estrangeira
+  barbearia_id String? @db.Uuid
+
+  servico   servicos   @relation(fields: [servicos_id], references: [id])
+  barbearia Barbearia? @relation(fields: [barbearia_id], references: [id])
+
+  @@index([barbearia_id])
+}
+
+model BloqueioAgenda {
+  id             String    @id @default(uuid()) @db.Uuid
   barbeiro_id    String?   @db.Uuid
   data           DateTime  @db.Date
   horario_inicio DateTime?
   horario_fim    DateTime?
   motivo         String
   observacoes    String?
-
-  //campos de controle
   ativo          Boolean   @default(true)
   created_at     DateTime  @default(now())
   updated_at     DateTime  @updatedAt
 
-  // Relacionamentos
-  barbeiro Barbeiro? @relation(fields: [barbeiro_id], references: [id], onDelete: Cascade)
+  barbearia_id String? @db.Uuid
+
+  barbeiro  barbeiros? @relation(fields: [barbeiro_id], references: [id], onDelete: Cascade)
+  barbearia Barbearia? @relation(fields: [barbearia_id], references: [id])
 
   @@index([barbeiro_id])
   @@index([data])
   @@index([ativo])
+  @@index([barbearia_id])
   @@map("bloqueios_agenda")
 }
 
-
 model Caixa {
-  //chave pk
-  id String @id @default(uuid()) @db.Uuid
+  id              String   @id @default(uuid()) @db.Uuid
+  usuario_id      String   @db.Uuid
+  cliente_id      String?  @db.Uuid
+  barbeiro_id     String?  @db.Uuid
+  estoque_id      String?  @db.Uuid
+  servico_id      String?  @db.Uuid
+  plano_id        String?  @db.Uuid
+  quantidade      Int
+  preco           Decimal  @db.Decimal(10, 2)
+  subtotal        Decimal  @db.Decimal(10, 2)
+  desconto        Decimal  @db.Decimal(10, 2)
+  total           Decimal  @db.Decimal(10, 2)
+  forma_pagamento String
+  valor_entregue  Decimal? @db.Decimal(10, 2)
+  troco           Decimal? @db.Decimal(10, 2)
+  status          String
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
 
-  //chaves estrangeiras
-  usuario_id  String  @db.Uuid // identificar 
-  cliente_id  String? @db.Uuid // selecionar cliente 
-  barbeiro_id String? @db.Uuid
-  estoque_id  String? @db.Uuid
-  servico_id  String? @db.Uuid
-  plano_id    String? @db.Uuid
+  barbearia_id String? @db.Uuid
 
-  //campos
-  //quantidade      Int
-  //preco           Decimal  @db.Decimal(10, 2)
-  //subtotal        Decimal  @db.Decimal(10, 2)
-  desconto          Decimal  @db.Decimal(10, 2) //registrar desconto
-  total             Decimal  @db.Decimal(10, 2) //registarar total
-  forma_pagamento   String                      //registrar forma de pagamento
-  valor_recebido    Decimal? @db.Decimal(10, 2) //valor recebido
-  troco             Decimal? @db.Decimal(10, 2) //registrar troco
-  status            String
-  registrar_venda   Boolean  @default(true) //registrar venda 
-  registrar_produto Boolean  @default(true) //registrar produto
-  registrar_plano   Boolean  @default(true) //registrar plano
+  barbeiro  barbeiros? @relation(fields: [barbeiro_id], references: [id])
+  cliente   Cliente?   @relation(fields: [cliente_id], references: [id])
+  estoque   Estoque?   @relation(fields: [estoque_id], references: [id])
+  plano     Plano?     @relation(fields: [plano_id], references: [id])
+  servico   servicos?  @relation(fields: [servico_id], references: [id])
+  usuario   Usuario    @relation(fields: [usuario_id], references: [id])
+  barbearia Barbearia? @relation(fields: [barbearia_id], references: [id])
 
-//campos de controle
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-// Relacionamentos
-  usuario  Usuario   @relation(fields: [usuario_id], references: [id])
-  cliente  Cliente?  @relation(fields: [cliente_id], references: [id])
-  barbeiro Barbeiro? @relation(fields: [barbeiro_id], references: [id])
-  estoque  Estoque?  @relation(fields: [estoque_id], references: [id])
-  servico  Servicos? @relation(fields: [servico_id], references: [id])
-  plano    Plano?    @relation(fields: [plano_id], references: [id])
-
-// Índices
   @@index([cliente_id])
   @@index([barbeiro_id])
   @@index([estoque_id])
   @@index([servico_id])
   @@index([plano_id])
+  @@index([barbearia_id])
 }
-
