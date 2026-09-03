@@ -28,4 +28,4 @@ async function enviarEmail({
 module.exports = {
   enviarEmail,
   modoMock,
-};
+}

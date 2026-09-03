@@ -8,24 +8,200 @@
       content="width=device-width, initial-scale=1.0"
     />
 
-    <title>configuraçao</title>
+    <title>Configurações - MW System</title>
+
+    <link
+      rel="stylesheet"
+      href="/html_site/css/cliente-portal.css"
+    />
   </head>
 
   <body>
-       <div id="titulo">
-            <h1>Bem-vindo ao Sistema</h1>
-        </div>
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-badge">MW</div>
 
-        <div id="subtitulo">
-            <h2>
-                Escolha uma das opções abaixo para continuar
+        <div class="brand-name">
+          MW<span>System</span>
+        </div>
+      </div>
+
+      <nav class="cliente-navigation">
+        <a
+          class="nav-link"
+          href="/cliente-agendamento"
+        >
+          <span class="nav-icon">⌂</span>
+          <span>Início</span>
+        </a>
+
+        <a
+          class="nav-link"
+          href="/meus-agendamentos"
+        >
+          <span class="nav-icon">📅</span>
+          <span>Meus agendamentos</span>
+        </a>
+
+        <a
+          class="nav-link"
+          href="/meu-perfil"
+        >
+          <span class="nav-icon">◉</span>
+          <span>Meu perfil</span>
+        </a>
+
+        <a
+          class="nav-link active"
+          href="/configuracoes"
+        >
+          <span class="nav-icon">⚙</span>
+          <span>Configurações</span>
+        </a>
+
+        <a
+          class="nav-link"
+          href="/pagamentos"
+        >
+          <span class="nav-icon">💳</span>
+          <span>Pagamentos</span>
+        </a>
+      </nav>
+
+      <button
+        type="button"
+        class="nav-link nav-logout"
+        id="btnLogout"
+      >
+        <span class="nav-icon">⏻</span>
+        <span>Sair</span>
+      </button>
+    </aside>
+
+    <main class="main">
+      <div class="page-container">
+        <header class="page-header">
+          <div>
+            <span class="page-kicker">
+              Preferências
+            </span>
+
+            <h1>Configurações</h1>
+
+            <p>
+              Personalize algumas preferências
+              locais do seu portal e gerencie
+              sua sessão.
+            </p>
+          </div>
+        </header>
+
+        <div
+          id="mensagemConfiguracao"
+          class="message"
+          role="status"
+          aria-live="polite"
+        ></div>
+
+        <section class="card">
+          <div style="margin-bottom: 20px;">
+            <span class="page-kicker">
+              Preferências
+            </span>
+
+            <h2 class="section-title">
+              Notificações
             </h2>
-        </div>
 
-        
+            <p class="section-subtitle">
+              Estas opções ficam salvas apenas
+              neste navegador.
+            </p>
+          </div>
 
+          <div class="settings-list">
+            <div class="settings-item">
+              <div>
+                <strong>
+                  Lembretes de agendamento
+                </strong>
 
+                <span>
+                  Ativa a preferência de receber
+                  lembretes.
+                </span>
+              </div>
 
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  id="notificacoesAgendamento"
+                />
 
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+
+            <div class="settings-item">
+              <div>
+                <strong>
+                  Mostrar confirmações
+                </strong>
+
+                <span>
+                  Exibe confirmações extras no
+                  portal.
+                </span>
+              </div>
+
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  id="mostrarConfirmacoes"
+                />
+
+                <span class="switch-slider"></span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <section
+          class="card"
+          style="margin-top: 18px;"
+        >
+          <div>
+            <span class="page-kicker">
+              Segurança
+            </span>
+
+            <h2 class="section-title">
+              Sessão da conta
+            </h2>
+
+            <p class="section-subtitle">
+              Ao encerrar todas as sessões, os
+              acessos existentes serão invalidados.
+            </p>
+          </div>
+
+          <div class="actions">
+            <button
+              type="button"
+              class="btn btn-danger"
+              id="btnEncerrarSessoes"
+            >
+              Encerrar todas as sessões
+            </button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script src="/html_site/js/api.js"></script>
+
+    <script src="/html_site/js/cliente-portal.js"></script>
+
+    <script src="/html_site/js/configuracao.js"></script>
   </body>
-</html>  
+</html>

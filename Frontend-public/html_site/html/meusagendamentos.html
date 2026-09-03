@@ -8,13 +8,454 @@
       content="width=device-width, initial-scale=1.0"
     />
 
-    <title>configuraçao</title>
+    <title>Meus Agendamentos - MW System</title>
+
+    <link
+      rel="stylesheet"
+      href="/html_site/css/cliente-portal.css"
+    />
   </head>
 
   <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <div
+          class="brand-badge"
+          aria-hidden="true"
+        >
+          MW
+        </div>
 
+        <div class="brand-name">
+          MW<span>System</span>
+        </div>
+      </div>
 
+      <nav
+        class="cliente-navigation"
+        aria-label="Navegação do cliente"
+      >
+        <a
+          class="nav-link"
+          href="/cliente-agendamento"
+        >
+          <span
+            class="nav-icon"
+            aria-hidden="true"
+          >
+            ⌂
+          </span>
 
+          <span>Início</span>
+        </a>
 
+        <a
+          class="nav-link active"
+          href="/meus-agendamentos"
+        >
+          <span
+            class="nav-icon"
+            aria-hidden="true"
+          >
+            📅
+          </span>
+
+          <span>Meus agendamentos</span>
+        </a>
+
+        <a
+          class="nav-link"
+          href="/meu-perfil"
+        >
+          <span
+            class="nav-icon"
+            aria-hidden="true"
+          >
+            ◉
+          </span>
+
+          <span>Meu perfil</span>
+        </a>
+
+        <a
+          class="nav-link"
+          href="/configuracoes"
+        >
+          <span
+            class="nav-icon"
+            aria-hidden="true"
+          >
+            ⚙
+          </span>
+
+          <span>Configurações</span>
+        </a>
+
+        <a
+          class="nav-link"
+          href="/pagamentos"
+        >
+          <span
+            class="nav-icon"
+            aria-hidden="true"
+          >
+            💳
+          </span>
+
+          <span>Pagamentos</span>
+        </a>
+      </nav>
+
+      <button
+        type="button"
+        class="nav-link nav-logout"
+        id="btnLogout"
+      >
+        <span
+          class="nav-icon"
+          aria-hidden="true"
+        >
+          ⏻
+        </span>
+
+        <span>Sair</span>
+      </button>
+    </aside>
+
+    <main class="main">
+      <div class="page-container">
+        <header class="page-header">
+          <div>
+            <span class="page-kicker">
+              Área do cliente
+            </span>
+
+            <h1>
+              Meus agendamentos
+            </h1>
+
+            <p>
+              Consulte seus horários, veja os detalhes
+              dos atendimentos e reagende ou cancele
+              seus próximos horários.
+            </p>
+          </div>
+
+          <a
+            href="/cliente-agendamento"
+            class="btn btn-gold"
+          >
+            + Novo agendamento
+          </a>
+        </header>
+
+        <div
+          id="mensagemAgendamentos"
+          class="message"
+          role="status"
+          aria-live="polite"
+        >
+          Carregando seus agendamentos...
+        </div>
+
+        <section class="grid grid-3">
+          <article class="card">
+            <span class="page-kicker">
+              Total
+            </span>
+
+            <h2
+              class="section-title"
+              id="totalAgendamentos"
+            >
+              0
+            </h2>
+
+            <p class="section-subtitle">
+              Agendamentos encontrados.
+            </p>
+          </article>
+
+          <article class="card">
+            <span class="page-kicker">
+              Próximo
+            </span>
+
+            <h2
+              class="section-title"
+              id="proximoAgendamento"
+            >
+              Nenhum
+            </h2>
+
+            <p class="section-subtitle">
+              Seu próximo atendimento.
+            </p>
+          </article>
+
+          <article class="card">
+            <span class="page-kicker">
+              Concluídos
+            </span>
+
+            <h2
+              class="section-title"
+              id="totalConcluidos"
+            >
+              0
+            </h2>
+
+            <p class="section-subtitle">
+              Atendimentos concluídos.
+            </p>
+          </article>
+        </section>
+
+        <section
+          class="card"
+          style="margin-top: 18px;"
+        >
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-end;
+              gap: 18px;
+              margin-bottom: 20px;
+            "
+          >
+            <div>
+              <span class="page-kicker">
+                Histórico
+              </span>
+
+              <h2 class="section-title">
+                Seus atendimentos
+              </h2>
+
+              <p class="section-subtitle">
+                Gerencie apenas os seus próprios
+                agendamentos.
+              </p>
+            </div>
+
+            <div class="field">
+              <label for="filtroStatus">
+                Status
+              </label>
+
+              <select id="filtroStatus">
+                <option value="TODOS">
+                  Todos
+                </option>
+
+                <option value="AGENDADO">
+                  Agendados
+                </option>
+
+                <option value="CONCLUIDO">
+                  Concluídos
+                </option>
+
+                <option value="CANCELADO">
+                  Cancelados
+                </option>
+
+                <option value="FALTOU">
+                  Faltas
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div
+            id="listaAgendamentos"
+            class="data-list"
+          ></div>
+        </section>
+      </div>
+    </main>
+
+    <div
+      id="modalDetalhes"
+      class="modal-overlay"
+      aria-hidden="true"
+    >
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitulo"
+      >
+        <div class="modal-head">
+          <div>
+            <span class="page-kicker">
+              Área do cliente
+            </span>
+
+            <h2 id="modalTitulo">
+              Agendamento
+            </h2>
+          </div>
+
+          <button
+            type="button"
+            class="modal-close"
+            id="btnFecharModal"
+            aria-label="Fechar"
+          >
+            ×
+          </button>
+        </div>
+
+        <div
+          id="modalConteudo"
+          class="modal-body"
+        ></div>
+
+        <div
+          id="modalReagendamento"
+          class="modal-body"
+          style="display: none;"
+        >
+          <div style="margin-bottom: 18px;">
+            <span class="page-kicker">
+              Reagendamento
+            </span>
+
+            <h3 class="section-title">
+              Escolha um novo horário
+            </h3>
+
+            <p class="section-subtitle">
+              O serviço e o valor do atendimento
+              permanecem os mesmos.
+            </p>
+          </div>
+
+          <form
+            id="formReagendamento"
+          >
+            <div class="form-grid">
+              <div class="field field-full">
+                <label for="reagendamentoServico">
+                  Serviço
+                </label>
+
+                <input
+                  id="reagendamentoServico"
+                  type="text"
+                  readonly
+                />
+              </div>
+
+              <div class="field">
+                <label for="reagendamentoData">
+                  Nova data
+                </label>
+
+                <input
+                  id="reagendamentoData"
+                  type="date"
+                  required
+                />
+              </div>
+
+              <div class="field">
+                <label for="reagendamentoBarbeiro">
+                  Barbeiro
+                </label>
+
+                <select
+                  id="reagendamentoBarbeiro"
+                  required
+                >
+                  <option value="">
+                    Carregando barbeiros...
+                  </option>
+                </select>
+              </div>
+
+              <div class="field field-full">
+                <label for="reagendamentoHorario">
+                  Novo horário
+                </label>
+
+                <select
+                  id="reagendamentoHorario"
+                  required
+                  disabled
+                >
+                  <option value="">
+                    Selecione a data e o barbeiro.
+                  </option>
+                </select>
+              </div>
+
+              <div
+                id="mensagemReagendamento"
+                class="message"
+                style="display: none; grid-column: 1 / -1;"
+                role="status"
+                aria-live="polite"
+              ></div>
+            </div>
+
+            <div class="actions">
+              <button
+                type="button"
+                class="btn btn-outline"
+                id="btnVoltarDetalhes"
+              >
+                Voltar
+              </button>
+
+              <button
+                type="submit"
+                class="btn btn-gold"
+                id="btnConfirmarReagendamento"
+              >
+                Confirmar reagendamento
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div
+          id="modalAcoes"
+          class="modal-actions"
+        >
+          <button
+            type="button"
+            class="btn btn-outline"
+            id="btnFecharDetalhes"
+          >
+            Fechar
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-outline"
+            id="btnReagendarAgendamento"
+          >
+            Reagendar
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-danger"
+            id="btnCancelarAgendamento"
+          >
+            Cancelar agendamento
+          </button>
+        </div>
+      </div>
+    </div>
+
+   <script src="/html_site/js/api.js"></script>
+<script src="/html_site/js/cliente-portal.js"></script>
+<script src="/html_site/js/meus-agendamentos.js"></script>
+<script src="/html_site/js/teste-agendamentos.js"></script>
   </body>
-</html>  
+</html>
+

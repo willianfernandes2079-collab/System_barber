@@ -280,10 +280,21 @@ async function atualizar(req, res) {
     }
   }
 
+  const dadosAtualizacao = {
+    ...req.body,
+  };
+
+  if (
+    req.user.cargo !== "ADMIN" &&
+    req.user.cargo !== "GERENTE"
+  ) {
+    delete dadosAtualizacao.ativo;
+  }
+
   const cliente =
     await clientService.atualizarCliente(
       id,
-      req.body,
+      dadosAtualizacao,
       req.user.barbearia_id,
     );
 

@@ -11,10 +11,7 @@ const FORMAS_PAGAMENTO_VALIDAS = [
 
 function validarBarbeariaId(barbeariaId) {
   if (!barbeariaId) {
-    throw new AppError(
-      "Usuário não está vinculado a uma barbearia.",
-      403,
-    );
+    throw new AppError("Usúario não está vinculado á uma barbearia.", 403);
   }
 
   return barbeariaId;
@@ -40,11 +37,7 @@ function sanitizarComissao(comissao) {
   };
 }
 
-function calcularIntervalo(
-  periodo,
-  data_inicio,
-  data_fim,
-) {
+function calcularIntervalo(periodo, data_inicio, data_fim) {
   const agora = new Date();
 
   let inicio;
@@ -80,31 +73,15 @@ function calcularIntervalo(
       break;
 
     case "mes_atual":
-      inicio = new Date(
-        agora.getFullYear(),
-        agora.getMonth(),
-        1,
-      );
+      inicio = new Date(agora.getFullYear(), agora.getMonth(), 1);
       inicio.setHours(0, 0, 0, 0);
       break;
 
     case "mes_anterior":
-      inicio = new Date(
-        agora.getFullYear(),
-        agora.getMonth() - 1,
-        1,
-      );
+      inicio = new Date(agora.getFullYear(), agora.getMonth() - 1, 1);
       inicio.setHours(0, 0, 0, 0);
 
-      fim = new Date(
-        agora.getFullYear(),
-        agora.getMonth(),
-        0,
-        23,
-        59,
-        59,
-        999,
-      );
+      fim = new Date(agora.getFullYear(), agora.getMonth(), 0, 23, 59, 59, 999);
       break;
 
     default:
@@ -115,28 +92,18 @@ function calcularIntervalo(
         fim = new Date(data_fim);
         fim.setHours(23, 59, 59, 999);
       } else {
-        inicio = new Date(
-          agora.getFullYear(),
-          agora.getMonth(),
-          1,
-        );
+        inicio = new Date(agora.getFullYear(), agora.getMonth(), 1);
         inicio.setHours(0, 0, 0, 0);
       }
   }
 
-  if (
-    isNaN(inicio.getTime()) ||
-    isNaN(fim.getTime())
-  ) {
-    throw new AppError(
-      "Período de datas inválido.",
-      422,
-    );
+  if (isNaN(inicio.getTime()) || isNaN(fim.getTime())) {
+    throw new AppError("Período de datas inválido.", 422);
   }
 
   if (inicio > fim) {
     throw new AppError(
-      "A data inicial não pode ser posterior à data final.",
+      "A data inicial não pode ser posterior á  data final.",
       422,
     );
   }
@@ -151,178 +118,132 @@ async function gerarComissao(
   agendamento,
   valorServico,
   barbeariaId,
+  prismaClient = prisma,
 ) {
-  barbeariaId =
-    validarBarbeariaId(barbeariaId);
+  barbeariaId = validarBarbeariaId(barbeariaId);
 
-  const servico =
-    agendamento.servicos;
+  const servico = agendamento.servicos;
 
-  let percentual =
-    servico?.percentual_comissao;
+  let percentual = servico?.percentual_comissao;
 
-  if (
-    percentual === null ||
-    percentual === undefined
-  ) {
-    const configuracao =
-      await prisma.configuracao.findFirst({
-        where: {
-          barbearia_id: barbeariaId,
-        },
-      });
+  if (percentual === null || percentual === undefined) {
+    const configuracao = await prismaClient.configuracao.findFirst({
+      where: {
+        barbearia_id: barbeariaId,
+      },
+    });
 
-    percentual = configuracao
-      ? Number(
-          configuracao.comissao_padrao,
-        )
-      : 40;
+    percentual = configuracao ? Number(configuracao.comissao_padrao) : 40;
   } else {
     percentual = Number(percentual);
   }
 
-  const valorComissao = Number(
-    (
-      valorServico *
-      (percentual / 100)
-    ).toFixed(2),
-  );
+  const valorComissao = Number((valorServico * (percentual / 100)).toFixed(2));
 
-  const comissao =
-    await prisma.comissao.upsert({
-      where: {
-        agendamento_id:
-          agendamento.id,
-      },
+  const comissao = await prismaClient.comissao.upsert({
+    where: {
+      agendamento_id: agendamento.id,
+    },
 
-      update: {
-        barbeiro_id:
-          agendamento.barbeiro_id,
-        valor_servico:
-          valorServico,
-        percentual,
-        valor_comissao:
-          valorComissao,
-        barbearia_id:
-          barbeariaId,
-      },
+    update: {
+      barbeiro_id: agendamento.barbeiro_id,
+      valor_servico: valorServico,
+      percentual,
+      valor_comissao: valorComissao,
+      barbearia_id: barbeariaId,
+    },
 
-      create: {
-        barbeiro_id:
-          agendamento.barbeiro_id,
-        agendamento_id:
-          agendamento.id,
-        valor_servico:
-          valorServico,
-        percentual,
-        valor_comissao:
-          valorComissao,
-        status: "PENDENTE",
-        barbearia_id:
-          barbeariaId,
-      },
-    });
+    create: {
+      barbeiro_id: agendamento.barbeiro_id,
+      agendamento_id: agendamento.id,
+      valor_servico: valorServico,
+      percentual,
+      valor_comissao: valorComissao,
+      status: "PENDENTE",
+      barbearia_id: barbeariaId,
+    },
+  });
 
   return sanitizarComissao(comissao);
 }
 
-async function listarAgendamentosParaPagamento(
-  barbeariaId,
-) {
-  barbeariaId =
-    validarBarbeariaId(barbeariaId);
+async function listarAgendamentosParaPagamento(barbeariaId) {
+  barbeariaId = validarBarbeariaId(barbeariaId);
 
-  const agendamentos =
-    await prisma.agendamentos.findMany({
-      where: {
-        barbearia_id:
-          barbeariaId,
+  const agendamentos = await prisma.agendamentos.findMany({
+    where: {
+      barbearia_id: barbeariaId,
 
-        status: {
-          notIn: [
-            "CANCELADO",
-            "FINALIZADO",
-          ],
+      status: {
+        notIn: ["CANCELADO", "FINALIZADO"],
+      },
+
+      pagamento: null,
+    },
+
+    orderBy: {
+      horario_inicio: "asc",
+    },
+
+    select: {
+      id: true,
+      status: true,
+      horario_inicio: true,
+      valor: true,
+
+      clientes: {
+        select: {
+          id: true,
+          nome: true,
         },
       },
 
-      orderBy: {
-        horario_inicio: "asc",
-      },
-
-      select: {
-        id: true,
-        status: true,
-        horario_inicio: true,
-        valor: true,
-
-        clientes: {
-          select: {
-            id: true,
-            nome: true,
-          },
-        },
-
-        barbeiros: {
-          select: {
-            id: true,
-            nome: true,
-          },
-        },
-
-        servicos: {
-          select: {
-            id: true,
-            nome: true,
-          },
+      barbeiros: {
+        select: {
+          id: true,
+          nome: true,
         },
       },
-    });
 
-  return agendamentos.map(
-    (agendamento) => ({
-      id: agendamento.id,
+      servicos: {
+        select: {
+          id: true,
+          nome: true,
+        },
+      },
+    },
+  });
 
-      status: agendamento.status,
+  return agendamentos.map((agendamento) => ({
+    id: agendamento.id,
 
-      horario_inicio:
-        agendamento.horario_inicio,
+    status: agendamento.status,
 
-      valor: Number(
-        agendamento.valor,
-      ),
+    horario_inicio: agendamento.horario_inicio,
 
-      clientes:
-        agendamento.clientes
-          ? {
-              id:
-                agendamento.clientes.id,
-              nome:
-                agendamento.clientes.nome,
-            }
-          : null,
+    valor: Number(agendamento.valor),
 
-      barbeiros:
-        agendamento.barbeiros
-          ? {
-              id:
-                agendamento.barbeiros.id,
-              nome:
-                agendamento.barbeiros.nome,
-            }
-          : null,
+    clientes: agendamento.clientes
+      ? {
+          id: agendamento.clientes.id,
+          nome: agendamento.clientes.nome,
+        }
+      : null,
 
-      servicos:
-        agendamento.servicos
-          ? {
-              id:
-                agendamento.servicos.id,
-              nome:
-                agendamento.servicos.nome,
-            }
-          : null,
-    }),
-  );
+    barbeiros: agendamento.barbeiros
+      ? {
+          id: agendamento.barbeiros.id,
+          nome: agendamento.barbeiros.nome,
+        }
+      : null,
+
+    servicos: agendamento.servicos
+      ? {
+          id: agendamento.servicos.id,
+          nome: agendamento.servicos.nome,
+        }
+      : null,
+  }));
 }
 
 async function registrarPagamento({
@@ -332,113 +253,65 @@ async function registrarPagamento({
   observacoes,
   barbeariaId,
 }) {
-  barbeariaId =
-    validarBarbeariaId(
-      barbeariaId,
-    );
+  barbeariaId = validarBarbeariaId(barbeariaId);
 
-  if (
-    !FORMAS_PAGAMENTO_VALIDAS.includes(
-      forma_pagamento,
-    )
-  ) {
+  if (!FORMAS_PAGAMENTO_VALIDAS.includes(forma_pagamento)) {
     throw new AppError(
       `Forma de pagamento inválida. Use uma de: ${FORMAS_PAGAMENTO_VALIDAS.join(", ")}.`,
       422,
     );
   }
 
-  const agendamento =
-    await prisma.agendamentos.findFirst({
-      where: {
-        id: agendamento_id,
-        barbearia_id:
-          barbeariaId,
-      },
-      include: {
-        clientes: true,
-        barbeiros: true,
-        servicos: true,
-        assinatura_plano: true,
-      },
-    });
+  const agendamento = await prisma.agendamentos.findFirst({
+    where: {
+      id: agendamento_id,
+      barbearia_id: barbeariaId,
+    },
+    include: {
+      clientes: true,
+      barbeiros: true,
+      servicos: true,
+      assinatura_plano: true,
+    },
+  });
 
   if (!agendamento) {
-    throw new AppError(
-      "Agendamento não encontrado.",
-      404,
-    );
+    throw new AppError("Agendamento não encontrado.", 404);
   }
 
-  if (
-    agendamento.status ===
-    "CANCELADO"
-  ) {
+  if (agendamento.status === "CANCELADO") {
     throw new AppError(
       "Não é possível registrar pagamento de um agendamento cancelado.",
       409,
     );
   }
 
-  const pagamentoExistente =
-    await prisma.pagamento.findFirst({
-      where: {
-        agendamento_id,
-        barbearia_id:
-          barbeariaId,
-      },
-    });
+  const pagamentoExistente = await prisma.pagamento.findFirst({
+    where: {
+      agendamento_id,
+      barbearia_id: barbeariaId,
+    },
+  });
 
   if (pagamentoExistente) {
-    throw new AppError(
-      "Este agendamento já tem um pagamento registrado.",
-      409,
-    );
+    throw new AppError("Este agendamento já tem um pagamento registrado.", 409);
   }
 
-  const valorAgendamento =
-    Number(
-      agendamento.valor,
-    );
+  const valorAgendamento = Number(agendamento.valor);
 
-  if (
-    !Number.isFinite(
-      valorAgendamento,
-    ) ||
-    valorAgendamento < 0
-  ) {
-    throw new AppError(
-      "O valor do agendamento é inválido.",
-      422,
-    );
+  if (!Number.isFinite(valorAgendamento) || valorAgendamento < 0) {
+    throw new AppError("O valor do agendamento é inválido.", 422);
   }
 
-  if (
-    valor !== undefined &&
-    valor !== null
-  ) {
-    const valorInformado =
-      Number(valor);
+  if (valor !== undefined && valor !== null) {
+    const valorInformado = Number(valor);
 
-    if (
-      !Number.isFinite(
-        valorInformado,
-      ) ||
-      valorInformado < 0
-    ) {
-      throw new AppError(
-        "Valor de pagamento inválido.",
-        422,
-      );
+    if (!Number.isFinite(valorInformado) || valorInformado < 0) {
+      throw new AppError("Valor de pagamento inválido.", 422);
     }
 
     if (
-      Number(
-        valorInformado.toFixed(2),
-      ) !==
-      Number(
-        valorAgendamento.toFixed(2),
-      )
+      Number(valorInformado.toFixed(2)) !== Number(valorAgendamento.toFixed(2))
     ) {
       throw new AppError(
         "O valor do pagamento deve corresponder ao valor do agendamento.",
@@ -447,72 +320,98 @@ async function registrarPagamento({
     }
   }
 
-  const valorFinal =
-    valorAgendamento;
+  const valorFinal = valorAgendamento;
 
   let pagamento;
 
   try {
-    pagamento =
-      await prisma.pagamento.create({
+    pagamento = await prisma.$transaction(async (tx) => {
+      let novoPagamento;
+
+      try {
+        novoPagamento = await tx.pagamento.create({
+          data: {
+            id: require("crypto").randomUUID(),
+
+            agendamento_id: agendamento.id,
+
+            cliente_id: agendamento.cliente_id,
+
+            valor: valorFinal,
+
+            forma_pagamento,
+
+            status: "PAGO",
+
+            data_pagamento: new Date(),
+
+            observacoes: observacoes || null,
+
+            barbearia_id: barbeariaId,
+          },
+
+          include: {
+            agendamentos: {
+              include: {
+                clientes: true,
+                barbeiros: true,
+                servicos: true,
+              },
+            },
+
+            clientes: true,
+          },
+        });
+      } catch (erro) {
+        if (erro?.code === "P2002") {
+          throw new AppError(
+            "Este agendamento já tem um pagamento registrado.",
+            409,
+          );
+        }
+
+        throw erro;
+      }
+
+      await gerarComissao(agendamento, valorFinal, barbeariaId, tx);
+
+      await tx.movimentacaoFinanceira.create({
         data: {
-          id: require("crypto").randomUUID(),
+          tipo: "RECEITA",
 
-          agendamento_id:
-            agendamento.id,
+          categoria: "SERVICO",
 
-          cliente_id:
-            agendamento.cliente_id,
+          descricao: `Pagamento do agendamento ${agendamento.id}`,
 
-          valor:
-            valorFinal,
+          valor: valorFinal,
 
           forma_pagamento,
 
-          status: "PAGO",
+          data: novoPagamento.data_pagamento,
 
-          data_pagamento:
-            new Date(),
+          status: "CONFIRMADA",
 
-          observacoes:
-            observacoes || null,
+          observacoes: observacoes || null,
 
-          barbearia_id:
-            barbeariaId,
-        },
+          usuario_id: null,
 
-        include: {
-          agendamentos: {
-            include: {
-              clientes: true,
-              barbeiros: true,
-              servicos: true,
-            },
-          },
+          cliente_id: agendamento.cliente_id,
 
-          clientes: true,
+          barbeiro_id: agendamento.barbeiro_id,
+
+          pagamento_id: novoPagamento.id,
+
+          barbearia_id: barbeariaId,
         },
       });
-  } catch (erro) {
-    if (erro?.code === "P2002") {
-      throw new AppError(
-        "Este agendamento já tem um pagamento registrado.",
-        409,
-      );
-    }
 
+      return novoPagamento;
+    });
+  } catch (erro) {
     throw erro;
   }
 
-  await gerarComissao(
-    agendamento,
-    valorFinal,
-    barbeariaId,
-  );
-
-  return sanitizarPagamento(
-    pagamento,
-  );
+  return sanitizarPagamento(pagamento);
 }
 
 async function listarPagamentos({
@@ -523,184 +422,110 @@ async function listarPagamentos({
   forma_pagamento,
   barbeariaId,
 } = {}) {
-  barbeariaId =
-    validarBarbeariaId(
-      barbeariaId,
-    );
+  barbeariaId = validarBarbeariaId(barbeariaId);
 
-  const paginaNumerica =
-    Math.max(
-      Number(pagina) || 1,
-      1,
-    );
+  const paginaNumerica = Math.max(Number(pagina) || 1, 1);
 
-  const limiteNumerico =
-    Math.min(
-      Math.max(
-        Number(limite) || 20,
-        1,
-      ),
-      100,
-    );
+  const limiteNumerico = Math.min(Math.max(Number(limite) || 20, 1), 100);
 
-  const skip =
-    (paginaNumerica - 1) *
-    limiteNumerico;
+  const skip = (paginaNumerica - 1) * limiteNumerico;
 
   const where = {
-    barbearia_id:
-      barbeariaId,
+    barbearia_id: barbeariaId,
   };
 
   if (forma_pagamento) {
-    where.forma_pagamento =
-      forma_pagamento;
+    where.forma_pagamento = forma_pagamento;
   }
 
-  if (
-    data_inicio ||
-    data_fim
-  ) {
+  if (data_inicio || data_fim) {
     where.data_pagamento = {};
 
     if (data_inicio) {
-      const inicio =
-        new Date(data_inicio);
+      const inicio = new Date(data_inicio);
 
-      if (
-        isNaN(
-          inicio.getTime(),
-        )
-      ) {
-        throw new AppError(
-          "Data inicial inválida.",
-          422,
-        );
+      if (isNaN(inicio.getTime())) {
+        throw new AppError("Data inicial inválida.", 422);
       }
 
-      inicio.setHours(
-        0,
-        0,
-        0,
-        0,
-      );
+      inicio.setHours(0, 0, 0, 0);
 
-      where.data_pagamento.gte =
-        inicio;
+      where.data_pagamento.gte = inicio;
     }
 
     if (data_fim) {
-      const fim =
-        new Date(data_fim);
+      const fim = new Date(data_fim);
 
-      if (
-        isNaN(
-          fim.getTime(),
-        )
-      ) {
-        throw new AppError(
-          "Data final inválida.",
-          422,
-        );
+      if (isNaN(fim.getTime())) {
+        throw new AppError("Data final inválida.", 422);
       }
 
-      fim.setHours(
-        23,
-        59,
-        59,
-        999,
-      );
+      fim.setHours(23, 59, 59, 999);
 
-      where.data_pagamento.lte =
-        fim;
+      where.data_pagamento.lte = fim;
     }
 
     if (
       where.data_pagamento.gte &&
       where.data_pagamento.lte &&
-      where.data_pagamento.gte >
-        where.data_pagamento.lte
+      where.data_pagamento.gte > where.data_pagamento.lte
     ) {
       throw new AppError(
-        "A data inicial não pode ser posterior à data final.",
+        "A data inicial não pode ser posterior á data final.",
         422,
       );
     }
   }
 
-  const [
-    pagamentos,
-    total,
-  ] =
-    await prisma.$transaction([
-      prisma.pagamento.findMany({
-        where,
+  const [pagamentos, total] = await prisma.$transaction([
+    prisma.pagamento.findMany({
+      where,
 
-        orderBy: {
-          data_pagamento:
-            "desc",
-        },
+      orderBy: {
+        data_pagamento: "desc",
+      },
 
-        skip,
-        take: limiteNumerico,
+      skip,
+      take: limiteNumerico,
 
-        include: {
-          clientes: true,
+      include: {
+        clientes: true,
 
-          agendamentos: {
-            include: {
-              barbeiros: true,
-              servicos: true,
-            },
+        agendamentos: {
+          include: {
+            barbeiros: true,
+            servicos: true,
           },
         },
-      }),
+      },
+    }),
 
-      prisma.pagamento.count({
-        where,
-      }),
-    ]);
+    prisma.pagamento.count({
+      where,
+    }),
+  ]);
 
-  const detalhados =
-    pagamentos.map(
-      (pagamento) => ({
-        ...sanitizarPagamento(
-          pagamento,
-        ),
+  const detalhados = pagamentos.map((pagamento) => ({
+    ...sanitizarPagamento(pagamento),
 
-        cliente:
-          pagamento.clientes,
+    cliente: pagamento.clientes,
 
-        barbeiro:
-          pagamento.agendamentos
-            ?.barbeiros ||
-          null,
+    barbeiro: pagamento.agendamentos?.barbeiros || null,
 
-        servico:
-          pagamento.agendamentos
-            ?.servicos ||
-          null,
-      }),
-    );
+    servico: pagamento.agendamentos?.servicos || null,
+  }));
 
   return {
-    pagamentos:
-      detalhados,
+    pagamentos: detalhados,
 
     paginacao: {
-      pagina:
-        paginaNumerica,
+      pagina: paginaNumerica,
 
-      limite:
-        limiteNumerico,
+      limite: limiteNumerico,
 
       total,
 
-      total_paginas:
-        Math.ceil(
-          total /
-            limiteNumerico,
-        ),
+      total_paginas: Math.ceil(total / limiteNumerico),
     },
   };
 }
@@ -711,112 +536,63 @@ async function resumoFinanceiro({
   data_fim,
   barbeariaId,
 } = {}) {
-  barbeariaId =
-    validarBarbeariaId(
-      barbeariaId,
-    );
+  barbeariaId = validarBarbeariaId(barbeariaId);
 
-  const {
-    inicio,
-    fim,
-  } =
-    calcularIntervalo(
-      periodo,
-      data_inicio,
-      data_fim,
-    );
+  const { inicio, fim } = calcularIntervalo(periodo, data_inicio, data_fim);
 
-  const pagamentos =
-    await prisma.pagamento.findMany({
-      where: {
-        barbearia_id:
-          barbeariaId,
+  const pagamentos = await prisma.pagamento.findMany({
+    where: {
+      barbearia_id: barbeariaId,
 
-        data_pagamento: {
-          gte: inicio,
-          lte: fim,
-        },
-
-        status: "PAGO",
+      data_pagamento: {
+        gte: inicio,
+        lte: fim,
       },
-    });
 
-  const faturamento =
-    pagamentos.reduce(
-      (soma, pagamento) =>
-        soma +
-        Number(
-          pagamento.valor,
-        ),
-      0,
-    );
+      status: "PAGO",
+    },
+  });
 
-  const ticketMedio =
-    pagamentos.length
-      ? faturamento /
-        pagamentos.length
-      : 0;
+  const faturamento = pagamentos.reduce(
+    (soma, pagamento) => soma + Number(pagamento.valor),
+    0,
+  );
+
+  const ticketMedio = pagamentos.length ? faturamento / pagamentos.length : 0;
 
   const porFormaMap = {};
 
-  for (
-    const pagamento of pagamentos
-  ) {
-    const forma =
-      pagamento.forma_pagamento;
+  for (const pagamento of pagamentos) {
+    const forma = pagamento.forma_pagamento;
 
-    porFormaMap[forma] =
-      (porFormaMap[forma] || 0) +
-      Number(
-        pagamento.valor,
-      );
+    porFormaMap[forma] = (porFormaMap[forma] || 0) + Number(pagamento.valor);
   }
 
-  const porForma =
-    Object.entries(
-      porFormaMap,
-    ).map(
-      ([
-        forma_pagamento,
-        valor,
-      ]) => ({
-        forma_pagamento,
-        valor,
-        percentual:
-          faturamento
-            ? Number(
-                (
-                  (valor /
-                    faturamento) *
-                  100
-                ).toFixed(1),
-              )
-            : 0,
-      }),
-    );
+  const porForma = Object.entries(porFormaMap).map(
+    ([forma_pagamento, valor]) => ({
+      forma_pagamento,
+      valor,
+      percentual: faturamento
+        ? Number(((valor / faturamento) * 100).toFixed(1))
+        : 0,
+    }),
+  );
 
-  const comissoes =
-    await prisma.comissao.findMany({
-      where: {
-        barbearia_id:
-          barbeariaId,
+  const comissoes = await prisma.comissao.findMany({
+    where: {
+      barbearia_id: barbeariaId,
 
-        data: {
-          gte: inicio,
-          lte: fim,
-        },
+      data: {
+        gte: inicio,
+        lte: fim,
       },
-    });
+    },
+  });
 
-  const comissoesTotal =
-    comissoes.reduce(
-      (soma, comissao) =>
-        soma +
-        Number(
-          comissao.valor_comissao,
-        ),
-      0,
-    );
+  const comissoesTotal = comissoes.reduce(
+    (soma, comissao) => soma + Number(comissao.valor_comissao),
+    0,
+  );
 
   return {
     periodo: {
@@ -826,19 +602,13 @@ async function resumoFinanceiro({
 
     faturamento,
 
-    ticket_medio:
-      Number(
-        ticketMedio.toFixed(2),
-      ),
+    ticket_medio: Number(ticketMedio.toFixed(2)),
 
-    total_atendimentos:
-      pagamentos.length,
+    total_atendimentos: pagamentos.length,
 
-    comissoes_total:
-      comissoesTotal,
+    comissoes_total: comissoesTotal,
 
-    por_forma_pagamento:
-      porForma,
+    por_forma_pagamento: porForma,
   };
 }
 
@@ -849,102 +619,59 @@ async function listarComissoes({
   data_fim,
   barbeariaId,
 } = {}) {
-  barbeariaId =
-    validarBarbeariaId(
-      barbeariaId,
-    );
+  barbeariaId = validarBarbeariaId(barbeariaId);
 
   const where = {
-    barbearia_id:
-      barbeariaId,
+    barbearia_id: barbeariaId,
   };
 
   if (barbeiro_id) {
-    const barbeiro =
-      await prisma.barbeiros.findFirst({
-        where: {
-          id: barbeiro_id,
-          barbearia_id:
-            barbeariaId,
-        },
-      });
+    const barbeiro = await prisma.barbeiros.findFirst({
+      where: {
+        id: barbeiro_id,
+        barbearia_id: barbeariaId,
+      },
+    });
 
     if (!barbeiro) {
       return [];
     }
 
-    where.barbeiro_id =
-      barbeiro_id;
+    where.barbeiro_id = barbeiro_id;
   }
 
   if (status) {
     where.status = status;
   }
 
-  if (
-    data_inicio ||
-    data_fim
-  ) {
+  if (data_inicio || data_fim) {
     where.data = {};
 
     if (data_inicio) {
-      const inicio =
-        new Date(data_inicio);
+      const inicio = new Date(data_inicio);
 
-      if (
-        isNaN(
-          inicio.getTime(),
-        )
-      ) {
-        throw new AppError(
-          "Data inicial inválida.",
-          422,
-        );
+      if (isNaN(inicio.getTime())) {
+        throw new AppError("Data inicial inválida.", 422);
       }
 
-      inicio.setHours(
-        0,
-        0,
-        0,
-        0,
-      );
+      inicio.setHours(0, 0, 0, 0);
 
-      where.data.gte =
-        inicio;
+      where.data.gte = inicio;
     }
 
     if (data_fim) {
-      const fim =
-        new Date(data_fim);
+      const fim = new Date(data_fim);
 
-      if (
-        isNaN(
-          fim.getTime(),
-        )
-      ) {
-        throw new AppError(
-          "Data final inválida.",
-          422,
-        );
+      if (isNaN(fim.getTime())) {
+        throw new AppError("Data final inválida.", 422);
       }
 
-      fim.setHours(
-        23,
-        59,
-        59,
-        999,
-      );
+      fim.setHours(23, 59, 59, 999);
 
-      where.data.lte =
-        fim;
+      where.data.lte = fim;
     }
 
-    if (
-      where.data.gte &&
-      where.data.lte &&
-      where.data.gte >
-        where.data.lte
-    ) {
+    if (where.data.gte && where.data.lte && where.data.gte > where.data.lte) {
       throw new AppError(
         "A data inicial não pode ser posterior à data final.",
         422,
@@ -952,112 +679,81 @@ async function listarComissoes({
     }
   }
 
-  const comissoes =
-    await prisma.comissao.findMany({
-      where,
+  const comissoes = await prisma.comissao.findMany({
+    where,
 
-      orderBy: {
-        data: "desc",
+    orderBy: {
+      data: "desc",
+    },
+
+    include: {
+      barbeiros: {
+        select: {
+          id: true,
+          nome: true,
+        },
       },
 
-      include: {
-        barbeiros: {
-          select: {
-            id: true,
-            nome: true,
-          },
-        },
-
-        agendamentos: {
-          include: {
-            clientes: {
-              select: {
-                id: true,
-                nome: true,
-              },
+      agendamentos: {
+        include: {
+          clientes: {
+            select: {
+              id: true,
+              nome: true,
             },
+          },
 
-            servicos: {
-              select: {
-                id: true,
-                nome: true,
-              },
+          servicos: {
+            select: {
+              id: true,
+              nome: true,
             },
           },
         },
       },
-    });
+    },
+  });
 
-  return comissoes.map(
-    (comissao) => ({
-      ...sanitizarComissao(
-        comissao,
-      ),
+  return comissoes.map((comissao) => ({
+    ...sanitizarComissao(comissao),
 
-      barbeiro:
-        comissao.barbeiros,
+    barbeiro: comissao.barbeiros,
 
-      cliente:
-        comissao.agendamentos
-          ?.clientes ||
-        null,
+    cliente: comissao.agendamentos?.clientes || null,
 
-      servico:
-        comissao.agendamentos
-          ?.servicos ||
-        null,
-    }),
-  );
+    servico: comissao.agendamentos?.servicos || null,
+  }));
 }
 
-async function marcarComissaoPaga(
-  id,
-  barbeariaId,
-) {
-  barbeariaId =
-    validarBarbeariaId(
-      barbeariaId,
-    );
+async function marcarComissaoPaga(id, barbeariaId) {
+  barbeariaId = validarBarbeariaId(barbeariaId);
 
-  const comissao =
-    await prisma.comissao.findFirst({
-      where: {
-        id,
-        barbearia_id:
-          barbeariaId,
-      },
-    });
+  const comissao = await prisma.comissao.findFirst({
+    where: {
+      id,
+      barbearia_id: barbeariaId,
+    },
+  });
 
   if (!comissao) {
-    throw new AppError(
-      "Comissão não encontrada.",
-      404,
-    );
+    throw new AppError("Comissão não encontrada.", 404);
   }
 
-  const resultado =
-    await prisma.comissao.updateMany({
-      where: {
-        id,
-        barbearia_id:
-          barbeariaId,
-        status: "PENDENTE",
-      },
+  const resultado = await prisma.comissao.updateMany({
+    where: {
+      id,
+      barbearia_id: barbeariaId,
+      status: "PENDENTE",
+    },
 
-      data: {
-        status: "PAGA",
-      },
-    });
+    data: {
+      status: "PAGA",
+    },
+  });
 
   if (resultado.count !== 1) {
-    if (
-      comissao.status ===
-      "PAGA"
-    ) {
-      throw new AppError(
-        "Esta comissão já está marcada como paga.",
-        409,
-      );
+    if (comissao.status === "PAGA") {
+      throw new AppError("Esta comissão já está marcada como paga.", 409);
     }
 
     throw new AppError(
@@ -1066,18 +762,14 @@ async function marcarComissaoPaga(
     );
   }
 
-  const atualizada =
-    await prisma.comissao.findFirst({
-      where: {
-        id,
-        barbearia_id:
-          barbeariaId,
-      },
-    });
+  const atualizada = await prisma.comissao.findFirst({
+    where: {
+      id,
+      barbearia_id: barbeariaId,
+    },
+  });
 
-  return sanitizarComissao(
-    atualizada,
-  );
+  return sanitizarComissao(atualizada);
 }
 
 module.exports = {

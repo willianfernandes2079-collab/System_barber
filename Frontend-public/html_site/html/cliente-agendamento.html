@@ -23,7 +23,7 @@
           class="brand-badge"
           aria-hidden="true"
         >
-          <img src="/frontend-public/html/Imagem/Logo-MWsystem.jpeg" alt="Logo-MWsystem">
+          MW
         </div>
 
         <div class="brand-name">
@@ -51,7 +51,7 @@
 
         <a
           class="nav-link"
-          href="#"
+          href="/meus-agendamentos"
           id="linkMeusAgendamentos"
         >
           <span
@@ -66,7 +66,7 @@
 
         <a
           class="nav-link"
-          href="#"
+          href="/meu-perfil"
           id="linkMeuPerfil"
         >
           <span
@@ -81,7 +81,7 @@
 
         <a
           class="nav-link"
-          href="#"
+          href="/configuracoes"
           id="linkConfiguracoes"
         >
           <span
@@ -92,6 +92,21 @@
           </span>
 
           <span>Configurações</span>
+        </a>
+
+        <a
+          class="nav-link"
+          href="/pagamentos"
+          id="linkPagamentos"
+        >
+          <span
+            class="ic"
+            aria-hidden="true"
+          >
+            💳
+          </span>
+
+          <span>Pagamentos</span>
         </a>
       </nav>
 
@@ -246,7 +261,28 @@
     </main>
 
     <script
+      src="/html_site/js/api.js"
+    ></script>
+
+    <script
       src="/html_site/js/cliente-agendamento.js"
     ></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        document
+          .getElementById("btnMeusAgendamentos")
+          ?.addEventListener("click", () => {
+            window.location.href = "/meus-agendamentos";
+          });
+
+        document
+          .getElementById("btnMinhaConta")
+          ?.addEventListener("click", () => {
+            window.location.href = "/meu-perfil";
+          });
+      });
+    </script>
   </body>
 </html>
+

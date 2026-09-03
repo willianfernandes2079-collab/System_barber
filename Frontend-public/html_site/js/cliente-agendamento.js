@@ -1,145 +1,244 @@
+
 let clienteLogado = null;
 
 let barbeariaSelecionadaId = null;
 
-const nomeCliente = document.getElementById("nomeCliente");
+const nomeCliente =
+  document.getElementById("nomeCliente");
 
-const nomeConta = document.getElementById("nomeConta");
+const nomeConta =
+  document.getElementById("nomeConta");
 
-const emailConta = document.getElementById("emailConta");
+const emailConta =
+  document.getElementById("emailConta");
 
-const btnLogout = document.getElementById("btnLogout");
+const btnLogout =
+  document.getElementById("btnLogout");
 
-const btnLogin = document.getElementById("btnLogin");
+const btnLogin =
+  document.getElementById("btnLogin");
 
-const btnMeusAgendamentos = document.getElementById("btnMeusAgendamentos");
+const btnMeusAgendamentos =
+  document.getElementById(
+    "btnMeusAgendamentos",
+  );
 
-const btnMinhaConta = document.getElementById("btnMinhaConta");
+const btnMinhaConta =
+  document.getElementById("btnMinhaConta");
 
-const btnAgendarBarbearia = document.getElementById("btnAgendarBarbearia");
+const btnAgendarBarbearia =
+  document.getElementById(
+    "btnAgendarBarbearia",
+  );
 
-const linkMeusAgendamentos = document.getElementById("linkMeusAgendamentos");
+const linkMeusAgendamentos =
+  document.getElementById(
+    "linkMeusAgendamentos",
+  );
 
-const linkMeuPerfil = document.getElementById("linkMeuPerfil");
+const linkMeuPerfil =
+  document.getElementById(
+    "linkMeuPerfil",
+  );
 
-const linkConfiguracoes = document.getElementById("linkConfiguracoes");
+const linkConfiguracoes =
+  document.getElementById(
+    "linkConfiguracoes",
+  );
 
-const proximoAgendamento = document.getElementById("proximoAgendamento");
+const linkPagamentos =
+  document.getElementById(
+    "linkPagamentos",
+  );
 
-const nomeBarbearia = document.getElementById("nomeBarbearia");
+const proximoAgendamento =
+  document.getElementById(
+    "proximoAgendamento",
+  );
 
-const infoBarbearia = document.getElementById("infoBarbearia");
+const nomeBarbearia =
+  document.getElementById(
+    "nomeBarbearia",
+  );
 
-const barbeariasGrid = document.getElementById("barbeariasGrid");
+const infoBarbearia =
+  document.getElementById(
+    "infoBarbearia",
+  );
 
-const statusBarbearia = document.getElementById("statusBarbearia");
+const barbeariasGrid =
+  document.getElementById(
+    "barbeariasGrid",
+  );
+
+const statusBarbearia =
+  document.getElementById(
+    "statusBarbearia",
+  );
 
 function mostrarNomeCliente(usuario) {
-  const nome = usuario?.nome || "Visitante";
+  const nome =
+    usuario?.nome || "Visitante";
 
   if (nomeCliente) {
-    nomeCliente.textContent = nome;
+    nomeCliente.textContent =
+      nome;
   }
 
   if (nomeConta) {
-    nomeConta.textContent = nome;
+    nomeConta.textContent =
+      nome;
   }
 }
 
 async function carregarClienteLogado() {
   try {
-    const resposta = await fetch("/api/auth/me", {
-      method: "GET",
-      credentials: "include",
-    });
+    const resposta = await fetch(
+      "/api/auth/me",
+      {
+        method: "GET",
+        credentials: "include",
+      },
+    );
 
     if (!resposta.ok) {
       mostrarNomeCliente(null);
 
       if (emailConta) {
-        emailConta.textContent = "Faça login para acessar sua conta.";
+        emailConta.textContent =
+          "Faça login para acessar sua conta.";
       }
 
       return;
     }
 
-    const dados = await resposta.json();
+    const dados =
+      await resposta.json();
 
-    if (!dados?.success || !dados.data) {
+    if (
+      !dados?.success ||
+      !dados.data
+    ) {
       mostrarNomeCliente(null);
 
       return;
     }
 
-    const usuario = dados.data;
+    const usuario =
+      dados.data;
 
-    if (usuario.cargo !== "CLIENTE") {
+    if (
+      usuario.cargo !==
+      "CLIENTE"
+    ) {
       mostrarNomeCliente(null);
 
       return;
     }
 
-    clienteLogado = usuario;
+    clienteLogado =
+      usuario;
 
-    barbeariaSelecionadaId = usuario.barbearia_id || null;
+    barbeariaSelecionadaId =
+      usuario.barbearia_id ||
+      null;
 
-    mostrarNomeCliente(usuario);
+    mostrarNomeCliente(
+      usuario,
+    );
 
     if (emailConta) {
-      emailConta.textContent = usuario.email || "E-mail não informado.";
+      emailConta.textContent =
+        usuario.email ||
+        "E-mail não informado.";
     }
 
     if (btnLogin) {
-      btnLogin.textContent = "Minha conta";
+      btnLogin.textContent =
+        "Minha conta";
     }
   } catch (erro) {
-    console.error("Erro ao verificar usuário:", erro);
+    console.error(
+      "Erro ao verificar usuário:",
+      erro,
+    );
 
     mostrarNomeCliente(null);
   }
 }
 
 async function carregarProximoAgendamento() {
-  if (!proximoAgendamento || !clienteLogado) {
+  if (
+    !proximoAgendamento ||
+    !clienteLogado
+  ) {
     return;
   }
 
   try {
-    const resposta = await api.get("/agendamentos");
+    const resposta =
+      await api.get(
+        "/agendamentos",
+      );
 
-    if (!resposta?.success || !Array.isArray(resposta.data)) {
+    if (
+      !resposta?.success ||
+      !Array.isArray(
+        resposta.data,
+      )
+    ) {
       return;
     }
 
-    const agora = Date.now();
+    const agora =
+      Date.now();
 
-    const futuros = resposta.data
-      .filter((agendamento) => {
-        if (
-          ["CANCELADO", "CONCLUIDO", "FALTOU"].includes(
-            agendamento.status,
-          )
-        ) {
-          return false;
-        }
+    const futuros =
+      resposta.data
+        .filter((agendamento) => {
+          if (
+            [
+              "CANCELADO",
+              "CONCLUIDO",
+              "FALTOU",
+            ].includes(
+              agendamento.status,
+            )
+          ) {
+            return false;
+          }
 
-        if (!agendamento.horario_inicio) {
-          return false;
-        }
+          if (
+            !agendamento.horario_inicio
+          ) {
+            return false;
+          }
 
-        const timestamp = new Date(
-          agendamento.horario_inicio,
-        ).getTime();
+          const timestamp =
+            new Date(
+              agendamento.horario_inicio,
+            ).getTime();
 
-        return Number.isFinite(timestamp) && timestamp >= agora;
-      })
-      .sort(
-        (a, b) =>
-          new Date(a.horario_inicio).getTime() -
-          new Date(b.horario_inicio).getTime(),
-      );
+          return (
+            Number.isFinite(
+              timestamp,
+            ) &&
+            timestamp >=
+              agora
+          );
+        })
+        .sort(
+          (a, b) =>
+            new Date(
+              a.horario_inicio,
+            ).getTime() -
+            new Date(
+              b.horario_inicio,
+            ).getTime(),
+        );
 
-    const proximo = futuros[0];
+    const proximo =
+      futuros[0];
 
     if (!proximo) {
       proximoAgendamento.textContent =
@@ -148,36 +247,61 @@ async function carregarProximoAgendamento() {
       return;
     }
 
-    const data = new Date(proximo.horario_inicio);
+    const data =
+      new Date(
+        proximo.horario_inicio,
+      );
 
-    if (Number.isNaN(data.getTime())) {
+    if (
+      Number.isNaN(
+        data.getTime(),
+      )
+    ) {
       return;
     }
 
-    const dataFormatada = data.toLocaleDateString("pt-BR");
+    const dataFormatada =
+      data.toLocaleDateString(
+        "pt-BR",
+      );
 
-    const horarioFormatado = data.toLocaleTimeString("pt-BR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const horarioFormatado =
+      data.toLocaleTimeString(
+        "pt-BR",
+        {
+          hour: "2-digit",
+          minute: "2-digit",
+        },
+      );
 
-    const servico = proximo.servicos?.nome || "Serviço";
+    const servico =
+      proximo.servicos?.nome ||
+      "Serviço";
 
-    const barbeiro = proximo.barbeiros?.nome || "Barbeiro";
+    const barbeiro =
+      proximo.barbeiros?.nome ||
+      "Barbeiro";
 
     proximoAgendamento.textContent =
       `${dataFormatada} às ${horarioFormatado} • ${servico} • ${barbeiro}`;
   } catch (erro) {
-    console.error("Erro ao carregar próximo agendamento:", erro);
+    console.error(
+      "Erro ao carregar próximo agendamento:",
+      erro,
+    );
   }
 }
 
-function atualizarBarbeariaSelecionada(barbearia) {
+function atualizarBarbeariaSelecionada(
+  barbearia,
+) {
   if (!barbearia) {
-    barbeariaSelecionadaId = null;
+    barbeariaSelecionadaId =
+      null;
 
     if (nomeBarbearia) {
-      nomeBarbearia.textContent = "Nenhuma selecionada";
+      nomeBarbearia.textContent =
+        "Nenhuma selecionada";
     }
 
     if (infoBarbearia) {
@@ -186,20 +310,24 @@ function atualizarBarbeariaSelecionada(barbearia) {
     }
 
     if (statusBarbearia) {
-      statusBarbearia.textContent = "Nenhuma selecionada";
+      statusBarbearia.textContent =
+        "Nenhuma selecionada";
     }
 
     if (btnAgendarBarbearia) {
-      btnAgendarBarbearia.disabled = true;
+      btnAgendarBarbearia.disabled =
+        true;
     }
 
     return;
   }
 
-  barbeariaSelecionadaId = barbearia.id;
+  barbeariaSelecionadaId =
+    barbearia.id;
 
   if (nomeBarbearia) {
-    nomeBarbearia.textContent = barbearia.nome;
+    nomeBarbearia.textContent =
+      barbearia.nome;
   }
 
   if (infoBarbearia) {
@@ -208,33 +336,54 @@ function atualizarBarbeariaSelecionada(barbearia) {
   }
 
   if (statusBarbearia) {
-    statusBarbearia.textContent = "Selecionada";
+    statusBarbearia.textContent =
+      "Selecionada";
   }
 
   if (btnAgendarBarbearia) {
-    btnAgendarBarbearia.disabled = false;
+    btnAgendarBarbearia.disabled =
+      false;
   }
 }
 
-function renderizarBarbearias(barbearias) {
+function renderizarBarbearias(
+  barbearias,
+) {
   if (!barbeariasGrid) {
     return;
   }
 
-  barbeariasGrid.innerHTML = "";
+  barbeariasGrid.innerHTML =
+    "";
 
-  if (!Array.isArray(barbearias) || !barbearias.length) {
-    const card = document.createElement("article");
+  if (
+    !Array.isArray(
+      barbearias,
+    ) ||
+    !barbearias.length
+  ) {
+    const card =
+      document.createElement(
+        "article",
+      );
 
-    card.className = "shop-card";
+    card.className =
+      "shop-card";
 
     card.innerHTML = `
       <div class="shop-thumb">
-        <span class="shop-logo" aria-hidden="true">💈</span>
+        <span
+          class="shop-logo"
+          aria-hidden="true"
+        >
+          💈
+        </span>
       </div>
 
       <div class="shop-info">
-        <h4>Nenhuma barbearia disponível</h4>
+        <h4>
+          Nenhuma barbearia disponível
+        </h4>
 
         <p>
           Não encontramos vínculos ativos de barbearia para sua conta.
@@ -242,75 +391,126 @@ function renderizarBarbearias(barbearias) {
       </div>
     `;
 
-    barbeariasGrid.appendChild(card);
+    barbeariasGrid.appendChild(
+      card,
+    );
 
-    atualizarBarbeariaSelecionada(null);
+    atualizarBarbeariaSelecionada(
+      null,
+    );
 
     return;
   }
 
-  const barbeariaAtual = barbearias.find(
-    (barbearia) =>
-      barbearia.id === barbeariaSelecionadaId &&
-      barbearia.ativo === true,
+  const barbeariaAtual =
+    barbearias.find(
+      (barbearia) =>
+        barbearia.id ===
+          barbeariaSelecionadaId &&
+        barbearia.ativo ===
+          true,
+    );
+
+  atualizarBarbeariaSelecionada(
+    barbeariaAtual ||
+      null,
   );
 
-  atualizarBarbeariaSelecionada(barbeariaAtual || null);
+  barbearias.forEach(
+    (barbearia) => {
+      const card =
+        document.createElement(
+          "article",
+        );
 
-  barbearias.forEach((barbearia) => {
-    const card = document.createElement("article");
+      card.className =
+        "shop-card";
 
-    card.className = "shop-card";
+      const selecionada =
+        barbearia.id ===
+        barbeariaSelecionadaId;
 
-    const selecionada =
-      barbearia.id === barbeariaSelecionadaId;
+      card.innerHTML = `
+        <div class="shop-thumb">
+          <span
+            class="shop-logo"
+            aria-hidden="true"
+          >
+            💈
+          </span>
+        </div>
 
-    card.innerHTML = `
-      <div class="shop-thumb">
-        <span class="shop-logo" aria-hidden="true">💈</span>
-      </div>
+        <div class="shop-info">
+          <h4>
+            ${escapeHtml(
+              barbearia.nome ||
+                "Barbearia",
+            )}
+          </h4>
 
-      <div class="shop-info">
-        <h4>${escapeHtml(barbearia.nome || "Barbearia")}</h4>
+          <p>
+            ${
+              selecionada
+                ? "Barbearia atualmente selecionada."
+                : "Barbearia vinculada à sua conta."
+            }
+          </p>
 
-        <p>
-          ${
-            selecionada
-              ? "Barbearia atualmente selecionada."
-              : "Barbearia vinculada à sua conta."
-          }
-        </p>
+          <button
+            type="button"
+            class="btn-gold shop-button btnSelecionarBarbearia"
+            data-barbearia-id="${escapeHtml(
+              barbearia.id,
+            )}"
+            ${
+              selecionada
+                ? "disabled"
+                : ""
+            }
+          >
+            ${
+              selecionada
+                ? "Selecionada"
+                : "Selecionar"
+            }
+          </button>
+        </div>
+      `;
 
-        <button
-          type="button"
-          class="btn-gold shop-button btnSelecionarBarbearia"
-          data-barbearia-id="${escapeHtml(barbearia.id)}"
-          ${selecionada ? "disabled" : ""}
-        >
-          ${selecionada ? "Selecionada" : "Selecionar"}
-        </button>
-      </div>
-    `;
-
-    barbeariasGrid.appendChild(card);
-  });
+      barbeariasGrid.appendChild(
+        card,
+      );
+    },
+  );
 
   document
-    .querySelectorAll(".btnSelecionarBarbearia")
+    .querySelectorAll(
+      ".btnSelecionarBarbearia",
+    )
     .forEach((botao) => {
-      botao.addEventListener("click", async () => {
-        const barbeariaId =
-          botao.dataset.barbeariaId;
+      botao.addEventListener(
+        "click",
+        async () => {
+          const barbeariaId =
+            botao.dataset
+              .barbeariaId;
 
-        await selecionarBarbearia(barbeariaId);
-      });
+          await selecionarBarbearia(
+            barbeariaId,
+          );
+        },
+      );
     });
 }
 
 function escapeHtml(valor) {
-  const div = document.createElement("div");
+  const div =
+    document.createElement(
+      "div",
+    );
 
-  div.textContent = String(valor ?? "");
+  div.textContent =
+    String(valor ?? "");
 
   return div.innerHTML;
 }
@@ -321,15 +521,25 @@ async function carregarBarbeariaDoCliente() {
   }
 
   try {
-    const resposta = await api.get("/clientes/me");
+    const resposta =
+      await api.get(
+        "/clientes/me",
+      );
 
-    if (!resposta?.success || !resposta.data) {
+    if (
+      !resposta?.success ||
+      !resposta.data
+    ) {
       return;
     }
 
-    const cliente = resposta.data;
+    const cliente =
+      resposta.data;
 
-    renderizarBarbearias(cliente.barbearias || []);
+    renderizarBarbearias(
+      cliente.barbearias ||
+        [],
+    );
   } catch (erro) {
     console.error(
       "Erro ao carregar barbearias do cliente:",
@@ -338,8 +548,13 @@ async function carregarBarbeariaDoCliente() {
   }
 }
 
-async function selecionarBarbearia(barbeariaId) {
-  if (!barbeariaId || !clienteLogado) {
+async function selecionarBarbearia(
+  barbeariaId,
+) {
+  if (
+    !barbeariaId ||
+    !clienteLogado
+  ) {
     return;
   }
 
@@ -348,35 +563,45 @@ async function selecionarBarbearia(barbeariaId) {
       ".btnSelecionarBarbearia",
     );
 
-  botoes.forEach((botao) => {
-    botao.disabled = true;
-  });
+  botoes.forEach(
+    (botao) => {
+      botao.disabled =
+        true;
+    },
+  );
 
   try {
-    const resposta = await fetch(
-      "/api/auth/barbearia",
-      {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
+    const resposta =
+      await fetch(
+        "/api/auth/barbearia",
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify({
+            barbeariaId,
+          }),
         },
-        body: JSON.stringify({
-          barbeariaId,
-        }),
-      },
-    );
+      );
 
-    const dados = await resposta.json();
+    const dados =
+      await resposta.json();
 
-    if (!resposta.ok || !dados?.success) {
+    if (
+      !resposta.ok ||
+      !dados?.success
+    ) {
       throw new Error(
         dados?.message ||
           "Não foi possível selecionar a barbearia.",
       );
     }
 
-    barbeariaSelecionadaId = barbeariaId;
+    barbeariaSelecionadaId =
+      barbeariaId;
 
     if (clienteLogado) {
       clienteLogado.barbearia_id =
@@ -397,17 +622,21 @@ async function selecionarBarbearia(barbeariaId) {
         "Não foi possível selecionar a barbearia.",
     );
 
-    botoes.forEach((botao) => {
-      botao.disabled =
-        botao.dataset.barbeariaId ===
-        barbeariaSelecionadaId;
-    });
+    botoes.forEach(
+      (botao) => {
+        botao.disabled =
+          botao.dataset
+            .barbeariaId ===
+          barbeariaSelecionadaId;
+      },
+    );
   }
 }
 
 function verificarLoginParaAcao() {
   if (!clienteLogado) {
-    window.location.href = "/login";
+    window.location.href =
+      "/login";
 
     return false;
   }
@@ -416,35 +645,59 @@ function verificarLoginParaAcao() {
 }
 
 function irParaMeusAgendamentos() {
-  if (!verificarLoginParaAcao()) {
+  if (
+    !verificarLoginParaAcao()
+  ) {
     return;
   }
 
-  window.location.href = "/cliente-agendamentos";
+  window.location.href =
+    "/meus-agendamentos";
 }
 
 function irParaPerfil() {
-  if (!verificarLoginParaAcao()) {
+  if (
+    !verificarLoginParaAcao()
+  ) {
     return;
   }
 
-  window.location.href = "/cliente-perfil";
+  window.location.href =
+    "/meu-perfil";
 }
 
 function irParaConfiguracoes() {
-  if (!verificarLoginParaAcao()) {
+  if (
+    !verificarLoginParaAcao()
+  ) {
     return;
   }
 
-  window.location.href = "/cliente-configuracoes";
+  window.location.href =
+    "/configuracoes";
+}
+
+function irParaPagamentos() {
+  if (
+    !verificarLoginParaAcao()
+  ) {
+    return;
+  }
+
+  window.location.href =
+    "/pagamentos";
 }
 
 function irParaAgendamento() {
-  if (!verificarLoginParaAcao()) {
+  if (
+    !verificarLoginParaAcao()
+  ) {
     return;
   }
 
-  if (!barbeariaSelecionadaId) {
+  if (
+    !barbeariaSelecionadaId
+  ) {
     alert(
       "Selecione uma barbearia antes de agendar um atendimento.",
     );
@@ -452,29 +705,46 @@ function irParaAgendamento() {
     return;
   }
 
-  window.location.href = "/cliente-agendamento";
+  window.location.href =
+    "/cliente-agendamento";
 }
 
 async function realizarLogout() {
   try {
-    await api.post("/auth/logout");
+    await api.post(
+      "/auth/logout",
+    );
   } catch (erro) {
     console.error(
       "Erro ao realizar logout:",
       erro,
     );
   } finally {
-    window.location.href = "/login";
+    localStorage.removeItem(
+      "usuario",
+    );
+
+    window.location.href =
+      "/login";
   }
 }
 
 function configurarEventos() {
   if (btnLogin) {
-    btnLogin.addEventListener("click", (evento) => {
-      evento.preventDefault();
+    btnLogin.addEventListener(
+      "click",
+      (evento) => {
+        evento.preventDefault();
 
-      window.location.href = "/login";
-    });
+        if (clienteLogado) {
+          irParaPerfil();
+          return;
+        }
+
+        window.location.href =
+          "/login";
+      },
+    );
   }
 
   btnLogout?.addEventListener(
@@ -523,6 +793,15 @@ function configurarEventos() {
       irParaConfiguracoes();
     },
   );
+
+  linkPagamentos?.addEventListener(
+    "click",
+    (evento) => {
+      evento.preventDefault();
+
+      irParaPagamentos();
+    },
+  );
 }
 
 document.addEventListener(
@@ -537,3 +816,4 @@ document.addEventListener(
     await carregarProximoAgendamento();
   },
 );
+

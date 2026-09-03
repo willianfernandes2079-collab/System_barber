@@ -19,6 +19,7 @@ model Barbearia {
   barbeiros           barbeiros[]
   servicos            servicos[]
   configuracao        Configuracao?
+  configuracao_fiscal ConfiguracaoFiscal?
   planos              Plano[]
   estoque             Estoque[]
   movimentacoes       MovimentacaoEstoque[]
@@ -30,6 +31,8 @@ model Barbearia {
   bloqueios_agenda    BloqueioAgenda[]
   caixas              Caixa[]
   sessaos             Sessao[]
+
+  movimentacoes_financeiras MovimentacaoFinanceira[]
 
   @@map("barbearias")
 }
@@ -51,6 +54,8 @@ model Usuario {
   barbeiro  barbeiros?
   sessoes   Sessao[]
   barbearia Barbearia? @relation(fields: [barbearia_id], references: [id])
+
+  movimentacoes_financeiras MovimentacaoFinanceira[]
 
   @@index([barbearia_id])
   @@map("usuarios")
@@ -101,6 +106,8 @@ model Cliente {
 
   vinculos_barbearias ClienteBarbearia[]
 
+  movimentacoes_financeiras MovimentacaoFinanceira[]
+
   @@index([nome])
   @@index([telefone])
   @@index([email])
@@ -149,6 +156,8 @@ model barbeiros {
   bloqueios_agenda BloqueioAgenda[]
   comissao         Comissao[]
   barbearia        Barbearia?       @relation(fields: [barbearia_id], references: [id])
+
+  movimentacoes_financeiras MovimentacaoFinanceira[]
 
   @@index([nome])
   @@index([ativo])
@@ -255,8 +264,9 @@ model Plano {
 
   assinaturas AssinaturaPlano[]
   caixa       Caixa[]
-  servico     servicos          @relation(fields: [servico_id], references: [id])
-  barbearia   Barbearia?        @relation(fields: [barbearia_id], references: [id])
+
+  servico   servicos   @relation(fields: [servico_id], references: [id])
+  barbearia Barbearia? @relation(fields: [barbearia_id], references: [id])
 
   @@index([servico_id])
   @@index([ativo])
@@ -384,9 +394,10 @@ model Pagamento {
 
   barbearia_id String? @db.Uuid
 
-  agendamentos Agendamentos @relation(fields: [agendamento_id], references: [id])
-  clientes     Cliente      @relation(fields: [cliente_id], references: [id])
-  barbearia    Barbearia?   @relation(fields: [barbearia_id], references: [id])
+  agendamentos            Agendamentos            @relation(fields: [agendamento_id], references: [id])
+  clientes                Cliente                 @relation(fields: [cliente_id], references: [id])
+  barbearia               Barbearia?              @relation(fields: [barbearia_id], references: [id])
+  movimentacao_financeira MovimentacaoFinanceira?
 
   @@index([cliente_id])
   @@index([data_pagamento])
@@ -471,4 +482,70 @@ model Caixa {
   @@index([servico_id])
   @@index([plano_id])
   @@index([barbearia_id])
+}
+
+model MovimentacaoFinanceira {
+  id              String   @id @default(uuid()) @db.Uuid
+  tipo            String
+  categoria       String
+  descricao       String?
+  valor           Decimal  @db.Decimal(12, 2)
+  forma_pagamento String?
+  data            DateTime
+  status          String   @default("CONFIRMADA")
+  observacoes     String?
+
+  usuario_id   String? @db.Uuid
+  cliente_id   String? @db.Uuid
+  barbeiro_id  String? @db.Uuid
+  pagamento_id String? @unique @db.Uuid
+
+  barbearia_id String @db.Uuid
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  barbearia Barbearia  @relation(fields: [barbearia_id], references: [id])
+  usuario   Usuario?   @relation(fields: [usuario_id], references: [id])
+  cliente   Cliente?   @relation(fields: [cliente_id], references: [id])
+  barbeiro  barbeiros? @relation(fields: [barbeiro_id], references: [id])
+  pagamento Pagamento? @relation(fields: [pagamento_id], references: [id])
+
+  @@index([barbearia_id])
+  @@index([tipo])
+  @@index([categoria])
+  @@index([data])
+  @@index([status])
+  @@index([cliente_id])
+  @@index([barbeiro_id])
+  @@map("movimentacoes_financeiras")
+}
+
+model ConfiguracaoFiscal {
+  id                  String  @id @default(uuid()) @db.Uuid
+  razao_social        String
+  nome_fantasia       String?
+  cnpj                String
+  inscricao_municipal String?
+  inscricao_estadual  String?
+  regime_tributario   String?
+  codigo_municipio    String?
+  municipio           String?
+  uf                  String?
+  endereco            String?
+  numero              String?
+  complemento         String?
+  bairro              String?
+  cep                 String?
+  ambiente            String  @default("HOMOLOGACAO")
+  habilitado          Boolean @default(false)
+
+  barbearia_id String @unique @db.Uuid
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  barbearia Barbearia @relation(fields: [barbearia_id], references: [id])
+
+  @@map("configuracoes_fiscais")
 }

@@ -1,8 +1,12 @@
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const env = require("../config/env");
 
-function signAccessToken(usuario, barbeariaId = undefined) {
+function signAccessToken(
+  usuario,
+  barbeariaId = undefined,
+) {
   return jwt.sign(
     {
       sub: usuario.id,
@@ -11,18 +15,23 @@ function signAccessToken(usuario, barbeariaId = undefined) {
       barbearia_id:
         barbeariaId !== undefined
           ? barbeariaId
-          : usuario.barbearia_id || null,
+          : usuario.barbearia_id ||
+            null,
     },
     env.JWT_SECRET,
     {
-      expiresIn: env.JWT_ACCESS_EXPIRES_IN,
+      expiresIn:
+        env.JWT_ACCESS_EXPIRES_IN,
     },
   );
 }
 
 function signRefreshToken(
   usuario,
-  { remember = false, barbeariaId = undefined } = {},
+  {
+    remember = false,
+    barbeariaId = undefined,
+  } = {},
 ) {
   const expiresIn = remember
     ? env.JWT_REFRESH_EXPIRES_IN_REMEMBER
@@ -36,12 +45,13 @@ function signRefreshToken(
       barbearia_id:
         barbeariaId !== undefined
           ? barbeariaId
-          : usuario.barbearia_id || null,
+          : usuario.barbearia_id ||
+            null,
     },
     env.JWT_REFRESH_SECRET,
     {
       expiresIn,
-      jwtid: `${usuario.id}-${Date.now()}`,
+      jwtid: crypto.randomUUID(),
     },
   );
 
@@ -59,21 +69,37 @@ function signResetToken(usuario) {
     },
     env.JWT_RESET_SECRET,
     {
-      expiresIn: env.JWT_RESET_EXPIRES_IN,
+      expiresIn:
+        env.JWT_RESET_EXPIRES_IN,
     },
   );
 }
 
-function verifyAccessToken(token) {
-  return jwt.verify(token, env.JWT_SECRET);
+function verifyAccessToken(
+  token,
+) {
+  return jwt.verify(
+    token,
+    env.JWT_SECRET,
+  );
 }
 
-function verifyRefreshToken(token) {
-  return jwt.verify(token, env.JWT_REFRESH_SECRET);
+function verifyRefreshToken(
+  token,
+) {
+  return jwt.verify(
+    token,
+    env.JWT_REFRESH_SECRET,
+  );
 }
 
-function verifyResetToken(token) {
-  return jwt.verify(token, env.JWT_RESET_SECRET);
+function verifyResetToken(
+  token,
+) {
+  return jwt.verify(
+    token,
+    env.JWT_RESET_SECRET,
+  );
 }
 
 module.exports = {
@@ -84,3 +110,4 @@ module.exports = {
   signResetToken,
   verifyResetToken,
 };
+

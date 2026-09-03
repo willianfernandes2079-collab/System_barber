@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+
+    <title>Pagamentos - MW System</title>
+
+    <link
+      rel="stylesheet"
+      href="/html_site/css/cliente-portal.css"
+    />
+  </head>
+
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-badge">MW</div>
+
+        <div class="brand-name">
+          MW<span>System</span>
+        </div>
+      </div>
+
+      <nav class="cliente-navigation">
+        <a
+          class="nav-link"
+          href="/cliente-agendamento"
+        >
+          <span class="nav-icon">⌂</span>
+          <span>Início</span>
+        </a>
+
+        <a
+          class="nav-link"
+          href="/meus-agendamentos"
+        >
+          <span class="nav-icon">📅</span>
+          <span>Meus agendamentos</span>
+        </a>
+
+        <a
+          class="nav-link"
+          href="/meu-perfil"
+        >
+          <span class="nav-icon">◉</span>
+          <span>Meu perfil</span>
+        </a>
+
+        <a
+          class="nav-link"
+          href="/configuracoes"
+        >
+          <span class="nav-icon">⚙</span>
+          <span>Configurações</span>
+        </a>
+
+        <a
+          class="nav-link active"
+          href="/pagamentos"
+        >
+          <span class="nav-icon">💳</span>
+          <span>Pagamentos</span>
+        </a>
+      </nav>
+
+      <button
+        type="button"
+        class="nav-link nav-logout"
+        id="btnLogout"
+      >
+        <span class="nav-icon">⏻</span>
+        <span>Sair</span>
+      </button>
+    </aside>
+
+    <main class="main">
+      <div class="page-container">
+        <header class="page-header">
+          <div>
+            <span class="page-kicker">
+              Pagamentos
+            </span>
+
+            <h1>
+              Formas de pagamento
+            </h1>
+
+            <p>
+              Confira as formas de pagamento
+              aceitas pela plataforma.
+            </p>
+          </div>
+        </header>
+
+        <section class="card">
+          <div style="margin-bottom: 20px;">
+            <span class="page-kicker">
+              Métodos aceitos
+            </span>
+
+            <h2 class="section-title">
+              Formas disponíveis
+            </h2>
+
+            <p class="section-subtitle">
+              O método escolhido é utilizado
+              durante o registro do pagamento do
+              atendimento.
+            </p>
+          </div>
+
+          <div
+            id="listaPagamentos"
+            class="payment-grid"
+          ></div>
+        </section>
+
+        <section
+          class="card"
+          style="margin-top: 18px;"
+        >
+          <span class="page-kicker">
+            Segurança
+          </span>
+
+          <h2 class="section-title">
+            Dados de cartão
+          </h2>
+
+          <p class="section-subtitle">
+            O portal atualmente não armazena
+            números de cartão, CVV ou dados
+            bancários. O backend ainda não possui
+            uma API de métodos de pagamento salvos.
+          </p>
+        </section>
+      </div>
+    </main>
+
+    <script src="/html_site/js/api.js"></script>
+
+    <script src="/html_site/js/cliente-portal.js"></script>
+
+    <script src="/html_site/js/pagamentos.js"></script>
+  </body>
+</html>

@@ -79,6 +79,7 @@ app.use(
     limit: "100kb",
   }),
 );
+
 app.use(cookieParser());
 
 // Proteção CSRF para requisições que alteram estado
@@ -182,6 +183,110 @@ app.get("/cliente-agendamento", (req, res) => {
   );
 });
 
+// Meus agendamentos
+app.get("/meus-agendamentos", (req, res) => {
+  const token = req.cookies?.accessToken;
+
+  if (!token) {
+    return res.redirect("/login");
+  }
+
+  try {
+    verifyAccessToken(token);
+  } catch {
+    return res.redirect("/login");
+  }
+
+  return res.sendFile(
+    path.join(
+      __dirname,
+      "..",
+      "frontend-public",
+      "html_site",
+      "html",
+      "meusagendamentos.html",
+    ),
+  );
+});
+
+// Meu perfil
+app.get("/meu-perfil", (req, res) => {
+  const token = req.cookies?.accessToken;
+
+  if (!token) {
+    return res.redirect("/login");
+  }
+
+  try {
+    verifyAccessToken(token);
+  } catch {
+    return res.redirect("/login");
+  }
+
+  return res.sendFile(
+    path.join(
+      __dirname,
+      "..",
+      "frontend-public",
+      "html_site",
+      "html",
+      "meuperfil.html",
+    ),
+  );
+});
+
+// Configurações do cliente
+app.get("/configuracoes", (req, res) => {
+  const token = req.cookies?.accessToken;
+
+  if (!token) {
+    return res.redirect("/login");
+  }
+
+  try {
+    verifyAccessToken(token);
+  } catch {
+    return res.redirect("/login");
+  }
+
+  return res.sendFile(
+    path.join(
+      __dirname,
+      "..",
+      "frontend-public",
+      "html_site",
+      "html",
+      "configuracao.html",
+    ),
+  );
+});
+
+// Pagamentos do cliente
+app.get("/pagamentos", (req, res) => {
+  const token = req.cookies?.accessToken;
+
+  if (!token) {
+    return res.redirect("/login");
+  }
+
+  try {
+    verifyAccessToken(token);
+  } catch {
+    return res.redirect("/login");
+  }
+
+  return res.sendFile(
+    path.join(
+      __dirname,
+      "..",
+      "frontend-public",
+      "html_site",
+      "html",
+      "pagamentos.html",
+    ),
+  );
+});
+
 app.get("/index", (req, res) => {
   res.sendFile(
     path.join(
@@ -227,4 +332,3 @@ async function start() {
 }
 
 start();
-

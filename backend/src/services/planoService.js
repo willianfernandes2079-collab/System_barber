@@ -10,7 +10,7 @@ function validarBarbeariaId(barbeariaId) {
   }
 
   return barbeariaId;
-}
+} 
 
 async function listarPlanos(barbeariaId) {
   barbeariaId =
@@ -21,6 +21,11 @@ async function listarPlanos(barbeariaId) {
       ativo: true,
       barbearia_id: barbeariaId,
     },
+
+
+
+
+    
 
     include: {
       servico: {

@@ -8,13 +8,207 @@
       content="width=device-width, initial-scale=1.0"
     />
 
-    <title>configuraçao</title>
+    <title>Meu Perfil - MW System</title>
+
+    <link
+      rel="stylesheet"
+      href="/html_site/css/cliente-portal.css"
+    />
   </head>
 
   <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-badge">MW</div>
 
+        <div class="brand-name">
+          MW<span>System</span>
+        </div>
+      </div>
 
+      <nav class="cliente-navigation">
+        <a
+          class="nav-link"
+          href="/cliente-agendamento"
+        >
+          <span class="nav-icon">⌂</span>
+          <span>Início</span>
+        </a>
 
+        <a
+          class="nav-link"
+          href="/meus-agendamentos"
+        >
+          <span class="nav-icon">📅</span>
+          <span>Meus agendamentos</span>
+        </a>
 
+        <a
+          class="nav-link active"
+          href="/meu-perfil"
+        >
+          <span class="nav-icon">◉</span>
+          <span>Meu perfil</span>
+        </a>
+
+        <a
+          class="nav-link"
+          href="/configuracoes"
+        >
+          <span class="nav-icon">⚙</span>
+          <span>Configurações</span>
+        </a>
+
+        <a
+          class="nav-link"
+          href="/pagamentos"
+        >
+          <span class="nav-icon">💳</span>
+          <span>Pagamentos</span>
+        </a>
+      </nav>
+
+      <button
+        type="button"
+        class="nav-link nav-logout"
+        id="btnLogout"
+      >
+        <span class="nav-icon">⏻</span>
+        <span>Sair</span>
+      </button>
+    </aside>
+
+    <main class="main">
+      <div class="page-container">
+        <header class="page-header">
+          <div>
+            <span class="page-kicker">
+              Conta
+            </span>
+
+            <h1>Meu perfil</h1>
+
+            <p>
+              Atualize seus dados pessoais.
+              Informações de autenticação e
+              permissões não podem ser alteradas
+              por esta tela.
+            </p>
+          </div>
+        </header>
+
+        <div
+          id="mensagemPerfil"
+          class="message"
+          role="status"
+          aria-live="polite"
+        ></div>
+
+        <section class="card">
+          <div style="margin-bottom: 20px;">
+            <span class="page-kicker">
+              Dados pessoais
+            </span>
+
+            <h2 class="section-title">
+              Informações da conta
+            </h2>
+          </div>
+
+          <form id="formPerfil">
+            <div class="form-grid">
+              <div class="field">
+                <label for="nome">
+                  Nome
+                </label>
+
+                <input
+                  id="nome"
+                  name="nome"
+                  type="text"
+                  maxlength="120"
+                  required
+                />
+              </div>
+
+              <div class="field">
+                <label for="email">
+                  E-mail
+                </label>
+
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  readonly
+                />
+              </div>
+
+              <div class="field">
+                <label for="telefone">
+                  Telefone
+                </label>
+
+                <input
+                  id="telefone"
+                  name="telefone"
+                  type="text"
+                  maxlength="30"
+                />
+              </div>
+
+              <div class="field">
+                <label for="cargo">
+                  Perfil de acesso
+                </label>
+
+                <input
+                  id="cargo"
+                  name="cargo"
+                  type="text"
+                  readonly
+                />
+              </div>
+
+              <div class="field field-full">
+                <label for="barbearia">
+                  Barbearia atual
+                </label>
+
+                <input
+                  id="barbearia"
+                  type="text"
+                  readonly
+                  value="Nenhuma selecionada"
+                />
+              </div>
+            </div>
+
+            <div class="actions">
+              <a
+                href="/cliente-agendamento"
+                class="btn btn-outline"
+              >
+                Voltar
+              </a>
+
+              <button
+                type="submit"
+                class="btn btn-gold"
+                id="btnSalvarPerfil"
+              >
+                Salvar alterações
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </main>
+
+    <script src="/html_site/js/api.js"></script>
+
+    <script src="/html_site/js/cliente-portal.js"></script>
+
+    <script src="/html_site/js/meu-perfil.js"></script>
   </body>
-</html>  
+</html>
